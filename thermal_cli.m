@@ -31,6 +31,8 @@ function thermal_cli()
             workflow_semi_on_pcb(parsed);
         case 'hydraulic-op'
             cmd_hydraulic_op(parsed);
+        case 'fin-rth'
+            cmd_fin_rth(parsed);
         otherwise
             fprintf(2, 'Unknown command: %s\n', command);
             cli_print_help();

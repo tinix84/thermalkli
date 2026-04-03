@@ -12,7 +12,7 @@ classdef ThermalLayerStack < handle
     
     methods
         function obj = ThermalLayerStack
-            obj.layerArray = [];
+            obj.layerArray = {};
             obj.thick = 0;
             obj.n = 0;
             obj.kOp = 0;
@@ -25,7 +25,7 @@ classdef ThermalLayerStack < handle
                 if ~(isa(newLayer,'ThermalLayer'))
                     error('newLayer must be of class ThermalLayer')
                 end
-                obj.layerArray = [obj.layerArray, newLayer];
+                obj.layerArray = [obj.layerArray, {newLayer}];
                 obj.thick = obj.thick + newLayer.thick;
                 obj.n = obj.n + 1;
                 obj.kOpEquiv();
@@ -111,23 +111,23 @@ classdef ThermalLayerStack < handle
                             hEffArr = zeros(1,obj.n);                    
                             hEffArr(end) = hEff;
                             for i = 1:obj.n-1
-                                k_i = obj.layerArray(end-i+1).kOp;
-                                thick_i = obj.layerArray(end-i+1).thick;
+                                k_i = obj.layerArray{end-i+1}.kOp;
+                                thick_i = obj.layerArray{end-i+1}.thick;
                                 hEffArr(end-i) = 1/(1/hEffArr(end-i+1)+thick_i/k_i);
                             end
                             % calculate the cumulative rTh from top to each layer if
                             % spreading only takes place subsequently
                             rThCum = zeros(1,obj.n);
                             for i = 2:obj.n
-                                k_i = obj.layerArray(i-1).kOp;
-                                thick_i = obj.layerArray(i-1).thick;
+                                k_i = obj.layerArray{i-1}.kOp;
+                                thick_i = obj.layerArray{i-1}.thick;
                                 rThCum(i) = rThCum(i-1)+thick_i/(k_i*aIn);
                             end
                             % calculate rTh for spreading in different Layers
                             rThArr = zeros(1,obj.n);
                             for i = 1:obj.n
                                 hEffL = hEffArr(i);
-                                rThL = obj.layerArray(i).thermalLayerResistance(aIn, aOut, hEffL );
+                                rThL = obj.layerArray{i}.thermalLayerResistance(aIn, aOut, hEffL );
                                 
                                 rThAfter = (1/hEffArr(i)-1/hEff)/aOut;
                                 rThBefore = rThCum(i);
@@ -163,8 +163,8 @@ classdef ThermalLayerStack < handle
 
             rLam = 0;
             for i = 1:obj.n
-                rLam = rLam + obj.layerArray(i).thick /...
-                    (obj.thick*obj.layerArray(i).kOp);
+                rLam = rLam + obj.layerArray{i}.thick /...
+                    (obj.thick*obj.layerArray{i}.kOp);
             end
             obj.kOp = 1/rLam;
         end
@@ -176,7 +176,7 @@ classdef ThermalLayerStack < handle
 
             kSum = 0;
             for i = 1:obj.n
-                kSum = kSum + obj.layerArray(i).thick*obj.layerArray(i).kIp;
+                kSum = kSum + obj.layerArray{i}.thick*obj.layerArray{i}.kIp;
             end
             obj.kIp = kSum/obj.thick;
 

@@ -286,9 +286,9 @@ classdef ThermalModelSemi < handle
                 1/(obj.input.hFluidTop*obj.input.areaCaseTop);
             
             if ~isempty(obj.pcb.pcbLayerStack.layerArray)
-                topSpreadLayer = obj.pcb.pcbLayerStack.layerArray(1);
+                topSpreadLayer = obj.pcb.pcbLayerStack.layerArray{1};
             elseif ~isempty(obj.sinkLayerStack.layerArray)
-                topSpreadLayer = obj.sinkLayerStack.layerArray(1);
+                topSpreadLayer = obj.sinkLayerStack.layerArray{1};
             else
                 error('no layer defined for heat spreading at top')
             end

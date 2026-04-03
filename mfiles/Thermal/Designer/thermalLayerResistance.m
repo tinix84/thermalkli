@@ -103,25 +103,25 @@ function [rTh, varargout] = thermalLayerResistance( layer, aIn, aOut, hEff )
                         hEffArr = zeros(1,n);                    
                         hEffArr(end) = hEff;
                         for i = 1:n-1
-                            k_i = layer.layerArray(end-i+1).kOp;
-                            thick_i = layer.layerArray(end-i+1).thick;
+                            k_i = layer.layerArray{end-i+1}.kOp;
+                            thick_i = layer.layerArray{end-i+1}.thick;
                             hEffArr(end-i) = 1/(1/hEffArr(end-i+1)+thick_i/k_i);
                         end
                         % calculate the cumulative rTh from top to each layer if
                         % spreading only takes place subsequently
                         rThCum = zeros(1,n);
                         for i = 2:n
-                            k_i = layer.layerArray(i-1).kOp;
-                            thick_i = layer.layerArray(i-1).thick;
+                            k_i = layer.layerArray{i-1}.kOp;
+                            thick_i = layer.layerArray{i-1}.thick;
                             rThCum(i) = rThCum(i-1)+thick_i/(k_i*aIn);
                         end
                         % calculate rTh for spreading in different Layers
                         rThArr = zeros(1,n);
                         for i = 1:n
-                            thickL = layer.layerArray(i).thick;
+                            thickL = layer.layerArray{i}.thick;
                             hEffL = hEffArr(i);
-                            kOpL = layer.layerArray(i).kOp;
-                            kIpL = layer.layerArray(i).kIp;
+                            kOpL = layer.layerArray{i}.kOp;
+                            kIpL = layer.layerArray{i}.kIp;
                             %   calculate equivalent radii of circular substitute area [m]
                             tau = thickL/rOut;
                             alpha = sqrt(kOpL/kIpL);

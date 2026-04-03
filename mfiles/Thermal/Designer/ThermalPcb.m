@@ -86,7 +86,7 @@ classdef ThermalPcb < handle
                       (1/obj.rThWithoutVia-1/rThAHeatWithoutVia);
                   [~, obj.rThLastLayerSpread] = ...
                       thermalLayerResistance(...
-                      obj.pcbLayerStack.layerArray(end), aHeat, aCool, hEff);
+                      obj.pcbLayerStack.layerArray{end}, aHeat, aCool, hEff);
                   if nargin > 4
                       rThViaSpread = min(rThSpreadAfter, obj.rThLastLayerSpread);
                   else

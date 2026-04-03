@@ -9,8 +9,8 @@ function [qRad12] = heatTransferSmallConvexRadiation(T1, T2, A1, eps1)
     %   eps1   emmissivity number of surface 1
     % references: fundamentals of heat and mass transfer sixth edition (978-0-471-45728-2) p833
     
-    sigmaBoltz = 5.670367*10^-8; % Stefan–Boltzmann constant [W/(m^2*K^4)]
+    sigmaBoltz = 5.670367*10^-8; % Stefanï¿½Boltzmann constant [W/(m^2*K^4)]
     
-    qRad12 = sigmaBoltz*A1*eps1(T1^4-T2^4);
+    qRad12 = sigmaBoltz*A1*eps1*(T1^4-T2^4);
     
 end

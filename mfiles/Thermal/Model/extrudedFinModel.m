@@ -53,7 +53,8 @@ classdef extrudedFinModel < HeatsinkClass
         function obj = extrudedFinModel(varargin)
             if nargin == 1
                 obj.heatsinkRef = varargin;
-                [~,~,raw] = xlsread('W:\Technology\Functions\Thermal\db\heatsinks.xlsx',...
+                pkg load io;
+                [~,~,raw] = xlsread(fullfile(thermal_db_path(), 'heatsinks.xlsx'),...
                     'extruded');
                 heatsinkType = 'undefined';
                 for i = 3:length(raw(:,1))
@@ -124,7 +125,7 @@ classdef extrudedFinModel < HeatsinkClass
         function hFluidLoc = calcHeatTransferFluid(obj, lengthHeatedBefore, TFluidMean, TWallEst)
             %calcHeatTransferFluid calculate the average heat transfer from
             %channel surface to fluid for specified arrangement
-            %   literature and source of formulae: VDI-Wärmeatlas, 11.
+            %   literature and source of formulae: VDI-Wï¿½rmeatlas, 11.
             %   Auflage, S. 785ff and Fundamentals of Heat and Mass
             %   Transfer, 6. edition, p518ff
             obj.vFluid = obj.flowrate/obj.crossAreaFluid;

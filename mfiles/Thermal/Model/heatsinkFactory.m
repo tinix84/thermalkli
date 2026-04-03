@@ -3,7 +3,8 @@ function [heatsink] = heatsinkFactory(heatsinkRef)
     %appropriate type
     %   Detailed explanation goes here
 
-    [~,~,raw] = xlsread('W:\Technology\Functions\Thermal\db\heatsinks.xlsx',...
+    pkg load io;
+    [~,~,raw] = xlsread(fullfile(thermal_db_path(), 'heatsinks.xlsx'),...
         'listOfHeatsinks');
     heatsinkType = 'undefined';
     for i = 3:length(raw(:,1))

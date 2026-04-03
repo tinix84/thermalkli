@@ -1,0 +1,163 @@
+%%% DATI PER LA SIMULAZIONE DEI DISSIPATORI
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% STEP 0: DEFINIZIONE INIZIALE DISSIPATORE
+
+%% DATI GEOMETRICI:
+%% LA DIMENSIONE X È QUELLA PERPENDICOLARE ALLE ALETTE; LA DIMENSIONE Y È
+%% QUELLA PARALLELA ALLE ALETTE
+a=160; % dimensione X  (mm)
+b=400; % dimensione Y (mm)        tb  Hf tf  bch
+tb=15; % spessore base (mm) I117=15x102x1.7x4.3
+Hf=61; % altezza aletta (mm)I76=15x61x1.3x2.7
+tf=2.7; % spessore aletta (mm)
+bch=1.3; % larghezza canale (mm)
+tr=1; %spessore piastra aggiuntiva (mm) (non possiamo mettere zero)
+Nf=round(a/(bch+tf)); % Numero di alette.
+
+
+%% DATI FISICI:
+tecnology='all_aluminum'; % Questa stringa identifica un tipo di dissipatore all'interno del file HS_Tech.m
+                            % okkio che bisogna scriverlo giusto, come scritto nel file HS_Tech.m
+
+[Kth_plate, Kth_fin, Kth_piastra, Cost_kg, Piastra, rho_plate_fin_piastra]=HS_Tech(tecnology)
+if isempty(Kth_plate)==1
+    msgbox('Ocio hai scritto male il nome del dissipatore. Guarda quelli disponibili nel file HS_Tech.m')
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% STEP 1: PROCEDURA INIZIALIZZAZIONE SORGENTI
+
+%% LA DIMENSIONE X È QUELLA PERPENDICOLARE ALLE ALETTE; LA DIMESIONE Y È
+%% QUELLA PARALLELA ALLE ALETTE
+
+% ponte TL 160-200kVA semix3s dissipatore 400x160 (stile socomec)
+a_n=[93 93 93 93 93 93];  % dimensione sorgenti parallela asse X
+b_n=[55 55 55 55 55 55]; %dimensione sorgenti parallela asse Y
+p_n=[160 160 160 160 160 160]; % losses of the sources
+x_g=[80 80 80 80 80 80]; % source centerpoint X coordinate
+y_g=[32.5 99.5 166.5 233.5 300.5 367.5]; % source centerpoint Y coordinate
+
+% thyristor Powerex PD431207 per ponte SSM SG 600kVA
+% a_n=[177.8 177.8 177.8];  % dimensione sorgenti parallela asse X
+% b_n=[101.6 101.6 101.6]; %dimensione sorgenti parallela asse Y
+% p_n=[1000 1000 1000]; % losses of the sources
+% x_g=[125 125 125]; % source centerpoint X coordinate
+% y_g=[90 260 430]; % source centerpoint Y coordinate
+
+% thyristor Powerex PD431215 per ponte SSM SG 800kVA
+% a_n=[101.6 101.6 101.6 101.6 101.6 101.6];  % dimensione sorgenti parallela asse X
+% b_n=[177.8 177.8 177.8 177.8 177.8 177.8]; %dimensione sorgenti parallela asse Y
+% p_n=[1200 1200 1200 1200 1200 1200]; % losses of the sources
+% x_g=[90 90 250 250 410 410]; % source centerpoint X coordinate
+% y_g=[140 380 140 380 140 380]; % source centerpoint Y coordinate
+
+% Mitsubishi CM400DY-12NF inverter SG 600kVA@0.8 100%
+% a_n=[108 108 108 108 108 108 108 108 108 50 50 50 50 50 50];  % dimensione sorgenti parallela asse X
+% b_n=[62 62 62 62 62 62 62 62 62 16 16 16 16 16 16]; %dimensione sorgenti parallela asse Y
+% p_n=[760 760 760 760 760 760 760 760 760 38 38 38 38 38 38]; % losses of the sources
+% x_g=[70 70 70 200 200 200 330 330 330 70 200 330 70 200 330]; % source centerpoint X coordinate
+% y_g=[80 250 410 80 250 410 80 250 410 472 472 472 497 497 497]; % source centerpoint Y coordinate
+
+% Mitsubishi CM600DY-12NF inverter SG 600kVA@0.9 100%
+% a_n=[110 110 110 110 110 110 110 110 110 50 50 50 50 50 50];  % dimensione sorgenti parallela asse X
+% b_n=[80 80 80 80 80 80 80 80 80 16 16 16 16 16 16]; %dimensione sorgenti parallela asse Y
+% p_n=[624 624 624 624 624 624 624 624 624 38 38 38 38 38 38]; % losses of the sources
+% x_g=[70 70 70 200 200 200 330 330 330 70 200 330 70 200 330]; % source centerpoint X coordinate
+% y_g=[80 250 410 80 250 410 80 250 410 472 472 472 497 497 497]; % source centerpoint Y coordinate
+
+% IGBT rectifier 300kVA su scheda con dissipatore 520x465 4moduli/fase
+% a_n=[106.4 106.4 106.4 106.4 106.4 106.4 106.4 106.4 106.4 106.4 106.4 106.4 94 94 94 94];  % dimensione sorgenti parallela asse X
+% b_n=[61.4 61.4 61.4 61.4 61.4 61.4 61.4 61.4 61.4 61.4 61.4 61.4  34 34 34 34]; %dimensione sorgenti parallela asse Y
+% p_n=[576 576 576 576 576 576 576 576 576 576 576 576 110 110 110 110]; % losses of the sources
+% x_g=[76.2 232.7 389.2 76.2 232.7 389.2 76.2 232.7 389.2 76.2 232.7 389.2 145 319.5 145 319.5]; % source centerpoint X coordinate
+% y_g=[63 63 63 198 198 198 322 322 322 457 457 457 132 132 388 388]; % source centerpoint Y coordinate
+
+% Ponte 160kVA dissipatore I117(710x520) INV+IGBTrect+SSM
+% orizzontali
+% a_n=[62 62 62 62 62 62 16 16 16 106.4 106.4 106.4 106.4 106.4 106.4 94 94 92 92 92];  % dimensione sorgenti parallela asse X
+% b_n=[108 108 108 108 108 108 50 50 50 61.4 61.4 61.4 61.4 61.4 61.4 34 34 50 50 50]; %dimensione sorgenti parallela asse Y
+% p_n=[468 468 468 468 468 468 38 38 38 628 628 628 628 628 628 118 118 0 0 0]; % losses of the sources
+% x_g=[94 94 94 210 210 210 25 25 25 405.5 608.5 405.5 608.5 405.5 608.5 507 507 320 468 616]; % source centerpoint X coordinate
+% y_g=[154.5 299.5 444.5 154.5 299.5 444.5 154.5 299.5 444.5 120 120 285.5 285.5 449.5 449.5 203 368 40 40 40]; % source centerpoint Y coordinate
+
+% Ponte SSM 200-300kVA SKKT500(124x60) o SKKT250(92x50) diss.200x520
+% a_n=[92 92 92];  % dimensione sorgenti parallela asse X
+% b_n=[50 50 50]; %dimensione sorgenti parallela asse Y
+% p_n=[500 500 500]; % losses of the sources
+% x_g=[86 86 86]; % source centerpoint X coordinate
+% y_g=[84 260 436]; % source centerpoint Y coordinate
+
+% Ponte LP10kVA 240x140 2 ventilatori
+% a_n=[55 31 30 40 30];  % dimensione sorgenti parallela asse X
+% b_n=[60 55 30 28 30]; %dimensione sorgenti parallela asse Y
+% p_n=[340 250 115 90 126]; % losses of the sources
+% x_g=[45 205 91.5 145 203]; % source centerpoint X coordinate
+% y_g=[60 43 118 118 118]; % source centerpoint Y coordinate
+
+% Ponte LP20kVA 360x180 3 ventilatori
+% a_n=[55 55 31 31 30 40 34];  % dimensione sorgenti parallela asse X
+% b_n=[60 60 55 55 30 28 34]; %dimensione sorgenti parallela asse Y
+% p_n=[340 340 250 250 171 107 127]; % losses of the sources
+% x_g=[50 150 245 320 190 260 330]; % source centerpoint X coordinate
+% y_g=[50 50 55 55 150 150 150]; % source centerpoint Y coordinate
+
+% Ponte LP20kVA 360x180 3 ventilatori
+% a_n=[60 60 31 31 30 40 34];  % dimensione sorgenti parallela asse X
+% b_n=[55 55 55 55 30 28 34]; %dimensione sorgenti parallela asse Y
+% p_n=[340 340 250 250 171 107 127]; % losses of the sources
+% x_g=[70 70 240 240 320 320 320]; % source centerpoint X coordinate
+% y_g=[45 135 45 135 90 30 150]; % source centerpoint Y coordinate
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% STEP 2: DEFINIZIONE VENTILAZIONE
+
+%% TIPO DI VENTILAZIONE
+vent_type= 'impinge' ; %   'push'
+s=250; %% Apertura per impinge (mm)
+
+%% CALCOLO AUTOMATICO O MANUALE
+calc_mode='auto'; % 'flux_spec'
+flux=0.0028; % imposed flux (m^3/s) usato solo se calc_mode = flux_spec. si intende la portata complessiva
+
+%% SELEZIONE VENTOLE
+
+fan_model= 'EBM208_axial_AC' ; % 'EBM_4118_NH4'  'Sunon_DP200_2123XBT_AC_50Hz' 'EBMW1G180_axial_DC'
+
+[Hv1, Qv1, Qvmin1, Qvmax1, Cost_Fan1, Volume_Fan1]=Fan_Model(fan_model)
+
+if isempty(Hv1)==1
+    msgbox('Ocio hai scritto male il nome della ventola. Guarda quelli disponibili nel file Fan_Model.m')
+end
+
+%% SCELTA NUMERO VENTOLE IN PARALLELO
+
+Nv=1; % quantità di ventilatori
+Qv=Nv*Qv1; % portata totale ventola equivalente
+Hv=Hv1;
+Qvmin=Nv*Qvmin1; % Portata minima ventola equivalente
+Qvmax=Nv*Qvmax1; % Portata massima ventola equivalente
+Cost_Fan=Nv*Cost_Fan1; % Costo totale ventole
+Volume_Fan=Nv*Volume_Fan1; % Volume ingombro Fan (m^3)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% CALCOLO DATI DI PARTENZA PER CALCOLI IDRAULICI E TERMICI
+
+% Calcolo Tair per le caratteristiche dell'aria 
+if strcmp(calc_mode,'auto')==1
+    Qguess=(Qvmin+Qvmax)/2; % portata di guess. Siccome il punto di funzionamento della ventola non è
+                            % noto si ipotizza una media del campo di portate della ventola
+else
+    Qguess=flux;  % se volgio calcolare la termica saltando l'idraulica la portata è imposta e quindi nota
+end
+
+Tair=Tin+0.5*sum(p_n)/(Cp_air(Tin)*rho_air(Tin)*Qguess); % per il calcolo delle proprietà aria uso la T media
+ 
+
+
+
+
+
+

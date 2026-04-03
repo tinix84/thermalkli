@@ -1,0 +1,29 @@
+%% Plane_draw: verifica la corretta distribuzione delle sorgenti sul
+%% dissipatore
+%% Quando uso lo script da dati provenienti da risultati, devo generare le
+%% informazioni necessarie:
+%% a=Results(n).Dim_X_mm;
+%% b=Results(n).Dim_Y_mm;
+%% x_g1=Results(n).Coordinata_X_comp_mm;
+%% y_g1=Results(n).Coordinata_Y_comp_mm;
+%% a_n=Results(n).Dim_componente_X_mm;
+%% a_n=Results(n).Dim_componente_X_mm;
+
+Dim_X_mm', a, 'Dim_Y_mm', b, 'Passo_mm', Tp(k3), 'Spess_fin_mm', tf(k1), 'Solved_THERM', Solved_THERM ...
+                                        , 'Solved_HYDR', Solved_HYDR, 'Altezza_fin_mm', Hf(k2), 'Spess_plate_mm', tb(k4), 'Spessore_Piastra_mm', strcmp(Piastra,'yes')*tr(k5), ...
+                                        'Temp_critiche_gC', round(Ths), 'Temp_massime_gC', Tmax,'Portata_totale_m3_s', Qv_f, 'Prevalenza_Pa', Hv_f...
+                                        , 'Peso_kg', PesoHS, 'Volume_m3', Volume_Soluzione, 'Costo_CHF', Costo_Soluzione,...
+                                         'Dim_componente_X_mm', a_n, 'Dim_componente_Y_mm', b_n, 'Perdite_componenti_W', p_n,...
+                                         'Coordinata_X_comp_mm', x_g1, 'Coordinata_Y_comp_mm', y_g1);
+
+
+
+
+figure
+axis equal
+rectangle('Position',[0,0,a,b]);
+
+
+for nn=1:length(p_n)
+    rectangle('Position',[(x_g1(nn)-a_n(nn)/2),(y_g1(nn)-b_n(nn)/2),a_n(nn),b_n(nn)]);
+end

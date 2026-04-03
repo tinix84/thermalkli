@@ -1,0 +1,49 @@
+function optval = extrudedSinkObjectiveFun(optParam, depthChannel)
+    %extrudedSinkObjectiveFun Summary of this function goes here
+    %   Detailed explanation goes here
+
+    thickFin = optParam(1);
+    thickWall = thickFin;
+    
+    widthChannel = 1.05*10^-3;
+    widthHeatsink = 22*10^-3;
+    thickHeatsink = depthChannel+2*thickWall;
+    kProfile = 200;
+
+    flowrateLM = 1.0;
+    flowrate = flowrateLM/1000/60;
+
+    specHeatFluid = 3.6*10^3;
+    rhoFluid = 1000;
+    kFluid = 0.415;
+    kinViskM = 1*10^-6;
+
+    heatsink = extrudedFinModel(...
+        widthHeatsink,...
+        thickHeatsink,...
+        thickWall,...
+        thickFin,...
+        widthChannel, ...
+        kProfile,...
+        specHeatFluid,...
+        rhoFluid,...
+        kFluid,...
+        kinViskM);
+
+    widthContact = 16.5*10^-3;
+    lengthContact = 12.1*10^-3;
+    areaContact = widthContact*lengthContact;
+    widthDissipation = widthHeatsink-2*thickWall;
+    lengthDissipation = lengthContact*2.5;
+
+    heatsink.thermalResistance(...
+        areaContact,...
+        lengthDissipation,...
+        widthDissipation,...
+        2,...
+        flowrate)
+    rThSink = heatsink.rThTot;
+    
+    optval = rThSink;
+end
+

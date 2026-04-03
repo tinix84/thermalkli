@@ -23,6 +23,10 @@ function thermal_cli()
             cmd_fin_efficiency(parsed);
         case 'radiation'
             cmd_radiation(parsed);
+        case 'layer-rth'
+            cmd_layer_rth(parsed);
+        case 'stack-rth'
+            cmd_stack_rth(parsed);
         otherwise
             fprintf(2, 'Unknown command: %s\n', command);
             cli_print_help();

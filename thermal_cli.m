@@ -33,6 +33,8 @@ function thermal_cli()
             cmd_hydraulic_op(parsed);
         case 'fin-rth'
             cmd_fin_rth(parsed);
+        case 'forced-conv-sim'
+            workflow_forced_conv_sim(parsed);
         otherwise
             fprintf(2, 'Unknown command: %s\n', command);
             cli_print_help();

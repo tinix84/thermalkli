@@ -27,6 +27,8 @@ function thermal_cli()
             cmd_layer_rth(parsed);
         case 'stack-rth'
             cmd_stack_rth(parsed);
+        case 'semi-on-pcb'
+            workflow_semi_on_pcb(parsed);
         otherwise
             fprintf(2, 'Unknown command: %s\n', command);
             cli_print_help();

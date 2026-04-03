@@ -84,6 +84,15 @@ function result = workflow_semi_on_pcb(parsed)
         fprintf('Analytical results saved to: %s\n', parsed.save_csv);
     end
 
+    % FEMM Lua generation if requested
+    if isfield(parsed, 'femm_lua')
+        lua_str = femm_semi_on_pcb(cfg);
+        fid = fopen(parsed.femm_lua, 'w');
+        fprintf(fid, '%s', lua_str);
+        fclose(fid);
+        fprintf('FEMM Lua script written to: %s\n', parsed.femm_lua);
+    end
+
     fprintf('--- Complete ---\n');
 
     % Build result struct

@@ -37,6 +37,10 @@ function thermal_cli()
             workflow_forced_conv_sim(parsed);
         case 'extruded-fin'
             workflow_extruded_fin(parsed);
+        case 'gen-femm'
+            cmd_gen_femm(parsed);
+        case 'compare-femm'
+            cmd_compare_femm(parsed);
         otherwise
             fprintf(2, 'Unknown command: %s\n', command);
             cli_print_help();

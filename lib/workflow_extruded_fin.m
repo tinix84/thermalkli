@@ -96,5 +96,13 @@ function result = workflow_extruded_fin(parsed)
         fprintf('Results saved to: %s\n', parsed.save_csv);
     end
 
+    if isfield(parsed, 'femm_lua')
+        lua_str = femm_extruded_fin(cfg);
+        fid = fopen(parsed.femm_lua, 'w');
+        fprintf(fid, '%s', lua_str);
+        fclose(fid);
+        fprintf('FEMM Lua script written to: %s\n', parsed.femm_lua);
+    end
+
     fprintf('--- Complete ---\n');
 end

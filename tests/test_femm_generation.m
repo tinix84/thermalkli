@@ -142,4 +142,48 @@ function results = test_femm_generation()
     end
     results{end+1} = r;
 
+    % --- femm_extruded_fin tests ---
+    r.name = 'femm_extruded_fin: generates Lua string';
+    cfg2 = struct();
+    cfg2.heatsink.thickWall = 0.8e-3;
+    cfg2.heatsink.widthChannel = 1.05e-3;
+    cfg2.heatsink.thickHeatsink = 5e-3;
+    cfg2.heatsink.heightTotal = 21e-3;
+    cfg2.heatsink.kSink = 180;
+    cfg2.fluid.tInlet = 343.15;
+    cfg2.heating.pLoss = 100;
+    cfg2.heating.widthContact = 16.9e-3;
+    cfg2.heating.lengthContact = 13.7e-3;
+    cfg2.h_channel = 500;
+    lua2 = femm_extruded_fin(cfg2);
+    r.pass = ~isempty(lua2) && ~isempty(strfind(lua2, '"planar"'));
+    r.detail = sprintf('generated %d chars', length(lua2));
+    results{end+1} = r;
+
+    r.name = 'femm_extruded_fin: has convection and symmetry BCs';
+    r.pass = ~isempty(strfind(lua2, 'convection')) && ~isempty(strfind(lua2, 'symmetry'));
+    r.detail = 'should contain convection and symmetry boundaries';
+    results{end+1} = r;
+
+    % --- femm_baseplate_spreading tests ---
+    r.name = 'femm_baseplate_spreading: generates Lua string';
+    cfg3 = struct();
+    cfg3.heatsink.width = 0.1;
+    cfg3.heatsink.baseThickness = 0.005;
+    cfg3.heatsink.kPlate = 200;
+    cfg3.convection.h = 500;
+    cfg3.convection.tFluid = 313.15;
+    cfg3.sources.power = [50 50];
+    cfg3.sources.x = [0.03 0.07];
+    cfg3.sources.width = [0.01 0.01];
+    lua3 = femm_baseplate_spreading(cfg3);
+    r.pass = ~isempty(lua3) && ~isempty(strfind(lua3, '"planar"'));
+    r.detail = sprintf('generated %d chars', length(lua3));
+    results{end+1} = r;
+
+    r.name = 'femm_baseplate_spreading: has 2 source BCs';
+    r.pass = ~isempty(strfind(lua3, 'source_1')) && ~isempty(strfind(lua3, 'source_2'));
+    r.detail = 'should have source_1 and source_2';
+    results{end+1} = r;
+
 end

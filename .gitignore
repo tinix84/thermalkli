@@ -16,3 +16,8 @@ Thumbs.db
 
 # Octave generated
 octave-workspace
+
+# FEMM generated files (from examples)
+examples/*.lua
+examples/*.csv
+examples/*.feh

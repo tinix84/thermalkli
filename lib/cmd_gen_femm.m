@@ -1,12 +1,13 @@
 function result = cmd_gen_femm(parsed)
     % cmd_gen_femm - generate a FEMM Lua script from a config file
     % Usage: thermal_cli.m gen-femm --model <type> --config <file> [--output <lua_file>]
-    % Models: semi-on-pcb, extruded-fin, baseplate
+    % Models: semi-on-pcb, extruded-fin, baseplate, forced-air
 
     if isfield(parsed, 'help') && parsed.help
         fprintf('Usage: thermal_cli.m gen-femm --model <type> --config <file> [--output <lua_file>]\n');
         fprintf('If --output is omitted, prints Lua script to stdout.\n');
-        fprintf('Models: semi-on-pcb, extruded-fin, baseplate\n');
+        fprintf('Models: semi-on-pcb, extruded-fin, baseplate, forced-air\n');
+        fprintf('  forced-air requires: cfg.h_channel and cfg.n_fins_show (or auto-computed)\n');
         result = struct();
         return;
     end
@@ -26,6 +27,12 @@ function result = cmd_gen_femm(parsed)
             lua_str = femm_extruded_fin(cfg);
         case 'baseplate'
             lua_str = femm_baseplate_spreading(cfg);
+        case 'forced-air'
+            if isfield(cfg, 'n_fins_show')
+                lua_str = femm_forced_air_heatsink(cfg, cfg.h_channel, cfg.n_fins_show);
+            else
+                lua_str = femm_forced_air_heatsink(cfg, cfg.h_channel);
+            end
         otherwise
             fprintf(2, 'Error: unknown model "%s"\n', parsed.model);
             result = struct();

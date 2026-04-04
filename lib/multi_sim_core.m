@@ -39,6 +39,11 @@ function result = multi_sim_core(sol, geom, sources, params)
     % Get material properties
     [Kth_plate, Kth_fin, Kth_piastra, Cost_kg, Piastra_str, rho_arr] = HS_Tech(sol.hs_type);
 
+    % Validate spreader plate: disable if material has no plate conductivity
+    if ~strcmpi(Piastra_str, 'yes') || Kth_piastra <= 0
+        params.piastra = 'no';
+    end
+
     % Get fan curves
     [Hv1, Qv1, Qvmin1, Qvmax1, Cost_Fan1, Vol_Fan1] = Fan_Model(sol.fan_model);
     Qv = sol.n_fans * Qv1;
@@ -72,6 +77,9 @@ function result = multi_sim_core(sol, geom, sources, params)
     while any(Ths > sources.Tmax) && iter < max_iterations
         iter = iter + 1;
         Nf = round(a / (geom.bch + geom.tf));
+        if Nf < 2
+            error('multi_sim_core: Nf=%d (must be >= 2). Channel too wide for heatsink width a=%.0fmm.', Nf, a);
+        end
 
         % Hydraulic
         [Re_hydr, Hv_f, Qv_f] = idraulico(b, s, Nf, geom.tf, geom.bch, geom.Hf, Tair, sol.vent_type, Qv, Hv);
@@ -87,6 +95,9 @@ function result = multi_sim_core(sol, geom, sources, params)
                 (1 - exp((Tfluido_out - params.Tin) / LMTD)) - LMTD;
 
         % Temperature at measurement points
+        if ~strcmp(sources.scelta, 'centro')
+            error('multi_sim_core: only scelta=''centro'' is supported. XY_Thscalc has a bug in ''side'' mode (undefined variable bn).');
+        end
         [xThs, yThs] = XY_Thscalc(x_g1, y_g1, sources.a_n, sources.b_n, sources.scelta);
         Ths = zeros(1, length(sources.Tmax));
         for i = 1:length(sources.Tmax)

@@ -8,6 +8,7 @@ function cli_print_help(command)
         fprintf('  fin-efficiency     Fin efficiency (tanh model)\n');
         fprintf('  radiation          Radiation heat transfer (--mode parallel|cylinder|sphere|enclosure|convex)\n');
         fprintf('  h-coeff            Heat transfer coefficient (--mode forced|natural|radiation)\n');
+        fprintf('  zth                Transient thermal impedance (Foster network)\n');
         fprintf('\nLayer/Stack Thermal Resistance:\n');
         fprintf('  layer-rth          Single layer Rth with optional spreading\n');
         fprintf('  stack-rth          Multi-layer stack Rth (--config required)\n');
@@ -18,10 +19,16 @@ function cli_print_help(command)
         fprintf('  cspi               Compute CSPI from Rth and volume\n');
         fprintf('  cspi-optimize      Find optimal heatsink geometry for max CSPI\n');
         fprintf('  fan-fit            Fit fan scaling law constants k1,k2,k3\n');
+        fprintf('\nNatural Convection:\n');
+        fprintf('  natural-conv-hs    Natural convection heatsink Rth (no fan)\n');
         fprintf('\nForced Convection (SoftwareTermico):\n');
         fprintf('  hydraulic-op       Fan-heatsink hydraulic operating point\n');
         fprintf('  fin-rth            Finned heatsink thermal resistance\n');
         fprintf('  water-cooling      Water/glycol cooling system analysis\n');
+        fprintf('\nDatabase:\n');
+        fprintf('  heatsink-create    Create heatsink from database reference\n');
+        fprintf('  heatsink-rth       Heatsink Rth from DB reference + fluid\n');
+        fprintf('  tim-lookup         TIM database lookup (--list or --search)\n');
         fprintf('\nFEMM Verification:\n');
         fprintf('  gen-femm           Generate FEMM Lua script (--model semi-on-pcb|extruded-fin|baseplate)\n');
         fprintf('  compare-femm       Compare FEMM CSV results with analytical\n');

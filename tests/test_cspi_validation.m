@@ -58,4 +58,13 @@ function results = test_cspi_validation()
     r.pass = res_1mm.cspi <= res_free.cspi;
     r.detail = sprintf('free=%.1f, t_min=1mm: %.1f', res_free.cspi, res_1mm.cspi);
     results{end+1} = r;
+
+    % --- Fig.7a sub-optimum geometry match (n~16, s~1.5mm, t~1.0mm) ---
+    % Paper: Al, SanAce 40x40x28, sub-optimum n=16, s=1.5mm, t=1.0mm
+    % Our optimizer with t_min=1mm should produce similar n and geometry
+    r.name = 'cspi_validation: Fig.7a sub-optimum geometry n=14..20';
+    res_sub = cspi_optimize(210, 32e-4, 0.04, 20, 'k1', k1, 'k2', k2, 'k3', k3, 't_min', 1e-3);
+    r.pass = res_sub.n >= 14 && res_sub.n <= 26 && res_sub.t >= 0.8e-3;
+    r.detail = sprintf('n=%d (paper ~16), s=%.2fmm, t=%.2fmm', res_sub.n, res_sub.s*1e3, res_sub.t*1e3);
+    results{end+1} = r;
 end

@@ -1,0 +1,18 @@
+# Octave/MATLAB auto-save files
+*.asv
+
+# Java error logs
+hs_err_pid*.log
+
+# MATLAB figure files
+*.fig
+
+# Compiled results (keep .mat templates in fan_data only)
+mfiles/SoftwareTermico/Database_risultati/*.mat
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Octave generated
+octave-workspace

@@ -69,6 +69,8 @@ function thermal_cli()
             cmd_free_conv(parsed);
         case 'zth'
             cmd_zth(parsed);
+        case 'tim-lookup'
+            cmd_tim_lookup(parsed);
         otherwise
             fprintf(2, 'Unknown command: %s\n', command);
             cli_print_help();

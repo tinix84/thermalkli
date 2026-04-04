@@ -23,6 +23,10 @@ function cli_print_help(command)
         fprintf('  hydraulic-op       Fan-heatsink hydraulic operating point\n');
         fprintf('  fin-rth            Finned heatsink thermal resistance\n');
         fprintf('  water-cooling      Water/glycol cooling system analysis\n');
+        fprintf('\nDatabase:\n');
+        fprintf('  heatsink-create    Create heatsink from database reference\n');
+        fprintf('  heatsink-rth       Heatsink Rth from DB reference + fluid\n');
+        fprintf('  tim-lookup         TIM database lookup (--list or --search)\n');
         fprintf('\nFEMM Verification:\n');
         fprintf('  gen-femm           Generate FEMM Lua script (--model semi-on-pcb|extruded-fin|baseplate)\n');
         fprintf('  compare-femm       Compare FEMM CSV results with analytical\n');

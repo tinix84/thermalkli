@@ -61,6 +61,10 @@ function thermal_cli()
             workflow_multi_sim(parsed);
         case 'optimize-fin'
             workflow_optimize_fin(parsed);
+        case 'heatsink-create'
+            cmd_heatsink_create(parsed);
+        case 'heatsink-rth'
+            cmd_heatsink_rth(parsed);
         otherwise
             fprintf(2, 'Unknown command: %s\n', command);
             cli_print_help();

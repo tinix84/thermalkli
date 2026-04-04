@@ -65,6 +65,8 @@ function thermal_cli()
             cmd_heatsink_create(parsed);
         case 'heatsink-rth'
             cmd_heatsink_rth(parsed);
+        case 'free-conv'
+            cmd_free_conv(parsed);
         otherwise
             fprintf(2, 'Unknown command: %s\n', command);
             cli_print_help();

@@ -51,6 +51,8 @@ function thermal_cli()
             cmd_cspi(parsed);
         case 'cspi-optimize'
             cmd_cspi_optimize(parsed);
+        case 'fan-fit'
+            cmd_fan_fit(parsed);
         otherwise
             fprintf(2, 'Unknown command: %s\n', command);
             cli_print_help();

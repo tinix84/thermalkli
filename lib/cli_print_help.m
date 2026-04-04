@@ -19,6 +19,8 @@ function cli_print_help(command)
         fprintf('  cspi               Compute CSPI from Rth and volume\n');
         fprintf('  cspi-optimize      Find optimal heatsink geometry for max CSPI\n');
         fprintf('  fan-fit            Fit fan scaling law constants k1,k2,k3\n');
+        fprintf('\nNatural Convection:\n');
+        fprintf('  natural-conv-hs    Natural convection heatsink Rth (no fan)\n');
         fprintf('\nForced Convection (SoftwareTermico):\n');
         fprintf('  hydraulic-op       Fan-heatsink hydraulic operating point\n');
         fprintf('  fin-rth            Finned heatsink thermal resistance\n');

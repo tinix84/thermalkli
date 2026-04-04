@@ -67,6 +67,8 @@ function thermal_cli()
             cmd_heatsink_rth(parsed);
         case 'free-conv'
             cmd_free_conv(parsed);
+        case 'natural-conv-hs'
+            cmd_natural_conv_hs(parsed);
         case 'zth'
             cmd_zth(parsed);
         case 'tim-lookup'

@@ -33,6 +33,8 @@ function result = cmd_gen_femm(parsed)
             else
                 lua_str = femm_forced_air_heatsink(cfg, cfg.h_channel);
             end
+        case 'drofenik'
+            lua_str = femm_drofenik_heatsink(cfg);
         otherwise
             fprintf(2, 'Error: unknown model "%s"\n', parsed.model);
             result = struct();

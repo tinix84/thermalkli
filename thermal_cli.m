@@ -43,6 +43,10 @@ function thermal_cli()
             cmd_compare_femm(parsed);
         case 'h-coeff'
             cmd_h_coeff(parsed);
+        case 'channel-rth'
+            cmd_channel_rth(parsed);
+        case 'channel-dp'
+            cmd_channel_dp(parsed);
         otherwise
             fprintf(2, 'Unknown command: %s\n', command);
             cli_print_help();

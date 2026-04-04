@@ -1,10 +1,11 @@
 function result = cmd_gen_femm(parsed)
     % cmd_gen_femm - generate a FEMM Lua script from a config file
-    % Usage: thermal_cli.m gen-femm --model <type> --config <file> --output <lua_file>
+    % Usage: thermal_cli.m gen-femm --model <type> --config <file> [--output <lua_file>]
     % Models: semi-on-pcb, extruded-fin, baseplate
 
     if isfield(parsed, 'help') && parsed.help
-        fprintf('Usage: thermal_cli.m gen-femm --model <type> --config <file> --output <lua_file>\n');
+        fprintf('Usage: thermal_cli.m gen-femm --model <type> --config <file> [--output <lua_file>]\n');
+        fprintf('If --output is omitted, prints Lua script to stdout.\n');
         fprintf('Models: semi-on-pcb, extruded-fin, baseplate\n');
         result = struct();
         return;

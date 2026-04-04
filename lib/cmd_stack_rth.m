@@ -1,13 +1,13 @@
 function result = cmd_stack_rth(parsed)
     % cmd_stack_rth - calculate thermal resistance through a layer stack
-    % Usage: thermal_cli.m stack-rth --config <file> [--ain <m2>] [--aout <m2>] [--heff <W/m2K>]
+    % Usage: thermal_cli.m stack-rth --config <file> --ain <m2> [--aout <m2>] [--heff <W/m2K>]
 
     if isfield(parsed, 'help') && parsed.help
-        fprintf('Usage: thermal_cli.m stack-rth --config <file> [--ain <m2>] [--aout <m2>] [--heff <W/m2K>]\n');
+        fprintf('Usage: thermal_cli.m stack-rth --config <file> --ain <m2> [--aout <m2>] [--heff <W/m2K>]\n');
         fprintf('Calculates thermal resistance through a multi-layer stack.\n');
         fprintf('Config must define cfg.layers as [[thick1,kOp1]; [thick2,kOp2]; ...] or\n');
         fprintf('  [[thick1,kOp1,kIp1]; [thick2,kOp2,kIp2]; ...]\n');
-        fprintf('  --ain     Heat source area [m2]\n');
+        fprintf('  --ain     Heat source area [m2] (required)\n');
         fprintf('  --aout    Heat sink area [m2] (optional)\n');
         fprintf('  --heff    Effective heat transfer coefficient [W/(m2*K)] (required if aout given)\n');
         result = struct();

@@ -185,9 +185,10 @@ function lua = femm_semi_on_pcb(cfg)
         prev = sprintf('y%d', i-1);
         curr = sprintf('y%d', i);
         if i == nLayers
-            % bottom level: r=0 column resumes
-            L{end+1} = sprintf('hi_addsegment(rc, %s, 0,  %s)', prev, curr);
-            L{end+1} = sprintf('hi_addsegment(rc, %s, b,  %s)', prev, curr);  % diagonal -> skip, use:
+            % bottom level: r=0 column resumes, vertical segments down
+            L{end+1} = sprintf('hi_addsegment(0,  %s, 0,  %s)', prev, curr);
+            L{end+1} = sprintf('hi_addsegment(b,  %s, b,  %s)', prev, curr);
+            L{end+1} = sprintf('hi_addsegment(0,  %s, b,  %s)', curr, curr);
         else
             L{end+1} = sprintf('hi_addsegment(rc, %s, rc, %s)', prev, curr);
             L{end+1} = sprintf('hi_addsegment(b,  %s, b,  %s)', prev, curr);

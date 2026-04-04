@@ -75,6 +75,9 @@ classdef extrudedFinModel < HeatsinkClass
                 else
                     obj.heatsinkType = 'extruded';
                 end
+                if isempty(obj.numBridge)
+                    obj.numBridge = 0;
+                end
             else
                 obj.materialSink = 'generic';
                 obj.rhoSink = varargin{1};

@@ -53,6 +53,10 @@ function thermal_cli()
             cmd_cspi_optimize(parsed);
         case 'fan-fit'
             cmd_fan_fit(parsed);
+        case 'water-cooling'
+            cmd_water_cooling(parsed);
+        case 'cspi-sweep'
+            workflow_cspi_sweep(parsed);
         otherwise
             fprintf(2, 'Unknown command: %s\n', command);
             cli_print_help();

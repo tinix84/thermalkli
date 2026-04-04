@@ -41,6 +41,8 @@ function thermal_cli()
             cmd_gen_femm(parsed);
         case 'compare-femm'
             cmd_compare_femm(parsed);
+        case 'h-coeff'
+            cmd_h_coeff(parsed);
         otherwise
             fprintf(2, 'Unknown command: %s\n', command);
             cli_print_help();

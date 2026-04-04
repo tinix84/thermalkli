@@ -57,6 +57,8 @@ function thermal_cli()
             cmd_water_cooling(parsed);
         case 'cspi-sweep'
             workflow_cspi_sweep(parsed);
+        case 'multi-sim'
+            workflow_multi_sim(parsed);
         otherwise
             fprintf(2, 'Unknown command: %s\n', command);
             cli_print_help();

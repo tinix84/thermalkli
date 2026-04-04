@@ -11,7 +11,8 @@ classdef HeatsinkGenericClass < HeatsinkClass
     methods
         function obj = HeatsinkGenericClass(heatsinkRef)
             obj.heatsinkRef = heatsinkRef;
-            [~,~,raw] = xlsread('W:\Technology\Functions\Thermal\db\heatsinks.xlsx',...
+            pkg load io;
+            [~,~,raw] = xlsread(fullfile(thermal_db_path(), 'heatsinks.xlsx'),...
                 'generic');
             heatsinkType = 'undefined';
             for i = 3:length(raw(:,1))

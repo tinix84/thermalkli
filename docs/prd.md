@@ -89,6 +89,14 @@ octave thermal_cli.m <workflow> [--config path/to/config.m] [--override value ..
 | `temp-dist` | `SoftwareTermico/Visualizzazione_plane/` | Temperature distribution on heatsink plane |
 | `gen-femm` | New Lua generator | Generate FEMM Lua script for a thermal model (--model semi-on-pcb\|extruded-fin\|baseplate) |
 | `compare-femm` | New comparison utility | Compare FEMM CSV results against analytical CLI results, print % deviation |
+| `cspi` | New (Drofenik) | Compute CSPI = 1/(Rth * Vol_CS) from heatsink design result |
+| `cspi-optimize` | New (Drofenik eq. 45/50) | Find optimal fin geometry maximizing CSPI for given fan+material+chip area |
+| `channel-rth` | Ported from ntbees2 | Drofenik channel model: Rth from channel geometry + flow rate |
+| `channel-dp` | Ported from ntbees2 | Channel pressure drop from flow rate (laminar/turbulent) |
+| `fan-fit` | New | Fit fan scaling law constants k1,k2,k3 from PQ curve data |
+| `h-forced` | Ported from ntbees2 | Forced convection heat transfer coefficient (flat plate) |
+| `h-natural` | Ported from ntbees2 | Natural convection heat transfer coefficient (vertical/horizontal) |
+| `h-radiation` | Ported from ntbees2 | Radiation heat transfer coefficient (linearized) |
 
 **FEMM integration flag**: Workflows `semi-on-pcb`, `extruded-fin-design`, and `forced-conv-sim` support `--femm-lua <path>` to also generate a FEMM Lua script alongside the analytical calculation.
 
@@ -101,6 +109,7 @@ octave thermal_cli.m <workflow> [--config path/to/config.m] [--override value ..
 | `optimize-fin` | Parameter sweep over fin geometry -> Best configuration | Optimizer workflow |
 | `forced-conv-sim` | Hydraulic OP -> Fin Rth -> Temp distribution -> Results | SoftwareTermico single simulation |
 | `multi-sim` | Parametric geometry sweep -> Best configuration per thermal limit | SoftwareTermico multi simulation |
+| `cspi-sweep` | Sweep fan diameter/material -> CSPI vs parameters plot data | CSPI parametric study (Drofenik Fig.4/5) |
 
 ### Configuration
 

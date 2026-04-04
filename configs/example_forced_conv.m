@@ -1,0 +1,19 @@
+function cfg = example_forced_conv()
+    cfg.heatsink.profile = 'VHSmallHeatsink30mm';
+    cfg.heatsink.width = 0.063;
+    cfg.heatsink.length = 0.130;
+    cfg.heatsink.material = 'all_aluminum';
+    cfg.fan.model = 'JF0825-1H-02';
+    cfg.fan.count = 1;
+    cfg.ventilation.type = 'push';
+    cfg.ventilation.impingeOpening = 0.063;
+    cfg.ambient.tInlet = 313.15;
+    cfg.sources.width  = [0.013 0.013 0.013 0.013 0.013];
+    cfg.sources.length = [0.013 0.013 0.013 0.013 0.013];
+    cfg.sources.power  = [0.1 30 30 30 30];
+    cfg.sources.x      = [0.0165 0.0165 0.0165 0.0165 0.0165];
+    cfg.sources.y      = [0.119 0.094 0.0715 0.035 0.013];
+    cfg.niter = 15;
+    cfg.piastra = 'no';
+    cfg.grid_points = 11;
+end

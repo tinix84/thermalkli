@@ -13,7 +13,8 @@ classdef GasProperty < handle
             %FLUIDPROPERTY Construct an instance of this class
             %   Detailed explanation goes here
             obj.fluidRef = fluidRef;
-            [~,~,obj.raw] = xlsread('W:\Technology\Functions\Thermal\db\FluidData.xlsx',...
+            pkg load io;
+            [~,~,obj.raw] = xlsread(fullfile(thermal_db_path(), 'FluidData.xlsx'),...
                 obj.fluidRef);
             for i = 4:length(obj.raw(:,1))
                 j = i-3;

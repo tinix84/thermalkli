@@ -53,7 +53,8 @@ classdef extrudedFinModel < HeatsinkClass
         function obj = extrudedFinModel(varargin)
             if nargin == 1
                 obj.heatsinkRef = varargin;
-                [~,~,raw] = xlsread('W:\Technology\Functions\Thermal\db\heatsinks.xlsx',...
+                pkg load io;
+                [~,~,raw] = xlsread(fullfile(thermal_db_path(), 'heatsinks.xlsx'),...
                     'extruded');
                 heatsinkType = 'undefined';
                 for i = 3:length(raw(:,1))
@@ -124,7 +125,7 @@ classdef extrudedFinModel < HeatsinkClass
         function hFluidLoc = calcHeatTransferFluid(obj, lengthHeatedBefore, TFluidMean, TWallEst)
             %calcHeatTransferFluid calculate the average heat transfer from
             %channel surface to fluid for specified arrangement
-            %   literature and source of formulae: VDI-Wärmeatlas, 11.
+            %   literature and source of formulae: VDI-Wï¿½rmeatlas, 11.
             %   Auflage, S. 785ff and Fundamentals of Heat and Mass
             %   Transfer, 6. edition, p518ff
             obj.vFluid = obj.flowrate/obj.crossAreaFluid;
@@ -149,7 +150,7 @@ classdef extrudedFinModel < HeatsinkClass
                 ratioDimDef = [1, 1.43, 2, 3, 4, 8, 100000000];
                 valuesNu1 = [3.61, 3.73, 4.12, 4.79, 5.33, 6.49, 8.23];
                 ratioSide = max(obj.depthSingleChannel, obj.widthChannel)/min(obj.depthSingleChannel, obj.widthChannel);
-                Nu_x_q_1 = interp1(ratioDimDef,valuesNu1,ratioSide,'makima');
+                Nu_x_q_1 = interp1(ratioDimDef,valuesNu1,ratioSide,'pchip');
                 fak2 = 1.302+(Nu_x_q_1-4.364)/(8.23-4.364)*(1.841-1.302);
                 Nu_x_q_2 = fak2*(obj.Re*PrM*obj.dHydro/lengthHeatedBefore)^(1/3);
                 NuLoc = (Nu_x_q_1^3 + 1 + (Nu_x_q_2-1)^3)^(1/3)*K;

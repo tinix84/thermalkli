@@ -79,6 +79,7 @@ GUI-driven heatsink thermal simulation with fan database, heatsink profile datab
 | Config format | `.m` struct files (native Octave) |
 | Excel databases | Keep .xlsx as-is; Python loader planned later |
 | FEMM Lua generation | 3 generators (semi-on-pcb axi, extruded-fin 2D, baseplate 2D) + compare-femm command. User runs Lua in FEMM manually, results extracted to CSV |
+| CSPI (Drofenik/Kolar) | CSPI metric + optimizer (eq. 45/50), Drofenik channel model, fan scaling law fit, h-forced/natural/radiation commands. Ported from ntbees2 @channel code. |
 | LossTemperatureInteraction/ | Out of scope (depends on external SVM_7 function) |
 | GUI (prova_grafica.m) | Kept as optional separate concern, not part of CLI |
 

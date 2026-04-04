@@ -59,6 +59,8 @@ function thermal_cli()
             workflow_cspi_sweep(parsed);
         case 'multi-sim'
             workflow_multi_sim(parsed);
+        case 'optimize-fin'
+            workflow_optimize_fin(parsed);
         otherwise
             fprintf(2, 'Unknown command: %s\n', command);
             cli_print_help();

@@ -31,6 +31,7 @@ function cli_print_help(command)
         fprintf('  forced-conv-sim    Forced convection simulation (air cooling)\n');
         fprintf('  cspi-sweep         CSPI parametric study vs fan size/material\n');
         fprintf('  multi-sim          Multi-configuration heatsink optimization\n');
+        fprintf('  optimize-fin       Parametric fin geometry optimization\n');
         fprintf('\nOptions:\n');
         fprintf('  --help             Show help for a command\n');
         fprintf('  --config <file>    Load configuration from .m file\n');

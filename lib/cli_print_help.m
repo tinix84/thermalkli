@@ -8,6 +8,7 @@ function cli_print_help(command)
         fprintf('  fin-efficiency     Fin efficiency (tanh model)\n');
         fprintf('  radiation          Radiation heat transfer (--mode parallel|cylinder|sphere|enclosure|convex)\n');
         fprintf('  h-coeff            Heat transfer coefficient (--mode forced|natural|radiation)\n');
+        fprintf('  zth                Transient thermal impedance (Foster network)\n');
         fprintf('\nLayer/Stack Thermal Resistance:\n');
         fprintf('  layer-rth          Single layer Rth with optional spreading\n');
         fprintf('  stack-rth          Multi-layer stack Rth (--config required)\n');

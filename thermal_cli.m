@@ -47,6 +47,10 @@ function thermal_cli()
             cmd_channel_rth(parsed);
         case 'channel-dp'
             cmd_channel_dp(parsed);
+        case 'cspi'
+            cmd_cspi(parsed);
+        case 'cspi-optimize'
+            cmd_cspi_optimize(parsed);
         otherwise
             fprintf(2, 'Unknown command: %s\n', command);
             cli_print_help();

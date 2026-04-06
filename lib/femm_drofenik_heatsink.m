@@ -28,7 +28,7 @@ function lua_str = femm_drofenik_heatsink(params)
     %   .t       [m] fin thickness
     %   .lambda  [W/(m*K)] thermal conductivity of heatsink material
     %   .h       [W/(m2*K)] convective heat transfer coefficient in channels
-    %   .T_air   [C] mean air temperature in channels
+    %   .T_air   [K] mean air temperature in channels (Kelvin, matches sibling generators)
     %   .P_V     [W] total thermal losses (for heat flux calculation)
     %
     % The Rth from FEMM (per half-heatsink) should be compared with:
@@ -54,8 +54,16 @@ function lua_str = femm_drofenik_heatsink(params)
     % Pitch
     pitch = s + t;
 
+    % The half-heatsink model assumes a symmetry plane at x=0 that splits
+    % the fin array into two identical halves, so the total fin count must
+    % be even (otherwise floor(n/2) would silently drop one fin).
+    if mod(n, 2) ~= 0
+        error('femm_drofenik_heatsink:InvalidFinCount', ...
+              'params.n must be even for the half-heatsink symmetry model; got n=%d.', n);
+    end
+
     % Number of fins in half-heatsink
-    n_half = floor(n / 2);
+    n_half = n / 2;
 
     L_lines = {};
 
@@ -70,7 +78,7 @@ function lua_str = femm_drofenik_heatsink(params)
     L_lines{end+1} = '';
     L_lines{end+1} = 't1 = clock()';
     L_lines{end+1} = 'newdocument(2)';
-    L_lines{end+1} = sprintf('hi_probdef("meters", "planar", 1e-8, %.1f, 30)', T_air);
+    L_lines{end+1} = sprintf('hi_probdef("meters", "planar", 1e-8, %.1f, 30)', T_air - 273.15);
     L_lines{end+1} = '';
 
     % Materials
@@ -80,7 +88,7 @@ function lua_str = femm_drofenik_heatsink(params)
     % Boundary conditions
     L_lines{end+1} = '-- Boundary conditions';
     L_lines{end+1} = sprintf('hi_addboundprop("chip_heat", 1, 0, %.6e)', -q_flux);
-    L_lines{end+1} = sprintf('hi_addboundprop("convection", 2, 0, 0, %.4f, %.4f)', T_air + 273.15, h);
+    L_lines{end+1} = sprintf('hi_addboundprop("convection", 2, 0, 0, %.4f, %.4f)', T_air, h);
     L_lines{end+1} = 'hi_addboundprop("symmetry", 1, 0, 0)';
     L_lines{end+1} = 'hi_addboundprop("insulated", 1, 0, 0)';
     L_lines{end+1} = '';
@@ -276,8 +284,9 @@ function lua_str = femm_drofenik_heatsink(params)
     L_lines{end+1} = sprintf('print(string.format("  R_th_d   = %%.4f K/W", R_th_d))');
     L_lines{end+1} = sprintf('print(string.format("  R_th_A   = %%.4f K/W", R_th_A))');
     L_lines{end+1} = sprintf('print(string.format("  R_th_FIN = %%.4f K/W", R_th_FIN))');
+    % NOTE: omits R_th_DT (air temperature rise term in eq.14) — needs flow rate, out of scope here
     L_lines{end+1} = sprintf('R_th_half = 1/%d * (R_th_d + 0.5*(R_th_FIN + R_th_A))', n);
-    L_lines{end+1} = sprintf('print(string.format("  R_th_half (eq.14) = %%.4f K/W", R_th_half))');
+    L_lines{end+1} = sprintf('print(string.format("  R_th_half (eq.14, solid-to-air, no DT term) = %%.4f K/W", R_th_half))');
     L_lines{end+1} = '';
     L_lines{end+1} = sprintf('dT_FEMM = T_chip - %.4f', T_air);
     L_lines{end+1} = sprintf('R_th_FEMM = dT_FEMM / %.4f', P_V/2);

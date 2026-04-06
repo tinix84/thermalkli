@@ -121,7 +121,7 @@ params.s = s;
 params.t = t;
 params.lambda = lambda;
 params.h = h_ch;
-params.T_air = 80;  % match paper's 80C reference
+params.T_air = 80 + 273.15;  % [K] match paper's 80C reference (Kelvin convention)
 params.P_V = P_V;
 
 lua_str = femm_drofenik_heatsink(params);
@@ -148,8 +148,8 @@ fprintf('  Paper measured CSPI: %.1f (Rth=0.26, Vol=0.22L incl fan)\n', cspi_cal
 fprintf('\n=== Comparison Table ===\n');
 fprintf('%-25s %12s %12s\n', 'Quantity', 'Our model', 'Paper');
 fprintf('%s\n', repmat('-', 1, 50));
-fprintf('%-25s %12.4f %12.4f\n', 'Rth one side [K/W]', R_th_total, 0.254*2);
-fprintf('%-25s %12.4f %12.4f\n', 'Rth both sides [K/W]', R_th_total/2, 0.254);
+fprintf('%-25s %12.4f %12.4f\n', 'Rth one side [K/W]', R_th_total, 0.254);
+fprintf('%-25s %12.4f %12.4f\n', 'Rth both sides [K/W]', R_th_total/2, 0.254/2);
 fprintf('%-25s %12.0f %12.0f\n', 'n fins', n, 16);
 fprintf('%-25s %12.1f %12.1f\n', 's [mm]', s*1e3, 1.5);
 fprintf('%-25s %12.1f %12.1f\n', 't [mm]', t*1e3, 1.0);
@@ -162,5 +162,5 @@ fprintf('3. FEMM Rth should match analytical within ~5%%\n');
 fprintf('4. Temperature contour should show:\n');
 fprintf('   - Hot spot at baseplate top (chip surface)\n');
 fprintf('   - Gradient through baseplate (d=%.0fmm)\n', d*1e3);
-fprintf('   - Fin tips close to air temperature (%.0fC)\n', params.T_air);
+fprintf('   - Fin tips close to air temperature (%.0fC)\n', params.T_air - 273.15);
 fprintf('   - Center fins hotter than edge fins\n');

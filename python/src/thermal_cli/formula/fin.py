@@ -32,6 +32,15 @@ def fin_efficiency(*, L: float, h: float, A: float, k: float, Ac: float) -> floa
     -------
     float
         Fin efficiency (dimensionless, in (0, 1]).
+
+    Raises
+    ------
+    ValueError
+        If any input makes ``h * A / (k * Ac * L)`` negative (``math.sqrt``
+        of a negative number). Notably, the Octave source returns a complex
+        value in this case; Python raises instead.
+    ZeroDivisionError
+        If ``L``, ``k``, or ``Ac`` is zero.
     """
     mL = math.sqrt(h * A / (k * Ac * L)) * L
     return math.tanh(mL) / mL

@@ -11,7 +11,9 @@ def test_known_value_small_mL():
     """For small mL, efficiency approaches 1 (tanh(x)/x → 1 as x → 0)."""
     # L=0.001, very short fin → mL small → eta close to 1
     eta = fin_efficiency(L=0.001, h=10.0, A=1e-5, k=200.0, Ac=1e-6)
-    assert 0.99 < eta <= 1.0
+    # tanh(x)/x < 1 for x > 0; the bound is strict
+    assert eta < 1.0
+    assert math.isclose(eta, 1.0, rel_tol=2e-3)
 
 
 def test_known_value_large_mL():
@@ -21,15 +23,16 @@ def test_known_value_large_mL():
     assert 0.0 < eta < 0.1
 
 
-def test_matches_analytical_formula():
-    """Explicit computation: L=0.05, h=30, A=0.01, k=200, Ac=1e-4.
-    mL = sqrt(30*0.01 / (200*1e-4*0.05)) * 0.05 = sqrt(30) * 0.05
+def test_matches_reference_value():
+    """Hard-coded independent reference.
+
+    For L=0.05, h=30, A=0.01, k=200, Ac=1e-4 the analytical result is
+    0.8075387894207215 (verified against Octave finEfficieny.m). This is the
+    same input set used by the Task 6 regression fixture, so drift between
+    Octave and Python is caught here first.
     """
-    L, h, A, k, Ac = 0.05, 30.0, 0.01, 200.0, 1e-4
-    mL = math.sqrt(h * A / (k * Ac * L)) * L
-    expected = math.tanh(mL) / mL
-    eta = fin_efficiency(L=L, h=h, A=A, k=k, Ac=Ac)
-    assert eta == pytest.approx(expected, rel=1e-12)
+    eta = fin_efficiency(L=0.05, h=30.0, A=0.01, k=200.0, Ac=1e-4)
+    assert eta == pytest.approx(0.8075387894207215, rel=1e-12)
 
 
 def test_returns_float():

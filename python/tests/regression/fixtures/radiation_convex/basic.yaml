@@ -1,0 +1,16 @@
+command: radiation
+description: Small convex body eps=0.9, A1=0.01, T1=500K, T2=300K.
+octave_script: |
+  addpath('mfiles/Thermal/Formula');
+  q = heatTransferSmallConvexRadiation(500, 300, 0.01, 0.9);
+  disp(jsonencode(struct('q', q)));
+python_call:
+  module: thermal_cli.formula.radiation
+  function: small_convex
+  args:
+    T1: 500.0
+    T2: 300.0
+    A1: 0.01
+    eps1: 0.9
+tolerance:
+  rtol: 1.0e-6

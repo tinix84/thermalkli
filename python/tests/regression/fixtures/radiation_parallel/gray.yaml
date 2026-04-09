@@ -1,0 +1,17 @@
+command: radiation
+description: Parallel planes, gray surfaces eps=0.5, T1=500K, T2=300K.
+octave_script: |
+  addpath('mfiles/Thermal/Formula');
+  q = heatTransferParallelPlanesRadiation(500, 300, 1.0, 0.5, 0.5);
+  disp(jsonencode(struct('q', q)));
+python_call:
+  module: thermal_cli.formula.radiation
+  function: parallel_planes
+  args:
+    T1: 500.0
+    T2: 300.0
+    A: 1.0
+    eps1: 0.5
+    eps2: 0.5
+tolerance:
+  rtol: 1.0e-6

@@ -1,0 +1,2 @@
+heatsinkRef,type,material,rho,k,c,numChannel,l_1,l_2,l_3,l_4,l_5
+HS_EX_001,extruded,aluminum,2698.9,180,880,10,0.0216,0.01,0.001,0.001,0.00105

@@ -1,0 +1,20 @@
+command: layer-rth
+description: |
+  Single isotropic layer, thick=0.001m, k=200 W/mK.
+  Spreading from aIn=1e-4 to aOut=4e-4, hEff=500.
+octave_script: |
+  addpath('mfiles/Thermal/Designer');
+  ly = ThermalLayer(0.001, 200);
+  [rTh, rThSpread, rThThrough] = ly.thermalLayerResistance(1e-4, 4e-4, 500);
+  disp(jsonencode(struct('rTh', rTh, 'rThSpread', rThSpread, 'rThThrough', rThThrough)));
+python_call:
+  module: tests.regression.helpers
+  function: layer_spreading_isotropic
+  args:
+    thick: 0.001
+    k_op: 200.0
+    a_in: 1.0e-4
+    a_out: 4.0e-4
+    h_eff: 500.0
+tolerance:
+  rtol: 1.0e-3

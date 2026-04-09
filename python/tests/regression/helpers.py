@@ -42,3 +42,16 @@ def glycol_dynamic_viscosity(temperature: float) -> float:
 def sae30_density(temperature: float) -> float:
     oil = fluid_registry("SAE30")
     return oil.density(temperature)
+
+
+# --- Layer spreading helpers ---
+
+
+def layer_spreading_isotropic(
+    thick: float, k_op: float, a_in: float, a_out: float, h_eff: float
+) -> dict[str, float]:
+    from thermal_cli.layers import ThermalLayer
+
+    ly = ThermalLayer(thick=thick, k_op=k_op)
+    r_th, r_spread, r_through = ly.resistance(a_in=a_in, a_out=a_out, h_eff=h_eff)
+    return {"rTh": r_th, "rThSpread": r_spread, "rThThrough": r_through}

@@ -42,7 +42,7 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
-ignore = []
+ignore = ["B008"]  # typer.Argument/Option in defaults is required by Typer
 
 [tool.mypy]
 python_version = "3.11"

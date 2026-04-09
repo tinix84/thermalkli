@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import typer
 
 from thermal_cli import __version__
@@ -31,6 +33,21 @@ def main(
     ),
 ) -> None:
     """thermal-cli root command."""
+
+
+@app.command()
+def convert_config(
+    m_file: Path = typer.Argument(..., help="Input .m config file"),
+    yaml_file: Path = typer.Argument(..., help="Output .yaml config file"),
+) -> None:
+    """Convert an Octave .m struct config to YAML."""
+    from thermal_cli.io.convert_m_to_yaml import convert_m_to_yaml
+
+    if not m_file.exists():
+        typer.echo(f"Error: {m_file} not found")
+        raise typer.Exit(1)
+    convert_m_to_yaml(m_file, yaml_file)
+    typer.echo(f"Converted {m_file} → {yaml_file}")
 
 
 if __name__ == "__main__":

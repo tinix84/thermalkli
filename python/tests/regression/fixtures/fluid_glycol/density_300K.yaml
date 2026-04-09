@@ -1,0 +1,15 @@
+command: fluid-property
+description: H2OGly50 density at 300K.
+octave_script: |
+  addpath('mfiles/Thermal/Model');
+  addpath('lib');
+  g = LiquidProperty('H2OGly50');
+  rho = g.calcDensity(300);
+  disp(jsonencode(struct('value', rho)));
+python_call:
+  module: tests.regression.helpers
+  function: glycol_density
+  args:
+    temperature: 300.0
+tolerance:
+  rtol: 1.0e-3

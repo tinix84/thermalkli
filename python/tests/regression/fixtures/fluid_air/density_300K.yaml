@@ -1,0 +1,16 @@
+command: fluid-property
+description: airDry density at 300K, 101325Pa.
+octave_script: |
+  addpath('mfiles/Thermal/Model');
+  addpath('lib');
+  air = GasProperty('airDry');
+  rho = air.calcDensity(300, 101325);
+  disp(jsonencode(struct('value', rho)));
+python_call:
+  module: tests.regression.helpers
+  function: air_density
+  args:
+    temperature: 300.0
+    pressure: 101325.0
+tolerance:
+  rtol: 0.02

@@ -1,0 +1,17 @@
+command: radiation
+description: Parallel planes, blackbody (eps=1), T1=500K, T2=300K, A=1m^2.
+octave_script: |
+  addpath('mfiles/Thermal/Formula');
+  q = heatTransferParallelPlanesRadiation(500, 300, 1.0, 1.0, 1.0);
+  disp(jsonencode(struct('q', q)));
+python_call:
+  module: thermal_cli.formula.radiation
+  function: parallel_planes
+  args:
+    T1: 500.0
+    T2: 300.0
+    A: 1.0
+    eps1: 1.0
+    eps2: 1.0
+tolerance:
+  rtol: 1.0e-6

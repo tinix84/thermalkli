@@ -1,0 +1,18 @@
+command: radiation
+description: Concentric spheres, blackbody, r1=0.05, r2=0.10.
+octave_script: |
+  addpath('mfiles/Thermal/Formula');
+  q = heatTransferConcentricSphereRadiation(500, 300, 0.05, 0.10, 1.0, 1.0);
+  disp(jsonencode(struct('q', q)));
+python_call:
+  module: thermal_cli.formula.radiation
+  function: concentric_spheres
+  args:
+    T1: 500.0
+    T2: 300.0
+    r1: 0.05
+    r2: 0.10
+    eps1: 1.0
+    eps2: 1.0
+tolerance:
+  rtol: 1.0e-6

@@ -21,3 +21,6 @@ octave-workspace
 examples/*.lua
 examples/*.csv
 examples/*.feh
+
+# Git worktrees
+.worktrees/

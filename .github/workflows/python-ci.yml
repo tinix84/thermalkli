@@ -55,12 +55,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install octave + io package
+      - name: Install octave
         run: |
           sudo apt-get update
-          sudo apt-get install -y octave liboctave-dev
+          sudo apt-get install -y octave
           octave --version | head -1
-          octave --no-gui --quiet --eval "pkg install -forge io; pkg load io;"
       - name: Install package (dev)
         working-directory: python
         run: pip install -e ".[dev]"

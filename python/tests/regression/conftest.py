@@ -163,8 +163,7 @@ def assert_close(
             for i, (a, b) in enumerate(zip(ov, pv, strict=True)):
                 if not math.isclose(float(a), float(b), rel_tol=rtol, abs_tol=atol):
                     raise AssertionError(
-                        f"mismatch at '{key}[{i}]': "
-                        f"octave={a} python={b} rtol={rtol} atol={atol}"
+                        f"mismatch at '{key}[{i}]': octave={a} python={b} rtol={rtol} atol={atol}"
                     )
             continue
         if not math.isclose(float(ov), float(pv), rel_tol=rtol, abs_tol=atol):

@@ -1,0 +1,26 @@
+command: fin-efficiency
+description: |
+  Proof-of-life regression for fin_efficiency / finEfficieny.
+  Uses L=0.05, h=30, A=0.01, k=200, Ac=1e-4 — ordinary aluminum fin
+  in forced air convection.
+octave_script: |
+  addpath('mfiles/Thermal/Formula');
+  L = 0.05;
+  h = 30.0;
+  A = 0.01;
+  k = 200.0;
+  Ac = 1e-4;
+  eta = finEfficieny(L, h, A, k, Ac);
+  disp(jsonencode(struct('eta', eta)));
+python_call:
+  module: thermal_cli.formula.fin
+  function: fin_efficiency
+  args:
+    L: 0.05
+    h: 30.0
+    A: 0.01
+    k: 200.0
+    Ac: 1.0e-4
+tolerance:
+  rtol: 1.0e-6
+  atol: 1.0e-12

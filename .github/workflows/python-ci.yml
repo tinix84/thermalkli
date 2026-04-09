@@ -1,0 +1,68 @@
+name: python-ci
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "python/**"
+      - ".github/workflows/python-ci.yml"
+      - "mfiles/**"
+  pull_request:
+    paths:
+      - "python/**"
+      - ".github/workflows/python-ci.yml"
+      - "mfiles/**"
+
+jobs:
+  lint:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install package (dev)
+        working-directory: python
+        run: pip install -e ".[dev]"
+      - name: ruff check
+        working-directory: python
+        run: ruff check .
+      - name: ruff format check
+        working-directory: python
+        run: ruff format --check .
+
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install package (dev)
+        working-directory: python
+        run: pip install -e ".[dev]"
+      - name: pytest (unit)
+        working-directory: python
+        run: pytest tests/unit -v
+
+  regression:
+    name: Octave↔Python regression
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install octave
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y octave
+          octave --version | head -1
+      - name: Install package (dev)
+        working-directory: python
+        run: pip install -e ".[dev]"
+      - name: pytest (regression)
+        working-directory: python
+        run: pytest tests/regression -v

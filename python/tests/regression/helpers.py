@@ -19,7 +19,12 @@ _MU_REF: float = 18.27e-6
 
 
 def _air_mu(T: float) -> float:
-    return _MU_REF * (_SUTHERLAND_TREF + _SUTHERLAND_S) / (T + _SUTHERLAND_S) * (T / _SUTHERLAND_TREF) ** 1.5
+    return (
+        _MU_REF
+        * (_SUTHERLAND_TREF + _SUTHERLAND_S)
+        / (T + _SUTHERLAND_S)
+        * (T / _SUTHERLAND_TREF) ** 1.5
+    )
 
 
 def _air_rho(T: float) -> float:
@@ -53,7 +58,9 @@ def run_h_natural_vertical(
     """
     from thermal_cli.formula.convection import h_natural
 
-    h, _Nu = h_natural(orientation="vertical", length=length, t_ambient=t_ambient, t_surface=t_surface)
+    h, _Nu = h_natural(
+        orientation="vertical", length=length, t_ambient=t_ambient, t_surface=t_surface
+    )
     Tf = (t_ambient + t_surface) / 2.0
     rho = _air_rho(Tf)
     mu = _air_mu(Tf)

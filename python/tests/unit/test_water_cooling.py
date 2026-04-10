@@ -15,7 +15,6 @@ import pytest
 
 from thermal_cli.formula.water_cooling import WaterCoolingResult, water_cooling
 
-
 # ---------------------------------------------------------------------------
 # Helper: reference calculation
 # ---------------------------------------------------------------------------
@@ -36,7 +35,9 @@ def _ref(
     t_outlet = t_inlet + dt
     p_dev = p_loss / n_devices
     t_junc = t_outlet + p_dev * (rth_jc + rth_cl)
-    return dict(dt_coolant=dt, t_outlet=t_outlet, t_junction=t_junc, m_dot=m_dot, p_per_device=p_dev)
+    return dict(
+        dt_coolant=dt, t_outlet=t_outlet, t_junction=t_junc, m_dot=m_dot, p_per_device=p_dev
+    )
 
 
 # ---------------------------------------------------------------------------

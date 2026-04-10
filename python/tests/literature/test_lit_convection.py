@@ -8,13 +8,10 @@ regression floor.
 
 from __future__ import annotations
 
-import math
-
 import pytest
 
 from thermal_cli.formula.constants import STEFAN_BOLTZMANN
 from thermal_cli.formula.convection import h_forced, h_natural, h_radiation_linearized
-
 
 # ---------------------------------------------------------------------------
 # 1. Forced convection — laminar flat plate (Incropera §7.2)
@@ -92,7 +89,7 @@ def test_forced_turbulent_regime() -> None:
 
 
 def test_natural_convection_vertical_plate() -> None:
-    """h in range 2–10 W/(m²·K) for natural convection on a 0.5 m vertical plate.
+    """h in range 2-10 W/(m2 K) for natural convection on a 0.5 m vertical plate.
 
     Reference: Incropera §9.2, laminar vertical plate correlation
     Nu = 0.59 * Ra^0.25 for Ra < 1e9, air at Tf=325 K.
@@ -105,7 +102,7 @@ def test_natural_convection_vertical_plate() -> None:
     )
 
     # Laminar natural convection for air typically 2-10 W/(m²·K)
-    assert 1.0 < h < 15.0, f"h = {h:.2f} W/(m²·K) outside expected range 1–15"
+    assert 1.0 < h < 15.0, f"h = {h:.2f} W/(m2 K) outside expected range 1-15"
     # Nu should be positive and greater than 1
     assert Nu > 1.0
 
@@ -120,7 +117,7 @@ def test_natural_convection_vertical_plate_ra_laminar() -> None:
     Tf = 325.0
     rho = 101325.0 / (287.058 * Tf)
     mu = 18.27e-6 * (411.15 / (Tf + 120.0)) * (Tf / 291.15) ** 1.5
-    kf = 7e-5 * Tf + 5.1e-3
+    _kf = 7e-5 * Tf + 5.1e-3
     Pr = 0.71
     beta = 1.0 / Tf
     L = 0.5

@@ -124,7 +124,7 @@ def _fapp_rect(ld: float, fred: float, redh: float) -> float:
 
 
 def _fred_rect(bch: float, h: float) -> float:
-    """Fully-developed friction factor × Re for rectangular channel.
+    """Fully-developed friction factor x Re for rectangular channel.
 
     Parameters
     ----------
@@ -134,8 +134,9 @@ def _fred_rect(bch: float, h: float) -> float:
         Channel height [m].
     """
     ratio = bch / h
+    tanh_term = math.tanh(math.pi * h / (2.0 * bch))
     return 24.0 / (
-        (1.0 + ratio**2) * (1.0 - (192.0 / math.pi**5) * ratio * math.tanh(math.pi * h / (2.0 * bch)))
+        (1.0 + ratio**2) * (1.0 - (192.0 / math.pi**5) * ratio * tanh_term)
     )
 
 

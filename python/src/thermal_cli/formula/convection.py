@@ -36,7 +36,12 @@ _MIXED_A: float = 871.0
 def _air_properties(T: float) -> tuple[float, float, float, float]:
     """Return (rho, mu, kf, Pr) for dry air at temperature *T* [K]."""
     rho = 101325.0 / (287.058 * T)
-    mu = _MU_REF * (_SUTHERLAND_TREF + _SUTHERLAND_S) / (T + _SUTHERLAND_S) * (T / _SUTHERLAND_TREF) ** 1.5
+    mu = (
+        _MU_REF
+        * (_SUTHERLAND_TREF + _SUTHERLAND_S)
+        / (T + _SUTHERLAND_S)
+        * (T / _SUTHERLAND_TREF) ** 1.5
+    )
     kf = 7e-5 * T + 5.1e-3
     Pr = 0.71
     return rho, mu, kf, Pr
@@ -142,15 +147,9 @@ def h_natural(
     Ra = Pr * rho**2 * 9.81 * beta * (t_surface - t_ambient) * length**3 / mu**2
 
     if orientation == "vertical":
-        if Ra < 1e9:
-            Nu = 0.59 * Ra**0.25
-        else:
-            Nu = 0.1 * Ra ** (1.0 / 3.0)
+        Nu = 0.59 * Ra**0.25 if Ra < 1e9 else 0.1 * Ra ** (1.0 / 3.0)
     elif orientation == "horizontal_top":
-        if Ra < 1e7:
-            Nu = 0.54 * Ra**0.25
-        else:
-            Nu = 0.15 * Ra ** (1.0 / 3.0)
+        Nu = 0.54 * Ra**0.25 if Ra < 1e7 else 0.15 * Ra ** (1.0 / 3.0)
     elif orientation == "horizontal_bottom":
         Nu = 0.27 * Ra**0.25
     else:

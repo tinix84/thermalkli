@@ -11,7 +11,7 @@ All temperatures in Kelvin. All functions use keyword-only arguments.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from thermal_cli.formula.convection import h_natural, h_radiation_linearized
 
@@ -31,7 +31,7 @@ class Face:
         One of ``'vertical'``, ``'horizontal_top'``, or
         ``'horizontal_bottom'``.
     emissivity : float
-        Surface emissivity (0–1). Defaults to 0.9.
+        Surface emissivity (0-1). Defaults to 0.9.
     """
 
     area: float

@@ -9,10 +9,11 @@ Reference cases:
 
 from __future__ import annotations
 
+from typing import ClassVar
+
 import pytest
 
 from thermal_cli.formula.free_conv import Face, FreeConvResult, free_conv_surface_temp
-
 
 # ---------------------------------------------------------------------------
 # helpers
@@ -85,7 +86,7 @@ class TestMultiFaceBox:
 
     T_AMB = 298.15
     P = 5.0
-    FACES = [
+    FACES: ClassVar[list[Face]] = [
         Face(area=0.05 * 0.10, char_length=0.10, orientation="vertical"),
         Face(area=0.05 * 0.10, char_length=0.10, orientation="vertical"),
         Face(area=0.08 * 0.10, char_length=0.08, orientation="vertical"),

@@ -5,18 +5,17 @@ TDD: written before implementation.
 
 from __future__ import annotations
 
-import pytest
 import numpy as np
+import pytest
 
 from thermal_cli.heatsinks.profiles_db import (
-    lookup_hs_profile,
-    lookup_hs_material,
-    lookup_fan,
-    HsProfile,
-    HsMaterial,
     FanCurve,
+    HsMaterial,
+    HsProfile,
+    lookup_fan,
+    lookup_hs_material,
+    lookup_hs_profile,
 )
-
 
 # ---------------------------------------------------------------------------
 # HsProfile

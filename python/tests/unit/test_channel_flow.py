@@ -13,14 +13,14 @@ import numpy as np
 import pytest
 
 from thermal_cli.heatsinks.channel_flow import (
-    HydraulicResult,
     FinRthResult,
-    rho_air,
-    mu_air,
-    kt_air,
+    HydraulicResult,
     cp_air,
-    hydraulic_operating_point,
     fin_thermal_resistance,
+    hydraulic_operating_point,
+    kt_air,
+    mu_air,
+    rho_air,
 )
 
 # ---------------------------------------------------------------------------

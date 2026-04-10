@@ -18,7 +18,6 @@ from thermal_cli.formula.convection import (
     h_radiation_linearized,
 )
 
-
 # ============================================================
 # h_forced — forced convection on a flat plate
 # ============================================================
@@ -40,7 +39,7 @@ class TestHForced:
         assert Re < 5e5  # verify laminar branch was taken
 
     def test_laminar_returns_positive_h(self):
-        h, Re = h_forced(length=0.3, velocity=5.0, t_ambient=298.15, t_surface=348.15)
+        h, _Re = h_forced(length=0.3, velocity=5.0, t_ambient=298.15, t_surface=348.15)
         assert h > 0
 
     def test_turbulent_reference(self):

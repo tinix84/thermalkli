@@ -3,7 +3,7 @@
 CSVs live in the repo-root ``db/`` directory:
 - ``db/hs_profiles.csv``   — extruded-fin geometry (mm)
 - ``db/hs_materials.csv``  — material conductivity / density
-- ``db/fans.csv``          — fan P–Q curves (SI units: m³/s, Pa)
+- ``db/fans.csv``          — fan P-Q curves (SI units: m³/s, Pa)
 """
 
 from __future__ import annotations
@@ -14,7 +14,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
-
 
 # ---------------------------------------------------------------------------
 # Dataclasses
@@ -43,7 +42,7 @@ class HsMaterial:
 
 @dataclass
 class FanCurve:
-    """Fan pressure–flow curve."""
+    """Fan pressure-flow curve."""
 
     name: str
     qv: np.ndarray  # volumetric flow rate [m³/s]

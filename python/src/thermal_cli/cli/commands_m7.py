@@ -10,7 +10,7 @@ matching the radiation.py API.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated
 
 import typer
 import yaml
@@ -231,7 +231,7 @@ def _free_conv_command(
     t_ambient: Annotated[float, typer.Option("--t-ambient", help="Ambient temperature [°C]")],
     p_total: Annotated[float, typer.Option("--p-total", help="Total heat to dissipate [W]")],
     face: Annotated[
-        List[str],
+        list[str],
         typer.Option(
             "--face",
             help=(
@@ -258,7 +258,7 @@ def _free_conv_command(
 
     t_surface_c = result.t_surface - _C_TO_K
     _out("t_surface", t_surface_c)
-    for i, (h, q) in enumerate(zip(result.h_per_face, result.q_per_face)):
+    for i, (h, q) in enumerate(zip(result.h_per_face, result.q_per_face, strict=True)):
         _out(f"h_face{i}", h)
         _out(f"q_face{i}", q)
 
@@ -272,7 +272,9 @@ def _water_cooling_command(
     p_loss: Annotated[float, typer.Option("--p-loss", help="Total power loss [W]")],
     flow: Annotated[float, typer.Option("--flow", help="Coolant flow rate [l/min]")],
     t_in: Annotated[float, typer.Option("--t-in", help="Coolant inlet temperature [°C]")],
-    rth_jc: Annotated[float, typer.Option("--rth-jc", help="Junction-to-case Rth per device [K/W]")],
+    rth_jc: Annotated[
+        float, typer.Option("--rth-jc", help="Junction-to-case Rth per device [K/W]")
+    ],
     n_devices: Annotated[int, typer.Option("--n-devices", help="Number of parallel devices")],
     cp: Annotated[float, typer.Option("--cp", help="Coolant specific heat [J/(kg K)]")] = 3483.0,
     rho: Annotated[float, typer.Option("--rho", help="Coolant density [kg/m³]")] = 1064.0,
@@ -361,8 +363,8 @@ def _load_yaml_config(config_path: Path) -> dict:
 
 
 def _build_hs_geometry(cfg: dict):
-    """Return (profile, material_name, b_m, width_m, n_fins, tf_m, bch_m, hf_m, vent_type, s_m, t_air_k)
-    from a YAML config dict."""
+    """Return (profile, material_name, b_m, width_m, n_fins, tf_m, bch_m, hf_m,
+    vent_type, s_m, t_air_k) from a YAML config dict."""
     from thermal_cli.heatsinks.profiles_db import lookup_hs_profile
 
     hs_cfg = cfg["heatsink"]
@@ -383,10 +385,7 @@ def _build_hs_geometry(cfg: dict):
 
     # Ventilation
     vent_type = vent_cfg.get("type", "push")
-    if vent_type == "impinge":
-        s_m = float(vent_cfg.get("impingeOpening", 0.05))
-    else:  # push: s = width (full inlet face)
-        s_m = width_m
+    s_m = float(vent_cfg.get("impingeOpening", 0.05)) if vent_type == "impinge" else width_m
 
     # Air inlet temperature with 5 K margin
     t_inlet_k = float(amb_cfg.get("tInlet", 313.15))
@@ -405,13 +404,14 @@ def _hydraulic_op_command(
     config: Annotated[Path, typer.Option("--config", help="YAML config file path")],
 ) -> None:
     """Fan-heatsink hydraulic operating point from YAML config."""
+
     from thermal_cli.heatsinks.channel_flow import hydraulic_operating_point
     from thermal_cli.heatsinks.profiles_db import lookup_fan
 
-    import numpy as np
-
     cfg = _load_yaml_config(config)
-    _, _, b_m, width_m, n_fins, tf_m, bch_m, hf_m, vent_type, s_m, t_air_k = _build_hs_geometry(cfg)
+    _, _, b_m, _width_m, n_fins, tf_m, bch_m, hf_m, vent_type, s_m, t_air_k = (
+        _build_hs_geometry(cfg)
+    )
 
     fan_cfg = cfg.get("fan", {})
     fan_model = fan_cfg["model"]
@@ -454,7 +454,7 @@ def _fin_rth_command(
     from thermal_cli.heatsinks.profiles_db import lookup_hs_material
 
     cfg = _load_yaml_config(config)
-    profile, material_name, b_m, width_m, n_fins, tf_m, bch_m, hf_m, vent_type, s_m, t_air_k = (
+    _profile, material_name, b_m, width_m, n_fins, tf_m, bch_m, hf_m, vent_type, s_m, t_air_k = (
         _build_hs_geometry(cfg)
     )
 

@@ -31,6 +31,7 @@ OCTAVE_PATHS = ":".join(
         "mfiles/Thermal/Formula",
         "mfiles/Thermal/Model",
         "mfiles/Thermal/Designer",
+        "lib",
     )
 )
 

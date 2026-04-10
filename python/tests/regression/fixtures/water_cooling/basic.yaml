@@ -1,0 +1,13 @@
+command: water-cooling
+description: 1000W, 5 l/min, glycol-water, 4 devices, Rjc=0.5.
+octave_script: |
+  addpath('lib');
+  parsed = struct('p_loss','1000','flow','5','t_in','25','rth_jc','0.5','n_devices','4','cp','3483','rho','1064','rth_cl','0');
+  result = cmd_water_cooling(parsed);
+  disp(jsonencode(struct('dT_coolant',result.dT_coolant,'T_out',result.T_out,'T_junction',result.T_junction)));
+python_call:
+  module: tests.regression.helpers
+  function: run_water_cooling_basic
+  args: {}
+tolerance:
+  rtol: 1.0e-4

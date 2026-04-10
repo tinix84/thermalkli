@@ -7,5 +7,21 @@ from thermal_cli.cspi.formulas import (
     cspi_calc,
     fan_scaling_fit,
 )
+from thermal_cli.cspi.optimizer import (
+    CspiOptResult,
+    CspiSweepResult,
+    cspi_optimize,
+    cspi_sweep,
+)
 
-__all__ = ["FluidProps", "air_properties", "channel_rth", "cspi_calc", "fan_scaling_fit"]
+__all__ = [
+    "FluidProps",
+    "air_properties",
+    "channel_rth",
+    "cspi_calc",
+    "fan_scaling_fit",
+    "CspiOptResult",
+    "CspiSweepResult",
+    "cspi_optimize",
+    "cspi_sweep",
+]

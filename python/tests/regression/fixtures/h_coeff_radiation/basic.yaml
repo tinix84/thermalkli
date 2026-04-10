@@ -1,0 +1,18 @@
+command: h-coeff
+description: Linearized radiation h, eps=0.9, Ta=25C, Ts=75C.
+octave_script: |
+  addpath('lib');
+  h = h_radiation(0.9, 25, 75);
+  disp(jsonencode(struct('h', h)));
+python_call:
+  module: tests.regression.helpers
+  function: run_h_radiation
+  args:
+    emissivity: 0.9
+    t_ambient: 298.15
+    t_surface: 348.15
+tolerance:
+  # Python uses STEFAN_BOLTZMANN=5.670367e-8 (CODATA 2014) while
+  # Octave uses 5.67e-8 (rounded). Relative difference ~6.5e-5,
+  # so 1e-4 tolerance is appropriate.
+  rtol: 1.0e-4

@@ -1,0 +1,16 @@
+command: h-coeff
+description: Forced convection, laminar, L=0.3m, U=5m/s, Ta=25C, Ts=75C.
+octave_script: |
+  addpath('lib');
+  [h, Re] = h_forced_convection(0.3, 5, 25, 75);
+  disp(jsonencode(struct('h', h, 'Re', Re)));
+python_call:
+  module: tests.regression.helpers
+  function: run_h_forced_laminar
+  args:
+    length: 0.3
+    velocity: 5.0
+    t_ambient: 298.15
+    t_surface: 348.15
+tolerance:
+  rtol: 1.0e-6

@@ -1,0 +1,15 @@
+command: h-coeff
+description: Natural convection, vertical, L=0.3m, Ta=25C, Ts=75C.
+octave_script: |
+  addpath('lib');
+  [h, Ra] = h_natural_convection('vertical', 0.3, 25, 75);
+  disp(jsonencode(struct('h', h, 'Ra', Ra)));
+python_call:
+  module: tests.regression.helpers
+  function: run_h_natural_vertical
+  args:
+    length: 0.3
+    t_ambient: 298.15
+    t_surface: 348.15
+tolerance:
+  rtol: 1.0e-6

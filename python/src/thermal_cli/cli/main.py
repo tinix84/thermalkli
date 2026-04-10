@@ -7,6 +7,7 @@ from pathlib import Path
 import typer
 
 from thermal_cli import __version__
+from thermal_cli.cli.commands_m7 import register_all
 
 app = typer.Typer(
     name="thermal",
@@ -48,6 +49,9 @@ def convert_config(
         raise typer.Exit(1)
     convert_m_to_yaml(m_file, yaml_file)
     typer.echo(f"Converted {m_file} → {yaml_file}")
+
+
+register_all(app)
 
 
 if __name__ == "__main__":

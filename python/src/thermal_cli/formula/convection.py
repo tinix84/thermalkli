@@ -193,8 +193,5 @@ def h_radiation_linearized(
         Linearized radiation heat transfer coefficient [W/(m²·K)].
     """
     return float(
-        emissivity
-        * STEFAN_BOLTZMANN
-        * (t_surface**2 + t_ambient**2)
-        * (t_surface + t_ambient)
+        emissivity * STEFAN_BOLTZMANN * (t_surface**2 + t_ambient**2) * (t_surface + t_ambient)
     )

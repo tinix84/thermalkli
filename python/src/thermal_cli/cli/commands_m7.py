@@ -235,8 +235,7 @@ def _free_conv_command(
         typer.Option(
             "--face",
             help=(
-                "Face spec (repeatable): "
-                "area=<m²>,length=<m>,orientation=<str>[,emissivity=<f>]"
+                "Face spec (repeatable): area=<m²>,length=<m>,orientation=<str>[,emissivity=<f>]"
             ),
         ),
     ],
@@ -320,9 +319,7 @@ def _natural_conv_hs_command(
     k: Annotated[float, typer.Option("--k", help="Fin thermal conductivity [W/(m K)]")],
     t_ambient: Annotated[float, typer.Option("--t-ambient", help="Ambient temperature [°C]")],
     p_loss: Annotated[float, typer.Option("--p-loss", help="Applied power loss [W]")],
-    emissivity: Annotated[
-        float, typer.Option("--emissivity", help="Surface emissivity")
-    ] = 0.9,
+    emissivity: Annotated[float, typer.Option("--emissivity", help="Surface emissivity")] = 0.9,
 ) -> None:
     """Fanless heatsink Rth estimator (natural convection + radiation)."""
     from thermal_cli.heatsinks.natural_conv import natural_conv_hs
@@ -372,8 +369,8 @@ def _build_hs_geometry(cfg: dict):
     amb_cfg = cfg.get("ambient", {})
 
     profile = lookup_hs_profile(hs_cfg["profile"])
-    b_m = float(hs_cfg["length"])         # heatsink length = fin depth direction
-    width_m = float(hs_cfg["width"])      # heatsink width = fin span direction
+    b_m = float(hs_cfg["length"])  # heatsink length = fin depth direction
+    width_m = float(hs_cfg["width"])  # heatsink width = fin span direction
 
     # Dimensions from profile (mm → m)
     hf_m = profile.hf_mm / 1000.0
@@ -409,8 +406,8 @@ def _hydraulic_op_command(
     from thermal_cli.heatsinks.profiles_db import lookup_fan
 
     cfg = _load_yaml_config(config)
-    _, _, b_m, _width_m, n_fins, tf_m, bch_m, hf_m, vent_type, s_m, t_air_k = (
-        _build_hs_geometry(cfg)
+    _, _, b_m, _width_m, n_fins, tf_m, bch_m, hf_m, vent_type, s_m, t_air_k = _build_hs_geometry(
+        cfg
     )
 
     fan_cfg = cfg.get("fan", {})

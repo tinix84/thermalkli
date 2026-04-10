@@ -19,6 +19,7 @@ from thermal_cli.formula.water_cooling import WaterCoolingResult, water_cooling
 # Helper: reference calculation
 # ---------------------------------------------------------------------------
 
+
 def _ref(
     p_loss: float,
     flow_lpm: float,
@@ -43,6 +44,7 @@ def _ref(
 # ---------------------------------------------------------------------------
 # Basic energy balance
 # ---------------------------------------------------------------------------
+
 
 def test_basic_energy_balance():
     """1000 W, 5 l/min, 4 devices, Rjc=0.5 K/W, inlet=423.15 K."""
@@ -80,6 +82,7 @@ def test_basic_dt_approx():
 # Single device case
 # ---------------------------------------------------------------------------
 
+
 def test_single_device():
     """Single device: p_per_device == p_loss, Tj = t_out + p_loss * rth_jc."""
     res = water_cooling(
@@ -111,6 +114,7 @@ def test_single_device_p_per_device_equals_total():
 # rth_cl contribution
 # ---------------------------------------------------------------------------
 
+
 def test_rth_cl_increases_junction_temperature():
     """Adding rth_cl must raise t_junction by p_dev * rth_cl."""
     base = water_cooling(
@@ -137,6 +141,7 @@ def test_rth_cl_increases_junction_temperature():
 # Custom fluid properties (cp / rho override)
 # ---------------------------------------------------------------------------
 
+
 def test_custom_fluid_properties():
     """Override cp and rho to pure water values and verify m_dot."""
     cp_water = 4182.0
@@ -159,6 +164,7 @@ def test_custom_fluid_properties():
 # Return type
 # ---------------------------------------------------------------------------
 
+
 def test_returns_dataclass():
     res = water_cooling(
         p_loss=1000.0,
@@ -176,6 +182,7 @@ def test_returns_dataclass():
 # ---------------------------------------------------------------------------
 # Keyword-only enforcement
 # ---------------------------------------------------------------------------
+
 
 def test_keyword_only_raises_on_positional():
     """water_cooling must reject positional arguments."""

@@ -37,42 +37,30 @@ class TestSingleVerticalFace:
     FACES = _single_vertical_face(area=0.01, char_length=0.05)
 
     def test_returns_free_conv_result(self):
-        result = free_conv_surface_temp(
-            faces=self.FACES, t_ambient=self.T_AMB, p_total=self.P
-        )
+        result = free_conv_surface_temp(faces=self.FACES, t_ambient=self.T_AMB, p_total=self.P)
         assert isinstance(result, FreeConvResult)
 
     def test_surface_temp_above_ambient(self):
-        result = free_conv_surface_temp(
-            faces=self.FACES, t_ambient=self.T_AMB, p_total=self.P
-        )
+        result = free_conv_surface_temp(faces=self.FACES, t_ambient=self.T_AMB, p_total=self.P)
         assert result.t_surface > self.T_AMB
 
     def test_surface_temp_above_ambient_by_30K(self):
         """10 W on 0.01 m² should require ΔT >> 30 K."""
-        result = free_conv_surface_temp(
-            faces=self.FACES, t_ambient=self.T_AMB, p_total=self.P
-        )
+        result = free_conv_surface_temp(faces=self.FACES, t_ambient=self.T_AMB, p_total=self.P)
         assert result.t_surface > self.T_AMB + 30.0
 
     def test_energy_closure(self):
         """sum(q_per_face) ≈ p_total within 1%."""
-        result = free_conv_surface_temp(
-            faces=self.FACES, t_ambient=self.T_AMB, p_total=self.P
-        )
+        result = free_conv_surface_temp(faces=self.FACES, t_ambient=self.T_AMB, p_total=self.P)
         assert sum(result.q_per_face) == pytest.approx(self.P, rel=0.01)
 
     def test_per_face_lists_have_correct_length(self):
-        result = free_conv_surface_temp(
-            faces=self.FACES, t_ambient=self.T_AMB, p_total=self.P
-        )
+        result = free_conv_surface_temp(faces=self.FACES, t_ambient=self.T_AMB, p_total=self.P)
         assert len(result.h_per_face) == 1
         assert len(result.q_per_face) == 1
 
     def test_h_per_face_positive(self):
-        result = free_conv_surface_temp(
-            faces=self.FACES, t_ambient=self.T_AMB, p_total=self.P
-        )
+        result = free_conv_surface_temp(faces=self.FACES, t_ambient=self.T_AMB, p_total=self.P)
         assert result.h_per_face[0] > 0
 
 
@@ -96,22 +84,16 @@ class TestMultiFaceBox:
 
     def test_energy_closure(self):
         """sum(q_per_face) ≈ p_total within 1%."""
-        result = free_conv_surface_temp(
-            faces=self.FACES, t_ambient=self.T_AMB, p_total=self.P
-        )
+        result = free_conv_surface_temp(faces=self.FACES, t_ambient=self.T_AMB, p_total=self.P)
         assert sum(result.q_per_face) == pytest.approx(self.P, rel=0.01)
 
     def test_per_face_lists_length(self):
-        result = free_conv_surface_temp(
-            faces=self.FACES, t_ambient=self.T_AMB, p_total=self.P
-        )
+        result = free_conv_surface_temp(faces=self.FACES, t_ambient=self.T_AMB, p_total=self.P)
         assert len(result.h_per_face) == 5
         assert len(result.q_per_face) == 5
 
     def test_surface_temp_above_ambient(self):
-        result = free_conv_surface_temp(
-            faces=self.FACES, t_ambient=self.T_AMB, p_total=self.P
-        )
+        result = free_conv_surface_temp(faces=self.FACES, t_ambient=self.T_AMB, p_total=self.P)
         assert result.t_surface > self.T_AMB
 
 
@@ -125,21 +107,13 @@ class TestMonotonicity:
     FACES = _single_vertical_face(area=0.01, char_length=0.1)
 
     def test_higher_power_gives_higher_temperature(self):
-        res_low = free_conv_surface_temp(
-            faces=self.FACES, t_ambient=self.T_AMB, p_total=1.0
-        )
-        res_high = free_conv_surface_temp(
-            faces=self.FACES, t_ambient=self.T_AMB, p_total=10.0
-        )
+        res_low = free_conv_surface_temp(faces=self.FACES, t_ambient=self.T_AMB, p_total=1.0)
+        res_high = free_conv_surface_temp(faces=self.FACES, t_ambient=self.T_AMB, p_total=10.0)
         assert res_high.t_surface > res_low.t_surface
 
     def test_higher_power_gives_higher_q(self):
-        res_low = free_conv_surface_temp(
-            faces=self.FACES, t_ambient=self.T_AMB, p_total=1.0
-        )
-        res_high = free_conv_surface_temp(
-            faces=self.FACES, t_ambient=self.T_AMB, p_total=10.0
-        )
+        res_low = free_conv_surface_temp(faces=self.FACES, t_ambient=self.T_AMB, p_total=1.0)
+        res_high = free_conv_surface_temp(faces=self.FACES, t_ambient=self.T_AMB, p_total=10.0)
         assert sum(res_high.q_per_face) > sum(res_low.q_per_face)
 
 

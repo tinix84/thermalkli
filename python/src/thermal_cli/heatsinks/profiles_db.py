@@ -25,9 +25,9 @@ class HsProfile:
     """Extruded-fin heatsink geometric profile (all dimensions in mm)."""
 
     name: str
-    tb_mm: float   # base plate thickness
-    hf_mm: float   # fin height
-    tf_mm: float   # fin thickness
+    tb_mm: float  # base plate thickness
+    hf_mm: float  # fin height
+    tf_mm: float  # fin thickness
     bch_mm: float  # channel width
 
 
@@ -36,7 +36,7 @@ class HsMaterial:
     """Heatsink material thermal and physical properties."""
 
     name: str
-    k_fin: float    # fin thermal conductivity [W/(m·K)]
+    k_fin: float  # fin thermal conductivity [W/(m·K)]
     k_plate: float  # base-plate thermal conductivity [W/(m·K)]
 
 
@@ -61,10 +61,7 @@ def _find_db_dir() -> Path:
         candidate = parent / "db"
         if (candidate / "hs_profiles.csv").exists():
             return candidate
-    raise FileNotFoundError(
-        "db/hs_profiles.csv not found in any parent directory of "
-        f"{__file__}"
-    )
+    raise FileNotFoundError(f"db/hs_profiles.csv not found in any parent directory of {__file__}")
 
 
 # ---------------------------------------------------------------------------
@@ -96,10 +93,7 @@ def lookup_hs_profile(name: str) -> HsProfile:
                     tf_mm=float(row["tf_mm"]),
                     bch_mm=float(row["bch_mm"]),
                 )
-    raise ValueError(
-        f"Heatsink profile '{name}' not found in database. "
-        "Check db/hs_profiles.csv."
-    )
+    raise ValueError(f"Heatsink profile '{name}' not found in database. Check db/hs_profiles.csv.")
 
 
 def lookup_hs_material(name: str) -> HsMaterial:
@@ -125,8 +119,7 @@ def lookup_hs_material(name: str) -> HsMaterial:
                     k_plate=float(row["k_plate"]),
                 )
     raise ValueError(
-        f"Heatsink material '{name}' not found in database. "
-        "Check db/hs_materials.csv."
+        f"Heatsink material '{name}' not found in database. Check db/hs_materials.csv."
     )
 
 
@@ -152,7 +145,4 @@ def lookup_fan(name: str) -> FanCurve:
                 qv = np.array(json.loads(row["qv_m3s"]), dtype=float)
                 hv = np.array(json.loads(row["hv_pa"]), dtype=float)
                 return FanCurve(name=row["name"], qv=qv, hv=hv)
-    raise ValueError(
-        f"Fan '{name}' not found in database. "
-        "Check db/fans.csv."
-    )
+    raise ValueError(f"Fan '{name}' not found in database. Check db/fans.csv.")

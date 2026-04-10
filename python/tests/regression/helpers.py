@@ -48,9 +48,7 @@ def run_h_forced_laminar(
     return {"h": h, "Re": Re}
 
 
-def run_h_natural_vertical(
-    length: float, t_ambient: float, t_surface: float
-) -> dict:
+def run_h_natural_vertical(length: float, t_ambient: float, t_surface: float) -> dict:
     """Return {'h': h, 'Ra': Ra} for natural convection, vertical plate.
 
     Ra is computed from first principles (matching the Octave formula) since

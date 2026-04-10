@@ -27,7 +27,7 @@ from scipy.interpolate import CubicSpline
 
 _T_KNOTS_K = np.array([273.15, 311.15, 366.15, 422.15])  # 0, 38, 93, 149 °C
 
-_RHO_DATA = np.array([1.296, 1.136, 0.96, 0.832])        # kg/m³
+_RHO_DATA = np.array([1.296, 1.136, 0.96, 0.832])  # kg/m³
 _MU_DATA = np.array([1.732, 1.910, 2.140, 2.392]) * 1e-5  # Pa·s
 # kcal/(h·m·°C) → W/(m·K): multiply by 4.1868e3/3600
 _KT_DATA = np.array([0.0208, 0.0230, 0.0259, 0.0287]) * 4.1868e3 / 3600.0
@@ -104,10 +104,10 @@ class FinRthResult:
     """
 
     reynolds: float
-    v_ch1: float   # [m/s]
-    v_ch2: float   # [m/s]
-    rth: float     # [K/W]
-    h_eq: float    # [W/(m²·K)]
+    v_ch1: float  # [m/s]
+    v_ch2: float  # [m/s]
+    rth: float  # [K/W]
+    h_eq: float  # [W/(m²·K)]
 
 
 # ---------------------------------------------------------------------------
@@ -135,9 +135,7 @@ def _fred_rect(bch: float, h: float) -> float:
     """
     ratio = bch / h
     tanh_term = math.tanh(math.pi * h / (2.0 * bch))
-    return 24.0 / (
-        (1.0 + ratio**2) * (1.0 - (192.0 / math.pi**5) * ratio * tanh_term)
-    )
+    return 24.0 / ((1.0 + ratio**2) * (1.0 - (192.0 / math.pi**5) * ratio * tanh_term))
 
 
 def _nu_channel(reb: float, pr: float) -> float:
@@ -152,7 +150,7 @@ def _nu_channel(reb: float, pr: float) -> float:
     """
     term_fd = reb * pr / 2.0
     term_dev = 0.664 * math.sqrt(reb) * pr ** (1.0 / 3.0) * math.sqrt(1.0 + 3.65 / math.sqrt(reb))
-    return (term_fd**(-3) + term_dev**(-3)) ** (-1.0 / 3.0)
+    return (term_fd ** (-3) + term_dev ** (-3)) ** (-1.0 / 3.0)
 
 
 # ---------------------------------------------------------------------------
@@ -252,9 +250,7 @@ def hydraulic_operating_point(
 
             ratio_hs = hf / s
             if ratio_hs <= 1.0:
-                k90 = (
-                    3.64 - 9.15 * ratio_hs + 10.87 * ratio_hs**2 - 4.93 * ratio_hs**3
-                )
+                k90 = 3.64 - 9.15 * ratio_hs + 10.87 * ratio_hs**2 - 4.93 * ratio_hs**3
             else:
                 k90 = 0.5 * ((1.0 + vch2 / vch1) / 2.0)
 
@@ -263,10 +259,15 @@ def hydraulic_operating_point(
             ke = 1.0 - sigma**2 - 0.4 * sigma
 
             hv_hs = (
-                (kc + k90 + 4.0 * fapp1 * leff1 / dh1) * (4.0 * hf**2 / s**2)
-                + 4.0 * fapp2 * leff2 / dh2
-                + ke
-            ) * 0.5 * rho * vch2**2
+                (
+                    (kc + k90 + 4.0 * fapp1 * leff1 / dh1) * (4.0 * hf**2 / s**2)
+                    + 4.0 * fapp2 * leff2 / dh2
+                    + ke
+                )
+                * 0.5
+                * rho
+                * vch2**2
+            )
 
         else:  # push
             leff2 = b
@@ -411,8 +412,8 @@ def fin_thermal_resistance(
         hfin = nu_fin * kt / bch
 
     # Areas (all in m²)
-    a_bare = a * b - n_fins * b * tf      # base plate between fins
-    a_fin = n_ch * b * hf * 2.0           # both faces of all fins
+    a_bare = a * b - n_fins * b * tf  # base plate between fins
+    a_fin = n_ch * b * hf * 2.0  # both faces of all fins
 
     rth = 1.0 / (a_bare * hbare + a_fin * hfin)
     h_eq = 1.0 / (a * b * rth)

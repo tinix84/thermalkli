@@ -17,14 +17,14 @@ from thermal_cli.heatsinks.natural_conv import NaturalConvHsResult, natural_conv
 
 _TYPICAL_KWARGS = dict(
     n_fins=10,
-    fin_height=0.05,       # 50 mm
-    fin_length=0.10,       # 100 mm
-    fin_thickness=0.002,   # 2 mm
-    channel_width=0.005,   # 5 mm
+    fin_height=0.05,  # 50 mm
+    fin_length=0.10,  # 100 mm
+    fin_thickness=0.002,  # 2 mm
+    channel_width=0.005,  # 5 mm
     base_thickness=0.003,  # 3 mm (not used in calc)
-    k=200.0,               # aluminum
-    t_ambient=298.15,      # 25 °C
-    p_loss=10.0,           # 10 W
+    k=200.0,  # aluminum
+    t_ambient=298.15,  # 25 °C
+    p_loss=10.0,  # 10 W
 )
 
 

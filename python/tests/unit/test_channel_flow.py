@@ -31,7 +31,7 @@ _T_CELSIUS = [0.0, 38.0, 93.0, 149.0]
 _T_K = [t + 273.15 for t in _T_CELSIUS]
 
 # Expected values at table knots
-_RHO_EXPECTED = [1.296, 1.136, 0.96, 0.832]          # kg/m³
+_RHO_EXPECTED = [1.296, 1.136, 0.96, 0.832]  # kg/m³
 _MU_EXPECTED = [1.732e-5, 1.910e-5, 2.140e-5, 2.392e-5]  # Pa·s
 _KT_EXPECTED = [
     0.0208 * 4.1868e3 / 3600,
@@ -111,7 +111,7 @@ _HS = dict(
     tf=0.002,
     bch=0.004,
     hf=0.040,
-    t_air=300.0,   # K
+    t_air=300.0,  # K
     k_fin=200.0,
 )
 
@@ -213,14 +213,28 @@ class TestHydraulicOperatingPoint:
         fan_hv_low = np.linspace(60.0, 0.0, _N_FAN)
         fan_hv_high = np.linspace(200.0, 0.0, _N_FAN)
         r_low = hydraulic_operating_point(
-            b=_HS["b"], s=_HS["s"], n_fins=_HS["n_fins"], tf=_HS["tf"],
-            bch=_HS["bch"], hf=_HS["hf"], t_air=_HS["t_air"], vent_type="push",
-            fan_qv=_FAN_QV, fan_hv=fan_hv_low,
+            b=_HS["b"],
+            s=_HS["s"],
+            n_fins=_HS["n_fins"],
+            tf=_HS["tf"],
+            bch=_HS["bch"],
+            hf=_HS["hf"],
+            t_air=_HS["t_air"],
+            vent_type="push",
+            fan_qv=_FAN_QV,
+            fan_hv=fan_hv_low,
         )
         r_high = hydraulic_operating_point(
-            b=_HS["b"], s=_HS["s"], n_fins=_HS["n_fins"], tf=_HS["tf"],
-            bch=_HS["bch"], hf=_HS["hf"], t_air=_HS["t_air"], vent_type="push",
-            fan_qv=_FAN_QV, fan_hv=fan_hv_high,
+            b=_HS["b"],
+            s=_HS["s"],
+            n_fins=_HS["n_fins"],
+            tf=_HS["tf"],
+            bch=_HS["bch"],
+            hf=_HS["hf"],
+            t_air=_HS["t_air"],
+            vent_type="push",
+            fan_qv=_FAN_QV,
+            fan_hv=fan_hv_high,
         )
         assert r_high.pressure > r_low.pressure
 
@@ -255,9 +269,17 @@ class TestFinThermalResistance:
     def test_push_vch1_is_zero(self):
         """Push mode has no vertical channel flow."""
         result = fin_thermal_resistance(
-            qv_f=0.01, a=_HS["a"], b=_HS["b"], s=_HS["s"], tf=_HS["tf"],
-            bch=_HS["bch"], hf=_HS["hf"], t_air=_HS["t_air"], vent_type="push",
-            k_fin=_HS["k_fin"], n_fins=_HS["n_fins"],
+            qv_f=0.01,
+            a=_HS["a"],
+            b=_HS["b"],
+            s=_HS["s"],
+            tf=_HS["tf"],
+            bch=_HS["bch"],
+            hf=_HS["hf"],
+            t_air=_HS["t_air"],
+            vent_type="push",
+            k_fin=_HS["k_fin"],
+            n_fins=_HS["n_fins"],
         )
         assert result.v_ch1 == 0.0
 
@@ -284,18 +306,33 @@ class TestFinThermalResistance:
     def test_impinge_vch1_positive(self):
         """Impinge mode has vertical channel velocity > 0."""
         result = fin_thermal_resistance(
-            qv_f=0.01, a=_HS["a"], b=_HS["b"], s=_HS["s"], tf=_HS["tf"],
-            bch=_HS["bch"], hf=_HS["hf"], t_air=_HS["t_air"], vent_type="impinge",
-            k_fin=_HS["k_fin"], n_fins=_HS["n_fins"],
+            qv_f=0.01,
+            a=_HS["a"],
+            b=_HS["b"],
+            s=_HS["s"],
+            tf=_HS["tf"],
+            bch=_HS["bch"],
+            hf=_HS["hf"],
+            t_air=_HS["t_air"],
+            vent_type="impinge",
+            k_fin=_HS["k_fin"],
+            n_fins=_HS["n_fins"],
         )
         assert result.v_ch1 > 0.0
 
     def test_higher_flow_lower_rth_push(self):
         """Higher volumetric flow → lower thermal resistance (push)."""
         common = dict(
-            a=_HS["a"], b=_HS["b"], s=_HS["s"], tf=_HS["tf"],
-            bch=_HS["bch"], hf=_HS["hf"], t_air=_HS["t_air"],
-            vent_type="push", k_fin=_HS["k_fin"], n_fins=_HS["n_fins"],
+            a=_HS["a"],
+            b=_HS["b"],
+            s=_HS["s"],
+            tf=_HS["tf"],
+            bch=_HS["bch"],
+            hf=_HS["hf"],
+            t_air=_HS["t_air"],
+            vent_type="push",
+            k_fin=_HS["k_fin"],
+            n_fins=_HS["n_fins"],
         )
         r_low = fin_thermal_resistance(qv_f=0.005, **common)
         r_high = fin_thermal_resistance(qv_f=0.02, **common)
@@ -304,9 +341,16 @@ class TestFinThermalResistance:
     def test_higher_flow_lower_rth_impinge(self):
         """Higher volumetric flow → lower thermal resistance (impinge)."""
         common = dict(
-            a=_HS["a"], b=_HS["b"], s=_HS["s"], tf=_HS["tf"],
-            bch=_HS["bch"], hf=_HS["hf"], t_air=_HS["t_air"],
-            vent_type="impinge", k_fin=_HS["k_fin"], n_fins=_HS["n_fins"],
+            a=_HS["a"],
+            b=_HS["b"],
+            s=_HS["s"],
+            tf=_HS["tf"],
+            bch=_HS["bch"],
+            hf=_HS["hf"],
+            t_air=_HS["t_air"],
+            vent_type="impinge",
+            k_fin=_HS["k_fin"],
+            n_fins=_HS["n_fins"],
         )
         r_low = fin_thermal_resistance(qv_f=0.005, **common)
         r_high = fin_thermal_resistance(qv_f=0.02, **common)
@@ -315,17 +359,33 @@ class TestFinThermalResistance:
     def test_unknown_vent_type_raises(self):
         with pytest.raises(ValueError, match="vent_type"):
             fin_thermal_resistance(
-                qv_f=0.01, a=_HS["a"], b=_HS["b"], s=_HS["s"], tf=_HS["tf"],
-                bch=_HS["bch"], hf=_HS["hf"], t_air=_HS["t_air"],
-                vent_type="lateral", k_fin=_HS["k_fin"], n_fins=_HS["n_fins"],
+                qv_f=0.01,
+                a=_HS["a"],
+                b=_HS["b"],
+                s=_HS["s"],
+                tf=_HS["tf"],
+                bch=_HS["bch"],
+                hf=_HS["hf"],
+                t_air=_HS["t_air"],
+                vent_type="lateral",
+                k_fin=_HS["k_fin"],
+                n_fins=_HS["n_fins"],
             )
 
     def test_rth_h_eq_consistent(self):
         """h_eq and rth should be consistent: h_eq ≈ 1 / (a*b*rth)."""
         result = fin_thermal_resistance(
-            qv_f=0.01, a=_HS["a"], b=_HS["b"], s=_HS["s"], tf=_HS["tf"],
-            bch=_HS["bch"], hf=_HS["hf"], t_air=_HS["t_air"], vent_type="push",
-            k_fin=_HS["k_fin"], n_fins=_HS["n_fins"],
+            qv_f=0.01,
+            a=_HS["a"],
+            b=_HS["b"],
+            s=_HS["s"],
+            tf=_HS["tf"],
+            bch=_HS["bch"],
+            hf=_HS["hf"],
+            t_air=_HS["t_air"],
+            vent_type="push",
+            k_fin=_HS["k_fin"],
+            n_fins=_HS["n_fins"],
         )
         a = _HS["a"]
         b = _HS["b"]

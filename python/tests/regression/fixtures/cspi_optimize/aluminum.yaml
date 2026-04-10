@@ -1,0 +1,12 @@
+command: cspi-optimize
+description: Aluminum HS, A_chip=10cm2, c=40mm, P_fan=5W.
+octave_script: |
+  addpath('lib');
+  r = cspi_optimize(200, 10e-4, 0.040, 5);
+  disp(jsonencode(struct('cspi', r.cspi, 'rth', r.rth, 'n', r.n, 's', r.s)));
+python_call:
+  module: tests.regression.helpers
+  function: run_cspi_optimize_aluminum
+  args: {}
+tolerance:
+  rtol: 1.0e-4

@@ -50,5 +50,10 @@ def convert_config(
     typer.echo(f"Converted {m_file} → {yaml_file}")
 
 
+from thermal_cli.cli.commands_m7 import register_all
+
+register_all(app)
+
+
 if __name__ == "__main__":
     app()

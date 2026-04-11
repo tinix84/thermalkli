@@ -1,0 +1,17 @@
+command: fan-fit
+description: Fan scaling k1/k2/k3 for V=0.05, dp=50, P=3, D=0.12, N=2500.
+octave_script: |
+  addpath('lib');
+  [k1, k2, k3] = fan_scaling_fit(0.05, 50, 3, 0.12, 2500);
+  disp(jsonencode(struct('k1', k1, 'k2', k2, 'k3', k3)));
+python_call:
+  module: tests.regression.helpers
+  function: run_fan_scaling_fit
+  args:
+    v_max: 0.05
+    dp_max: 50.0
+    p_fan: 3.0
+    d: 0.12
+    n: 2500.0
+tolerance:
+  rtol: 1.0e-10

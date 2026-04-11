@@ -141,6 +141,26 @@ def sae30_density(temperature: float) -> float:
 # --- Layer spreading helpers ---
 
 
+# ---------------------------------------------------------------------------
+# M8 CSPI wrappers
+# ---------------------------------------------------------------------------
+
+
+def run_fan_scaling_fit(v_max: float, dp_max: float, p_fan: float, d: float, n: float) -> dict:
+    """Return {'k1': k1, 'k2': k2, 'k3': k3} from fan_scaling_fit."""
+    from thermal_cli.cspi.formulas import fan_scaling_fit
+
+    k1, k2, k3 = fan_scaling_fit(v_max=v_max, dp_max=dp_max, p_fan=p_fan, d=d, n=n)
+    return {"k1": k1, "k2": k2, "k3": k3}
+
+
+def run_cspi_optimize_aluminum() -> dict:
+    from thermal_cli.cspi.optimizer import cspi_optimize
+
+    r = cspi_optimize(lambda_hs=200.0, a_chip=10e-4, c=0.040, p_fan_max=5.0)
+    return {"cspi": r.cspi, "rth": r.rth, "n": float(r.n), "s": r.s}
+
+
 def layer_spreading_isotropic(
     thick: float, k_op: float, a_in: float, a_out: float, h_eff: float
 ) -> dict[str, float]:

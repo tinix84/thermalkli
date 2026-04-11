@@ -1,0 +1,27 @@
+"""CSPI (Cooling System Performance Index) module — Drofenik & Kolar CIPS06."""
+
+from thermal_cli.cspi.formulas import (
+    FluidProps,
+    air_properties,
+    channel_rth,
+    cspi_calc,
+    fan_scaling_fit,
+)
+from thermal_cli.cspi.optimizer import (
+    CspiOptResult,
+    CspiSweepResult,
+    cspi_optimize,
+    cspi_sweep,
+)
+
+__all__ = [
+    "CspiOptResult",
+    "CspiSweepResult",
+    "FluidProps",
+    "air_properties",
+    "channel_rth",
+    "cspi_calc",
+    "cspi_optimize",
+    "cspi_sweep",
+    "fan_scaling_fit",
+]

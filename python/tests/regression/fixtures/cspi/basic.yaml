@@ -1,0 +1,14 @@
+command: cspi
+description: CSPI = 1/(0.5 * 2.0) = 1.0
+octave_script: |
+  addpath('lib');
+  cspi = cspi_calc(0.5, 2.0);
+  disp(jsonencode(struct('cspi', cspi)));
+python_call:
+  module: thermal_cli.cspi.formulas
+  function: cspi_calc
+  args:
+    rth: 0.5
+    vol_cs: 2.0
+tolerance:
+  rtol: 1.0e-12

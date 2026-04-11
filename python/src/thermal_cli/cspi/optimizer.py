@@ -29,7 +29,7 @@ class CspiOptResult:
     s: float  # optimal channel width [m]
     t: float  # fin thickness [m]
     re: float  # Reynolds number
-    n_fan: float  # fan speed [rev/s]
+    n_fan: float  # fan speed [rpm] (matches fan_scaling_fit convention)
     length: float  # heatsink length [m]
     v_max: float  # max fan flow [m^3/s]
     dp_max: float  # max fan pressure [Pa]
@@ -72,12 +72,34 @@ def cspi_optimize(
     k2:         Fan scaling: dp_MAX = k2 * N^2 * D^2
     k3:         Fan scaling: P_FAN = k3 * N^3 * D^5
     t_air:      Reference air temperature [°C]
-    n_pts:      Number of sweep points
+    n_pts:      Number of sweep points (>= 2)
+
+    Raises
+    ------
+    ValueError
+        If any physical input is non-positive (or ``t_min`` is negative,
+        or ``n_pts < 2``).
     """
+    if lambda_hs <= 0:
+        raise ValueError(f"lambda_hs must be > 0, got {lambda_hs}")
+    if a_chip <= 0:
+        raise ValueError(f"a_chip must be > 0, got {a_chip}")
+    if c <= 0:
+        raise ValueError(f"c must be > 0, got {c}")
+    if p_fan_max <= 0:
+        raise ValueError(f"p_fan_max must be > 0, got {p_fan_max}")
+    if k1 <= 0 or k2 <= 0 or k3 <= 0:
+        raise ValueError(f"k1, k2, k3 must all be > 0, got k1={k1}, k2={k2}, k3={k3}")
+    if t_min < 0:
+        raise ValueError(f"t_min must be >= 0, got {t_min}")
+    if n_pts < 2:
+        raise ValueError(f"n_pts must be >= 2, got {n_pts}")
+
     # Heatsink is square cross-section b=c, length L along flow
     L = a_chip / c
 
-    # Fan operating point at max power: P = k3 * N^3 * D^5  =>  N [rev/s]
+    # Fan operating point at max power: P_fan = k3 * N^3 * D^5  =>  N [rpm]
+    # (k3 is fitted with N in rpm, so N computed here is also rpm.)
     N = (p_fan_max / (k3 * c**5)) ** (1.0 / 3.0)
     v_max = k1 * N * c**3  # max volumetric flow at zero pressure [m^3/s]
     dp_max = k2 * N**2 * c**2  # max static pressure at zero flow [Pa]

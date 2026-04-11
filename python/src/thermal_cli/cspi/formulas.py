@@ -56,7 +56,11 @@ def cspi_calc(*, rth: float, vol_cs: float) -> float:
     Parameters
     ----------
     rth:    Thermal resistance [K/W]
-    vol_cs: Cooling system volume [m^3]
+    vol_cs: Cooling system volume [L] (liters — matches CLI, tests, optimizer)
+
+    Returns
+    -------
+    CSPI [W/(K * L)]
     """
     return 1.0 / (rth * vol_cs)
 
@@ -124,13 +128,22 @@ def channel_rth(
         Nu   — Nusselt number [-]
         h    — convective heat transfer coefficient [W/(m^2 K)]
     """
+    if length <= 0:
+        raise ValueError(f"length must be > 0, got {length}")
+    if flow_rate <= 0:
+        raise ValueError(f"flow_rate must be > 0, got {flow_rate}")
+
     if diameter is not None:
+        if diameter <= 0:
+            raise ValueError(f"diameter must be > 0, got {diameter}")
         dh = diameter
         Ac = math.pi * (diameter / 2) ** 2
         P = math.pi * diameter
     else:
         if width is None or height is None:
             raise ValueError("Provide either 'diameter' or both 'width' and 'height'.")
+        if width <= 0 or height <= 0:
+            raise ValueError(f"width and height must be > 0, got width={width}, height={height}")
         dh = 4.0 * width * height / 2.0 / (height + width)
         Ac = width * height
         P = 2.0 * (width + height)

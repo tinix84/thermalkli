@@ -175,12 +175,14 @@ class TestCustomFanConstants:
         assert res_k3_low.n_fan > res_k3_high.n_fan
 
     def test_n_fan_formula(self):
-        """N_fan = (P_fan_max / (k3 * c^5))^(1/3) [rev/s internally, return as rpm]."""
+        """N_fan = (P_fan_max / (k3 * c^5))^(1/3), in rpm.
+
+        The k3 default (30e-6) was fitted in rpm units (consistent with
+        ``fan_scaling_fit``), so ``n_fan`` is returned directly in rpm.
+        """
         c = 40e-3
         p = 5.0
         k3 = 30e-6
-        # The formula gives N in rev/s; stored as rpm (multiply by 60) or raw rev/s
-        # We just check it's consistent with formula (within factor of 60 ambiguity)
         res = cspi_optimize(
             lambda_hs=200.0,
             a_chip=10e-4,
@@ -188,9 +190,8 @@ class TestCustomFanConstants:
             p_fan_max=p,
             k3=k3,
         )
-        expected_n = (p / (k3 * c**5)) ** (1.0 / 3.0)
-        # Accept either rev/s or rpm value being consistent
-        assert res.n_fan == pytest.approx(expected_n, rel=1e-6)
+        expected_n_rpm = (p / (k3 * c**5)) ** (1.0 / 3.0)
+        assert res.n_fan == pytest.approx(expected_n_rpm, rel=1e-6)
 
 
 # ---------------------------------------------------------------------------
@@ -354,3 +355,37 @@ class TestCspiSweep:
         )
         assert res.cspi.shape == (1, 1)
         assert res.cspi[0, 0] > 0
+
+
+_BASE_OPT_KW = {"lambda_hs": 200.0, "a_chip": 10e-4, "c": 40e-3, "p_fan_max": 5.0}
+
+
+class TestCspiOptimizeValidation:
+    """Non-physical inputs must raise ``ValueError`` before crashing deep in the sweep."""
+
+    @pytest.mark.parametrize(
+        "field,value",
+        [
+            ("lambda_hs", 0.0),
+            ("lambda_hs", -1.0),
+            ("a_chip", 0.0),
+            ("c", 0.0),
+            ("p_fan_max", 0.0),
+            ("k1", 0.0),
+            ("k2", -1e-4),
+            ("k3", 0.0),
+        ],
+    )
+    def test_non_positive_raises(self, field, value):
+        kwargs = dict(_BASE_OPT_KW)
+        kwargs[field] = value
+        with pytest.raises(ValueError, match=field):
+            cspi_optimize(**kwargs)
+
+    def test_negative_t_min_raises(self):
+        with pytest.raises(ValueError, match="t_min"):
+            cspi_optimize(t_min=-1e-3, **_BASE_OPT_KW)
+
+    def test_n_pts_too_small_raises(self):
+        with pytest.raises(ValueError, match="n_pts"):
+            cspi_optimize(n_pts=1, **_BASE_OPT_KW)

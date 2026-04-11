@@ -265,3 +265,49 @@ class TestChannelRth:
         )
         # They differ because Ac and P differ for same characteristic size
         assert rth_rect != pytest.approx(rth_circ)
+
+
+class TestChannelRthValidation:
+    """Input validation for non-physical arguments."""
+
+    def _fluid(self) -> FluidProps:
+        return air_properties(80.0)
+
+    def test_non_positive_length_raises(self):
+        with pytest.raises(ValueError, match="length"):
+            channel_rth(
+                width=0.002,
+                height=0.020,
+                length=0.0,
+                flow_rate=1e-4,
+                fluid=self._fluid(),
+            )
+
+    def test_non_positive_flow_rate_raises(self):
+        with pytest.raises(ValueError, match="flow_rate"):
+            channel_rth(
+                width=0.002,
+                height=0.020,
+                length=0.1,
+                flow_rate=0.0,
+                fluid=self._fluid(),
+            )
+
+    def test_negative_diameter_raises(self):
+        with pytest.raises(ValueError, match="diameter"):
+            channel_rth(
+                diameter=-1e-3,
+                length=0.1,
+                flow_rate=1e-4,
+                fluid=self._fluid(),
+            )
+
+    def test_zero_width_raises(self):
+        with pytest.raises(ValueError, match="width"):
+            channel_rth(
+                width=0.0,
+                height=0.020,
+                length=0.1,
+                flow_rate=1e-4,
+                fluid=self._fluid(),
+            )

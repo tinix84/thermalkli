@@ -16,11 +16,11 @@ from dataclasses import dataclass
 class FluidProps:
     """Fluid thermal properties at a single reference temperature."""
 
-    density: float              # [kg/m^3]
+    density: float  # [kg/m^3]
     kinematic_viscosity: float  # [m^2/s]
-    prandtl_number: float       # [-]
-    thermal_conductivity: float # [W/(m K)]
-    heat_capacity: float        # [J/(kg K)]
+    prandtl_number: float  # [-]
+    thermal_conductivity: float  # [W/(m K)]
+    heat_capacity: float  # [J/(kg K)]
 
 
 def air_properties(t_ref_c: float = 80.0) -> FluidProps:
@@ -30,15 +30,15 @@ def air_properties(t_ref_c: float = 80.0) -> FluidProps:
 
     * Density: ideal gas at 101 325 Pa.
     * Dynamic viscosity: Sutherland's law (S = 120 K, T_ref = 291.15 K,
-      mu_ref = 18.27 × 10⁻⁶ Pa·s).
-    * Thermal conductivity: linear fit kf = 7 × 10⁻⁵ T + 5.1 × 10⁻³ [W/m/K].
+      mu_ref = 18.27e-6 Pa*s).
+    * Thermal conductivity: linear fit kf = 7e-5 * T + 5.1e-3 [W/m/K].
     * Prandtl = 0.71, cp = 1010 J/(kg K) (constant).
     """
-    T = t_ref_c + 273.15                           # [K]
-    rho = 101325.0 / 287.058 / T                   # ideal gas
+    T = t_ref_c + 273.15  # [K]
+    rho = 101325.0 / 287.058 / T  # ideal gas
     mu = 18.27e-6 * (291.15 + 120) / (T + 120) * (T / 291.15) ** 1.5  # Sutherland
-    nu = mu / rho                                  # kinematic viscosity
-    kf = 7e-5 * T + 5.1e-3                         # linear fit
+    nu = mu / rho  # kinematic viscosity
+    kf = 7e-5 * T + 5.1e-3  # linear fit
     return FluidProps(
         density=rho,
         kinematic_viscosity=nu,
@@ -51,7 +51,7 @@ def air_properties(t_ref_c: float = 80.0) -> FluidProps:
 def cspi_calc(*, rth: float, vol_cs: float) -> float:
     """Cooling System Performance Index.
 
-    CSPI = 1 / (Rth × V_cs)
+    CSPI = 1 / (Rth * V_cs)
 
     Parameters
     ----------
@@ -69,7 +69,7 @@ def fan_scaling_fit(
     d: float,
     n: float,
 ) -> tuple[float, float, float]:
-    """Compute Drofenik fan scaling coefficients (eq. 29–31).
+    """Compute Drofenik fan scaling coefficients (eq. 29-31).
 
     Parameters
     ----------
@@ -83,9 +83,9 @@ def fan_scaling_fit(
     -------
     (k1, k2, k3) dimensionless fan similarity coefficients.
     """
-    k1 = float(v_max / (n * d ** 3))
-    k2 = float(dp_max / (n ** 2 * d ** 2))
-    k3 = float(p_fan / (n ** 3 * d ** 5))
+    k1 = float(v_max / (n * d**3))
+    k2 = float(dp_max / (n**2 * d**2))
+    k3 = float(p_fan / (n**3 * d**5))
     return k1, k2, k3
 
 
@@ -151,15 +151,14 @@ def channel_rth(
         # Gnielinski turbulent
         f = (0.79 * math.log(Re) - 1.64) ** 2
         Nu = (
-            (Re - 1000) * Pr * (1 + (dh / length) ** (2.0 / 3.0))
+            (Re - 1000)
+            * Pr
+            * (1 + (dh / length) ** (2.0 / 3.0))
             / (8.0 * f)
             / (1 + 12.7 * math.sqrt(1.0 / (8.0 * f)) * (Pr ** (2.0 / 3.0) - 1))
         )
 
     h = Nu * fluid.thermal_conductivity / dh
-    rth = (
-        1.0 / (h * length * P)
-        + 0.5 / (fluid.density * fluid.heat_capacity * flow_rate)
-    )
+    rth = 1.0 / (h * length * P) + 0.5 / (fluid.density * fluid.heat_capacity * flow_rate)
 
     return float(rth), float(Re), float(Nu), float(h)

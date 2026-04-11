@@ -15,13 +15,13 @@ from thermal_cli.cspi.optimizer import (
 )
 
 __all__ = [
+    "CspiOptResult",
+    "CspiSweepResult",
     "FluidProps",
     "air_properties",
     "channel_rth",
     "cspi_calc",
-    "fan_scaling_fit",
-    "CspiOptResult",
-    "CspiSweepResult",
     "cspi_optimize",
     "cspi_sweep",
+    "fan_scaling_fit",
 ]

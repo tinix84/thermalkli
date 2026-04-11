@@ -146,9 +146,7 @@ def sae30_density(temperature: float) -> float:
 # ---------------------------------------------------------------------------
 
 
-def run_fan_scaling_fit(
-    v_max: float, dp_max: float, p_fan: float, d: float, n: float
-) -> dict:
+def run_fan_scaling_fit(v_max: float, dp_max: float, p_fan: float, d: float, n: float) -> dict:
     """Return {'k1': k1, 'k2': k2, 'k3': k3} from fan_scaling_fit."""
     from thermal_cli.cspi.formulas import fan_scaling_fit
 

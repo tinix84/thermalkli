@@ -1,9 +1,13 @@
 """Literature-validated tests for CSPI formulas.
 Reference: Drofenik & Kolar, CIPS 2006.
 """
+
 from __future__ import annotations
+
 import pytest
+
 from thermal_cli.cspi.formulas import cspi_calc, fan_scaling_fit
+
 
 class TestCspiLiterature:
     def test_eq41_definition(self):
@@ -13,6 +17,7 @@ class TestCspiLiterature:
     def test_cspi_units_consistency(self):
         """Rth=1 K/W, Vol=1 liter -> CSPI=1 W/(K*liter)."""
         assert cspi_calc(rth=1.0, vol_cs=1.0) == pytest.approx(1.0)
+
 
 class TestFanScalingLiterature:
     def test_drofenik_eq29_31_roundtrip(self):

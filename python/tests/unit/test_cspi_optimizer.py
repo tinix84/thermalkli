@@ -1,6 +1,5 @@
 """Tests for cspi/optimizer.py — CSPI geometry optimizer and sweep."""
 
-import math
 import numpy as np
 import pytest
 
@@ -11,17 +10,26 @@ from thermal_cli.cspi.optimizer import (
     cspi_sweep,
 )
 
-
 # ---------------------------------------------------------------------------
 # CspiOptResult dataclass shape
 # ---------------------------------------------------------------------------
 
+
 class TestCspiOptResultShape:
     def test_has_expected_fields(self):
         res = CspiOptResult(
-            cspi=1.0, rth=0.5, vol=0.064, n=10, s=2e-3, t=2e-3,
-            re=500.0, n_fan=3000.0, length=0.025, v_max=1e-3,
-            dp_max=50.0, feasible=True,
+            cspi=1.0,
+            rth=0.5,
+            vol=0.064,
+            n=10,
+            s=2e-3,
+            t=2e-3,
+            re=500.0,
+            n_fan=3000.0,
+            length=0.025,
+            v_max=1e-3,
+            dp_max=50.0,
+            feasible=True,
         )
         assert res.cspi == pytest.approx(1.0)
         assert res.n == 10
@@ -31,6 +39,7 @@ class TestCspiOptResultShape:
 # ---------------------------------------------------------------------------
 # cspi_optimize — typical aluminum heatsink
 # ---------------------------------------------------------------------------
+
 
 class TestCspiOptimizeAluminum:
     """lambda=200 W/mK, A=10cm^2=10e-4 m^2, c=40mm, P_fan=5W"""
@@ -86,13 +95,20 @@ class TestCspiOptimizeAluminum:
 # Copper beats aluminum (higher thermal conductivity => higher CSPI)
 # ---------------------------------------------------------------------------
 
+
 class TestCopperVsAluminum:
     def test_copper_higher_cspi(self):
         al = cspi_optimize(
-            lambda_hs=200.0, a_chip=10e-4, c=40e-3, p_fan_max=5.0,
+            lambda_hs=200.0,
+            a_chip=10e-4,
+            c=40e-3,
+            p_fan_max=5.0,
         )
         cu = cspi_optimize(
-            lambda_hs=400.0, a_chip=10e-4, c=40e-3, p_fan_max=5.0,
+            lambda_hs=400.0,
+            a_chip=10e-4,
+            c=40e-3,
+            p_fan_max=5.0,
         )
         assert cu.cspi > al.cspi
 
@@ -101,13 +117,20 @@ class TestCopperVsAluminum:
 # More fan power => higher CSPI
 # ---------------------------------------------------------------------------
 
+
 class TestFanPowerEffect:
     def test_more_fan_power_higher_cspi(self):
         low = cspi_optimize(
-            lambda_hs=200.0, a_chip=10e-4, c=40e-3, p_fan_max=2.0,
+            lambda_hs=200.0,
+            a_chip=10e-4,
+            c=40e-3,
+            p_fan_max=2.0,
         )
         high = cspi_optimize(
-            lambda_hs=200.0, a_chip=10e-4, c=40e-3, p_fan_max=10.0,
+            lambda_hs=200.0,
+            a_chip=10e-4,
+            c=40e-3,
+            p_fan_max=10.0,
         )
         assert high.cspi > low.cspi
 
@@ -116,12 +139,18 @@ class TestFanPowerEffect:
 # Custom fan constants
 # ---------------------------------------------------------------------------
 
+
 class TestCustomFanConstants:
     def test_custom_k_constants_accepted(self):
         """Non-default k1/k2/k3 should run without error and return valid result."""
         res = cspi_optimize(
-            lambda_hs=200.0, a_chip=10e-4, c=40e-3, p_fan_max=5.0,
-            k1=5e-3, k2=4e-4, k3=25e-6,
+            lambda_hs=200.0,
+            a_chip=10e-4,
+            c=40e-3,
+            p_fan_max=5.0,
+            k1=5e-3,
+            k2=4e-4,
+            k3=25e-6,
         )
         assert res.cspi > 0
         assert res.rth > 0
@@ -129,11 +158,17 @@ class TestCustomFanConstants:
     def test_n_fan_uses_k3(self):
         """N = (P/(k3*c^5))^(1/3); doubling k3 reduces N_fan."""
         res_k3_low = cspi_optimize(
-            lambda_hs=200.0, a_chip=10e-4, c=40e-3, p_fan_max=5.0,
+            lambda_hs=200.0,
+            a_chip=10e-4,
+            c=40e-3,
+            p_fan_max=5.0,
             k3=15e-6,
         )
         res_k3_high = cspi_optimize(
-            lambda_hs=200.0, a_chip=10e-4, c=40e-3, p_fan_max=5.0,
+            lambda_hs=200.0,
+            a_chip=10e-4,
+            c=40e-3,
+            p_fan_max=5.0,
             k3=30e-6,
         )
         # Higher k3 => lower N_fan (less efficient fan)
@@ -147,7 +182,11 @@ class TestCustomFanConstants:
         # The formula gives N in rev/s; stored as rpm (multiply by 60) or raw rev/s
         # We just check it's consistent with formula (within factor of 60 ambiguity)
         res = cspi_optimize(
-            lambda_hs=200.0, a_chip=10e-4, c=c, p_fan_max=p, k3=k3,
+            lambda_hs=200.0,
+            a_chip=10e-4,
+            c=c,
+            p_fan_max=p,
+            k3=k3,
         )
         expected_n = (p / (k3 * c**5)) ** (1.0 / 3.0)
         # Accept either rev/s or rpm value being consistent
@@ -158,11 +197,15 @@ class TestCustomFanConstants:
 # t_min constraint
 # ---------------------------------------------------------------------------
 
+
 class TestTminConstraint:
     def test_fin_thickness_at_least_t_min(self):
         t_min = 1e-3  # 1 mm
         res = cspi_optimize(
-            lambda_hs=200.0, a_chip=10e-4, c=40e-3, p_fan_max=5.0,
+            lambda_hs=200.0,
+            a_chip=10e-4,
+            c=40e-3,
+            p_fan_max=5.0,
             t_min=t_min,
         )
         # t_fin should be >= t_min (within floating-point tolerance)
@@ -170,7 +213,10 @@ class TestTminConstraint:
 
     def test_t_min_returns_valid_result(self):
         res = cspi_optimize(
-            lambda_hs=200.0, a_chip=10e-4, c=40e-3, p_fan_max=5.0,
+            lambda_hs=200.0,
+            a_chip=10e-4,
+            c=40e-3,
+            p_fan_max=5.0,
             t_min=0.5e-3,
         )
         assert res.cspi > 0
@@ -181,17 +227,24 @@ class TestTminConstraint:
 # Feasibility flag
 # ---------------------------------------------------------------------------
 
+
 class TestFeasibility:
     def test_feasible_is_bool_type(self):
         res = cspi_optimize(
-            lambda_hs=200.0, a_chip=10e-4, c=40e-3, p_fan_max=5.0,
+            lambda_hs=200.0,
+            a_chip=10e-4,
+            c=40e-3,
+            p_fan_max=5.0,
         )
         assert type(res.feasible) is bool
 
     def test_feasible_true_for_typical_case(self):
         """Typical aluminum case should yield a feasible (laminar) result."""
         res = cspi_optimize(
-            lambda_hs=200.0, a_chip=10e-4, c=40e-3, p_fan_max=5.0,
+            lambda_hs=200.0,
+            a_chip=10e-4,
+            c=40e-3,
+            p_fan_max=5.0,
         )
         # Not guaranteed, but typical configs should pass
         # Just verify it's a bool — we can't assert True/False without known answer
@@ -202,15 +255,22 @@ class TestFeasibility:
 # n_pts parameter
 # ---------------------------------------------------------------------------
 
+
 class TestNPts:
     def test_higher_n_pts_same_order_of_magnitude(self):
         """Finer sweep should give similar but not necessarily equal result."""
         res_coarse = cspi_optimize(
-            lambda_hs=200.0, a_chip=10e-4, c=40e-3, p_fan_max=5.0,
+            lambda_hs=200.0,
+            a_chip=10e-4,
+            c=40e-3,
+            p_fan_max=5.0,
             n_pts=20,
         )
         res_fine = cspi_optimize(
-            lambda_hs=200.0, a_chip=10e-4, c=40e-3, p_fan_max=5.0,
+            lambda_hs=200.0,
+            a_chip=10e-4,
+            c=40e-3,
+            p_fan_max=5.0,
             n_pts=200,
         )
         # Both should be positive and within ~50% of each other
@@ -224,14 +284,14 @@ class TestNPts:
 # Re-exports from __init__
 # ---------------------------------------------------------------------------
 
+
 class TestReExports:
     def test_imports_from_cspi_package(self):
         from thermal_cli.cspi import (
-            CspiOptResult,
-            CspiSweepResult,
             cspi_optimize,
             cspi_sweep,
         )
+
         assert callable(cspi_optimize)
         assert callable(cspi_sweep)
 
@@ -239,6 +299,7 @@ class TestReExports:
 # ---------------------------------------------------------------------------
 # cspi_sweep — 2x2 grid
 # ---------------------------------------------------------------------------
+
 
 class TestCspiSweep:
     @pytest.fixture

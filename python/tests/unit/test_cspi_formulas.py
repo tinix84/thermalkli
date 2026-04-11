@@ -1,6 +1,7 @@
 """Tests for cspi/formulas.py — CSPI formulas, fan scaling, channel Rth."""
 
 import math
+
 import pytest
 
 from thermal_cli.cspi.formulas import (
@@ -11,10 +12,10 @@ from thermal_cli.cspi.formulas import (
     fan_scaling_fit,
 )
 
-
 # ---------------------------------------------------------------------------
 # cspi_calc
 # ---------------------------------------------------------------------------
+
 
 class TestCspiCalc:
     def test_basic(self):
@@ -40,6 +41,7 @@ class TestCspiCalc:
 # ---------------------------------------------------------------------------
 # fan_scaling_fit
 # ---------------------------------------------------------------------------
+
 
 class TestFanScalingFit:
     def test_returns_three_floats(self):
@@ -78,6 +80,7 @@ class TestFanScalingFit:
 # ---------------------------------------------------------------------------
 # air_properties
 # ---------------------------------------------------------------------------
+
 
 class TestAirProperties:
     def test_returns_fluid_props(self):
@@ -126,6 +129,7 @@ class TestAirProperties:
 # channel_rth
 # ---------------------------------------------------------------------------
 
+
 class TestChannelRth:
     @pytest.fixture
     def air_80(self):
@@ -135,8 +139,11 @@ class TestChannelRth:
 
     def test_rectangular_laminar_returns_four_values(self, air_80):
         rth, Re, Nu, h = channel_rth(
-            width=0.003, height=0.010, length=0.05,
-            flow_rate=1e-5, fluid=air_80,
+            width=0.003,
+            height=0.010,
+            length=0.05,
+            flow_rate=1e-5,
+            fluid=air_80,
         )
         assert rth > 0
         assert Re > 0
@@ -145,15 +152,21 @@ class TestChannelRth:
 
     def test_rectangular_laminar_re_below_2300(self, air_80):
         _, Re, _, _ = channel_rth(
-            width=0.003, height=0.010, length=0.05,
-            flow_rate=1e-5, fluid=air_80,
+            width=0.003,
+            height=0.010,
+            length=0.05,
+            flow_rate=1e-5,
+            fluid=air_80,
         )
         assert Re <= 2300
 
     def test_rectangular_laminar_rth_positive(self, air_80):
         rth, _, _, _ = channel_rth(
-            width=0.003, height=0.010, length=0.05,
-            flow_rate=1e-5, fluid=air_80,
+            width=0.003,
+            height=0.010,
+            length=0.05,
+            flow_rate=1e-5,
+            fluid=air_80,
         )
         assert rth > 0
 
@@ -161,15 +174,21 @@ class TestChannelRth:
 
     def test_turbulent_re_above_2300(self, air_80):
         _, Re, _, _ = channel_rth(
-            width=0.005, height=0.005, length=0.20,
-            flow_rate=5e-4, fluid=air_80,
+            width=0.005,
+            height=0.005,
+            length=0.20,
+            flow_rate=5e-4,
+            fluid=air_80,
         )
         assert Re > 2300
 
     def test_turbulent_rth_positive(self, air_80):
         rth, _, _, _ = channel_rth(
-            width=0.005, height=0.005, length=0.20,
-            flow_rate=5e-4, fluid=air_80,
+            width=0.005,
+            height=0.005,
+            length=0.20,
+            flow_rate=5e-4,
+            fluid=air_80,
         )
         assert rth > 0
 
@@ -177,12 +196,18 @@ class TestChannelRth:
 
     def test_higher_flow_lower_rth(self, air_80):
         rth_low, *_ = channel_rth(
-            width=0.005, height=0.010, length=0.10,
-            flow_rate=1e-5, fluid=air_80,
+            width=0.005,
+            height=0.010,
+            length=0.10,
+            flow_rate=1e-5,
+            fluid=air_80,
         )
         rth_high, *_ = channel_rth(
-            width=0.005, height=0.010, length=0.10,
-            flow_rate=5e-4, fluid=air_80,
+            width=0.005,
+            height=0.010,
+            length=0.10,
+            flow_rate=5e-4,
+            fluid=air_80,
         )
         assert rth_high < rth_low
 
@@ -190,8 +215,10 @@ class TestChannelRth:
 
     def test_circular_channel(self, air_80):
         rth, Re, Nu, h = channel_rth(
-            diameter=0.004, length=0.10,
-            flow_rate=1e-4, fluid=air_80,
+            diameter=0.004,
+            length=0.10,
+            flow_rate=1e-4,
+            fluid=air_80,
         )
         assert rth > 0
         assert Re > 0
@@ -205,8 +232,10 @@ class TestChannelRth:
         v = 1e-4 / Ac
         expected_Re = v * d / air_80.kinematic_viscosity
         _, Re, _, _ = channel_rth(
-            diameter=d, length=0.10,
-            flow_rate=1e-4, fluid=air_80,
+            diameter=d,
+            length=0.10,
+            flow_rate=1e-4,
+            fluid=air_80,
         )
         assert Re == pytest.approx(expected_Re, rel=1e-6)
 
@@ -222,12 +251,17 @@ class TestChannelRth:
     def test_rectangular_and_circular_give_different_rth(self, air_80):
         """Rectangular and circular channels have different geometries -> different rth."""
         rth_rect, *_ = channel_rth(
-            width=0.004, height=0.004, length=0.10,
-            flow_rate=1e-4, fluid=air_80,
+            width=0.004,
+            height=0.004,
+            length=0.10,
+            flow_rate=1e-4,
+            fluid=air_80,
         )
         rth_circ, *_ = channel_rth(
-            diameter=0.004, length=0.10,
-            flow_rate=1e-4, fluid=air_80,
+            diameter=0.004,
+            length=0.10,
+            flow_rate=1e-4,
+            fluid=air_80,
         )
         # They differ because Ac and P differ for same characteristic size
         assert rth_rect != pytest.approx(rth_circ)

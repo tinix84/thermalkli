@@ -22,18 +22,18 @@ from thermal_cli.cspi.formulas import air_properties, channel_rth, cspi_calc
 class CspiOptResult:
     """Result of a single CSPI optimisation run."""
 
-    cspi: float      # [W/(K liter)]
-    rth: float       # [K/W]
-    vol: float       # [liters]
-    n: int           # number of channels/fins
-    s: float         # optimal channel width [m]
-    t: float         # fin thickness [m]
-    re: float        # Reynolds number
-    n_fan: float     # fan speed [rev/s]
-    length: float    # heatsink length [m]
-    v_max: float     # max fan flow [m^3/s]
-    dp_max: float    # max fan pressure [Pa]
-    feasible: bool   # Re<2300 and valid geometry
+    cspi: float  # [W/(K liter)]
+    rth: float  # [K/W]
+    vol: float  # [liters]
+    n: int  # number of channels/fins
+    s: float  # optimal channel width [m]
+    t: float  # fin thickness [m]
+    re: float  # Reynolds number
+    n_fan: float  # fan speed [rev/s]
+    length: float  # heatsink length [m]
+    v_max: float  # max fan flow [m^3/s]
+    dp_max: float  # max fan pressure [Pa]
+    feasible: bool  # Re<2300 and valid geometry
 
 
 @dataclass
@@ -42,8 +42,8 @@ class CspiSweepResult:
 
     cs: list[float]
     lambdas: list[float]
-    cspi: np.ndarray   # shape (len(cs), len(lambdas))
-    rth: np.ndarray    # shape (len(cs), len(lambdas))
+    cspi: np.ndarray  # shape (len(cs), len(lambdas))
+    rth: np.ndarray  # shape (len(cs), len(lambdas))
 
 
 def cspi_optimize(
@@ -79,26 +79,23 @@ def cspi_optimize(
 
     # Fan operating point at max power: P = k3 * N^3 * D^5  =>  N [rev/s]
     N = (p_fan_max / (k3 * c**5)) ** (1.0 / 3.0)
-    v_max = k1 * N * c**3      # max volumetric flow at zero pressure [m^3/s]
+    v_max = k1 * N * c**3  # max volumetric flow at zero pressure [m^3/s]
     dp_max = k2 * N**2 * c**2  # max static pressure at zero flow [Pa]
 
     # Air fluid properties at reference temperature
     fluid = air_properties(t_air)
 
     # Sweep channel width s
-    s_min = max(t_min * 0.5, 0.2e-3)   # at least 0.2 mm channel
-    s_max = c * 0.5                      # at most half the height
+    s_min = max(t_min * 0.5, 0.2e-3)  # at least 0.2 mm channel
+    s_max = c * 0.5  # at most half the height
 
     s_arr = np.linspace(s_min, s_max, n_pts)
     cspi_arr = np.zeros(n_pts)
 
     for idx, s_try in enumerate(s_arr):
-        # Number of channels that fit in cross-section c
-        if t_min > 0:
-            n_try = math.floor(c / (s_try + t_min))
-        else:
-            # Without min-thickness assume thin fins: t ~ s (aspect guess)
-            n_try = math.floor(c / (2.0 * s_try))
+        # Number of channels that fit in cross-section c.
+        # Without a min-thickness constraint, assume thin fins: t ~ s (aspect guess).
+        n_try = math.floor(c / (s_try + t_min)) if t_min > 0 else math.floor(c / (2.0 * s_try))
 
         if n_try < 2:
             continue  # cspi_arr[idx] stays 0
@@ -118,8 +115,11 @@ def cspi_optimize(
         # Channel thermal resistance (rectangular: width=s, height=c)
         try:
             rth_ch, _re, _nu, _h = channel_rth(
-                width=s_try, height=c, length=L,
-                flow_rate=v_ch, fluid=fluid,
+                width=s_try,
+                height=c,
+                length=L,
+                flow_rate=v_ch,
+                fluid=fluid,
             )
         except Exception:
             continue
@@ -144,10 +144,7 @@ def cspi_optimize(
     s_opt = float(s_arr[best_idx])
 
     # --- Recompute final geometry at optimum ---
-    if t_min > 0:
-        n_fin = math.floor(c / (s_opt + t_min))
-    else:
-        n_fin = math.floor(c / (2.0 * s_opt))
+    n_fin = math.floor(c / (s_opt + t_min)) if t_min > 0 else math.floor(c / (2.0 * s_opt))
 
     if n_fin < 2:
         n_fin = 2
@@ -166,8 +163,11 @@ def cspi_optimize(
     v_ch = v_total / n_fin
 
     rth_ch, re_fin, _nu, _h = channel_rth(
-        width=s_opt, height=c, length=L,
-        flow_rate=v_ch, fluid=fluid,
+        width=s_opt,
+        height=c,
+        length=L,
+        flow_rate=v_ch,
+        fluid=fluid,
     )
     rth_fin_cond = (t_fin / 2.0) / (lambda_hs * c * L)
     rth = (rth_fin_cond + rth_ch) / n_fin
@@ -175,12 +175,7 @@ def cspi_optimize(
     vol_cs = L * c * c * 1000.0  # [liters]
     cspi_val = cspi_calc(rth=rth, vol_cs=vol_cs)
 
-    feasible = bool(
-        re_fin < 2300
-        and t_fin > 0
-        and rth > 0
-        and math.isfinite(rth)
-    )
+    feasible = bool(re_fin < 2300 and t_fin > 0 and rth > 0 and math.isfinite(rth))
 
     return CspiOptResult(
         cspi=float(cspi_val),

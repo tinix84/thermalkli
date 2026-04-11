@@ -9,11 +9,10 @@ All units follow the Drofenik/Kolar CSPI conventions:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 import yaml
-
 
 # ---------------------------------------------------------------------------
 # Helper
@@ -34,7 +33,7 @@ def _cspi_command(
     rth: Annotated[float, typer.Option("--rth", help="Thermal resistance [K/W]")],
     vol: Annotated[float, typer.Option("--vol", help="Cooling system volume [liters]")],
 ) -> None:
-    """Compute Cooling System Performance Index: CSPI = 1 / (Rth × V_cs)."""
+    """Compute Cooling System Performance Index: CSPI = 1 / (Rth * V_cs)."""
     from thermal_cli.cspi.formulas import cspi_calc
 
     val = cspi_calc(rth=rth, vol_cs=vol)
@@ -65,9 +64,7 @@ def _cspi_optimize_command(
     k3: Annotated[
         float, typer.Option("--k3", help="Fan scaling coeff k3: P_FAN = k3·N^3·D^5")
     ] = 30e-6,
-    t_air: Annotated[
-        float, typer.Option("--t-air", help="Reference air temperature [°C]")
-    ] = 80.0,
+    t_air: Annotated[float, typer.Option("--t-air", help="Reference air temperature [°C]")] = 80.0,
 ) -> None:
     """Optimise heatsink channel width to maximise CSPI (Drofenik/Kolar CIPS06)."""
     from thermal_cli.cspi.optimizer import cspi_optimize
@@ -103,15 +100,13 @@ def _cspi_optimize_command(
 
 
 def _fan_fit_command(
-    v_max: Annotated[
-        float, typer.Option("--v-max", help="Maximum volumetric flow rate [m^3/s]")
-    ],
+    v_max: Annotated[float, typer.Option("--v-max", help="Maximum volumetric flow rate [m^3/s]")],
     dp_max: Annotated[float, typer.Option("--dp-max", help="Maximum static pressure rise [Pa]")],
     p_fan: Annotated[float, typer.Option("--p-fan", help="Fan shaft power [W]")],
     diameter: Annotated[float, typer.Option("--diameter", help="Fan diameter [m]")],
     speed: Annotated[float, typer.Option("--speed", help="Fan rotational speed [rpm]")],
 ) -> None:
-    """Compute Drofenik fan scaling coefficients k1, k2, k3 (eq. 29–31)."""
+    """Compute Drofenik fan scaling coefficients k1, k2, k3 (eq. 29-31)."""
     from thermal_cli.cspi.formulas import fan_scaling_fit
 
     k1, k2, k3 = fan_scaling_fit(

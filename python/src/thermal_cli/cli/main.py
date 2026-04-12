@@ -9,6 +9,7 @@ import typer
 from thermal_cli import __version__
 from thermal_cli.cli.commands_m7 import register_all
 from thermal_cli.cli.commands_m8 import register_all as register_m8
+from thermal_cli.cli.commands_m9 import register_all as register_m9
 
 app = typer.Typer(
     name="thermal",
@@ -54,6 +55,7 @@ def convert_config(
 
 register_all(app)
 register_m8(app)
+register_m9(app)
 
 
 if __name__ == "__main__":

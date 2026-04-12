@@ -1,0 +1,7 @@
+command: multi-sim
+description: 2 baseplate scenarios (Al vs Cu) with 2 devices each.
+python_only: true
+python_call:
+  module: tests.regression.helpers
+  function: run_multi_sim_two_scenarios
+  args: {}

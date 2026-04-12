@@ -18,9 +18,10 @@ class TestParseAxisSpec:
         np.testing.assert_allclose(vals, [0.0, 0.25, 0.5, 0.75, 1.0])
 
     def test_range_inclusive_of_stop(self):
-        """``range`` uses numpy.arange and then appends stop if absent."""
+        """``range`` includes stop and does not overshoot it."""
         vals = parse_axis_spec({"range": {"start": 0.0, "stop": 1.0, "step": 0.25}})
         np.testing.assert_allclose(vals, [0.0, 0.25, 0.5, 0.75, 1.0])
+        assert float(vals[-1]) <= 1.0 + 1e-10
 
     def test_scalar_becomes_single_value(self):
         vals = parse_axis_spec(2.5)

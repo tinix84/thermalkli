@@ -41,7 +41,6 @@ def evaluate_extruded_fin_rth(
     a_hot: float,
     flowrate_lpm: float,
     fluid_ref: str,
-    t_fluid_in: float,
     num_channel: int,
     num_heated_sides: int = 1,
 ) -> float:

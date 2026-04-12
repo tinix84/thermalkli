@@ -27,7 +27,6 @@ def test_optimize_fin_smoke(tmp_path):
               a_hot: 0.00023153
               flowrate_lpm: 1.0
               fluid_ref: H2OGly50
-              t_fluid_in: 343.15
               num_channel: 18
             """
         )
@@ -78,11 +77,13 @@ def test_multi_sim_smoke(tmp_path):
     assert "t_j_max" in result.output
 
 
-def test_optimize_fin_missing_config_exits_nonzero():
-    result = runner.invoke(app, ["optimize-fin", "--config", "/tmp/does_not_exist_m9.yaml"])
+def test_optimize_fin_missing_config_exits_nonzero(tmp_path):
+    missing_cfg = tmp_path / "does_not_exist_m9.yaml"
+    result = runner.invoke(app, ["optimize-fin", "--config", str(missing_cfg)])
     assert result.exit_code != 0
 
 
-def test_multi_sim_missing_config_exits_nonzero():
-    result = runner.invoke(app, ["multi-sim", "--config", "/tmp/does_not_exist_m9.yaml"])
+def test_multi_sim_missing_config_exits_nonzero(tmp_path):
+    missing_cfg = tmp_path / "does_not_exist_m9.yaml"
+    result = runner.invoke(app, ["multi-sim", "--config", str(missing_cfg)])
     assert result.exit_code != 0

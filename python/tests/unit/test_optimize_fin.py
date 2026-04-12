@@ -25,7 +25,6 @@ class TestEvaluateExtrudedFinRth:
             a_hot=16.9e-3 * 13.7e-3,
             flowrate_lpm=1.0,
             fluid_ref="H2OGly50",
-            t_fluid_in=343.15,
             num_channel=18,
         )
         assert rth > 0
@@ -42,7 +41,6 @@ class TestEvaluateExtrudedFinRth:
             a_hot=16.9e-3 * 13.7e-3,
             flowrate_lpm=1.0,
             fluid_ref="H2OGly50",
-            t_fluid_in=343.15,
             num_channel=18,
         )
         rth_thin = evaluate_extruded_fin_rth(thick_heatsink=0.006, **kw)
@@ -66,7 +64,6 @@ class TestOptimizeFinGeometry:
                 "a_hot": 16.9e-3 * 13.7e-3,
                 "flowrate_lpm": 1.0,
                 "fluid_ref": "H2OGly50",
-                "t_fluid_in": 343.15,
                 "num_channel": 18,
             },
         )
@@ -86,7 +83,6 @@ class TestOptimizeFinGeometry:
                 "a_hot": 16.9e-3 * 13.7e-3,
                 "flowrate_lpm": 1.0,
                 "fluid_ref": "H2OGly50",
-                "t_fluid_in": 343.15,
                 "num_channel": 18,
             },
         )

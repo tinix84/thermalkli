@@ -53,7 +53,13 @@ def parse_axis_spec(spec: Any) -> np.ndarray:
         step = float(rg["step"])
         if step == 0:
             raise ValueError("range 'step' must be nonzero")
-        vals = np.arange(start, stop + 0.5 * step, step)
+        vals = np.arange(start, stop, step)
+        if vals.size == 0:
+            if np.isclose(start, stop):
+                return np.asarray([start])
+            return np.asarray([start, stop])
+        if not np.isclose(vals[-1], stop):
+            vals = np.append(vals, stop)
         return vals
 
     raise ValueError(f"unknown axis spec keys: {list(spec.keys())}")

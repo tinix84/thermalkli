@@ -201,7 +201,6 @@ def run_optimize_fin_basic() -> dict:
             "a_hot": 16.9e-3 * 13.7e-3,
             "flowrate_lpm": 1.0,
             "fluid_ref": "H2OGly50",
-            "t_fluid_in": 343.15,
             "num_channel": 18,
         },
     )

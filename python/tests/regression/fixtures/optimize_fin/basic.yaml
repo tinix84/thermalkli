@@ -5,5 +5,3 @@ python_call:
   module: tests.regression.helpers
   function: run_optimize_fin_basic
   args: {}
-tolerance:
-  rtol: 1.0e-6

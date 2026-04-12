@@ -236,8 +236,10 @@ def run_multi_sim_two_scenarios() -> dict:
         )
 
     result = run_multi_sim([_sc("Al", 200.0), _sc("Cu", 385.0)])
-    row_al = next(r for r in result.rows if r.name == "Al")
-    row_cu = next(r for r in result.rows if r.name == "Cu")
+    row_al = next((r for r in result.rows if r.name == "Al"), None)
+    assert row_al is not None, "Al scenario missing from multi_sim result"
+    row_cu = next((r for r in result.rows if r.name == "Cu"), None)
+    assert row_cu is not None, "Cu scenario missing from multi_sim result"
     return {
         "al_t_j_max": row_al.t_j_max,
         "cu_t_j_max": row_cu.t_j_max,

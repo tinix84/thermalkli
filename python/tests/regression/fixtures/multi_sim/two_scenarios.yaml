@@ -5,5 +5,3 @@ python_call:
   module: tests.regression.helpers
   function: run_multi_sim_two_scenarios
   args: {}
-tolerance:
-  rtol: 1.0e-6

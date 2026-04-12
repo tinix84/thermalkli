@@ -81,3 +81,8 @@ def test_multi_sim_smoke(tmp_path):
 def test_optimize_fin_missing_config_exits_nonzero():
     result = runner.invoke(app, ["optimize-fin", "--config", "/tmp/does_not_exist_m9.yaml"])
     assert result.exit_code != 0
+
+
+def test_multi_sim_missing_config_exits_nonzero():
+    result = runner.invoke(app, ["multi-sim", "--config", "/tmp/does_not_exist_m9.yaml"])
+    assert result.exit_code != 0

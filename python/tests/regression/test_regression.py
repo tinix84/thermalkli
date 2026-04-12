@@ -31,6 +31,11 @@ def _fixture_id(path: Path) -> str:
 )
 def test_octave_python_parity(fixture_path: Path) -> None:
     fx = load_fixture(fixture_path)
+    if fx.python_only:
+        # Python-only fixtures: just verify the Python callable runs without error.
+        py_out = call_python(fx.python_module, fx.python_function, fx.python_args)
+        assert py_out is not None, f"python_only fixture returned None: {fixture_path}"
+        return
     oct_out = run_octave(fx.octave_script)
     py_out = call_python(fx.python_module, fx.python_function, fx.python_args)
     # Normalize scalar Python results to a dict keyed by the single Octave field.

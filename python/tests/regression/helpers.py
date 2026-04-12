@@ -169,3 +169,76 @@ def layer_spreading_isotropic(
     ly = ThermalLayer(thick=thick, k_op=k_op)
     r_th, r_spread, r_through = ly.resistance(a_in=a_in, a_out=a_out, h_eff=h_eff)
     return {"rTh": r_th, "rThSpread": r_spread, "rThThrough": r_through}
+
+
+# ---------------------------------------------------------------------------
+# M9 sweep wrappers
+# ---------------------------------------------------------------------------
+
+
+def run_optimize_fin_basic() -> dict:
+    """Regression fixture wrapper: 3x3 grid over fin thickness/wall thickness.
+
+    Matches the toy grid used in ``optimize_fin/basic.yaml``. Returns
+    scalar best Rth + argmin coordinates so it can be round-tripped via
+    the JSON regression harness.
+    """
+    from thermal_cli.sweep.optimize_fin import (
+        FinGeometrySweepConfig,
+        optimize_fin_geometry,
+    )
+
+    cfg = FinGeometrySweepConfig(
+        axes={
+            "thick_heatsink": [0.006, 0.008, 0.010],
+            "thick_wall": [0.0006, 0.0008, 0.0010],
+        },
+        fixed={
+            "width_channel": 0.00105,
+            "k_sink": 180.0,
+            "rho_sink": 2698.9,
+            "l_heated": 0.137,
+            "a_hot": 16.9e-3 * 13.7e-3,
+            "flowrate_lpm": 1.0,
+            "fluid_ref": "H2OGly50",
+            "t_fluid_in": 343.15,
+            "num_channel": 18,
+        },
+    )
+    result = optimize_fin_geometry(cfg)
+    best = result.argmin()
+    return {
+        "best_r_th": result.min(),
+        "best_thick_heatsink": best["thick_heatsink"],
+        "best_thick_wall": best["thick_wall"],
+    }
+
+
+def run_multi_sim_two_scenarios() -> dict:
+    """Regression wrapper: 2-scenario baseplate run (Al vs Cu)."""
+    from thermal_cli.sweep.multi_sim import MultiSimScenario, run_multi_sim
+
+    def _sc(name: str, k: float) -> MultiSimScenario:
+        return MultiSimScenario(
+            name=name,
+            lx=0.12,
+            ly=0.08,
+            thickness=0.005,
+            conductivity=k,
+            r_sa=0.1,
+            t_ambient=298.15,
+            devices=[
+                {"name": "Q1", "x": 0.03, "y": 0.04, "width": 0.02, "height": 0.02, "power": 100.0},
+                {"name": "Q2", "x": 0.09, "y": 0.04, "width": 0.02, "height": 0.02, "power": 100.0},
+            ],
+            nx=21,
+            ny=21,
+        )
+
+    result = run_multi_sim([_sc("Al", 200.0), _sc("Cu", 385.0)])
+    row_al = next(r for r in result.rows if r.name == "Al")
+    row_cu = next(r for r in result.rows if r.name == "Cu")
+    return {
+        "al_t_j_max": row_al.t_j_max,
+        "cu_t_j_max": row_cu.t_j_max,
+    }

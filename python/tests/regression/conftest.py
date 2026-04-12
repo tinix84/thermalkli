@@ -43,7 +43,8 @@ class Fixture:
     path: Path
     command: str
     description: str
-    octave_script: str
+    octave_script: str | None
+    python_only: bool
     python_module: str
     python_function: str
     python_args: dict[str, Any]
@@ -55,11 +56,13 @@ def load_fixture(path: Path) -> Fixture:
     """Parse a fixture YAML into a Fixture dataclass."""
     data = yaml.safe_load(path.read_text())
     tol = data.get("tolerance", {})
+    python_only = bool(data.get("python_only", False))
     return Fixture(
         path=path,
         command=data["command"],
         description=data.get("description", ""),
-        octave_script=data["octave_script"],
+        octave_script=data.get("octave_script"),
+        python_only=python_only,
         python_module=data["python_call"]["module"],
         python_function=data["python_call"]["function"],
         python_args=data["python_call"].get("args", {}),

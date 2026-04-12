@@ -44,8 +44,7 @@ def register_all(app: typer.Typer) -> None:
         typer.echo("-" * len(header))
         for idx_tuple in _iter_indices(result.values.shape):
             axis_cells = [
-                f"{vals[i]:g}"
-                for vals, i in zip(result.axis_values, idx_tuple, strict=True)
+                f"{vals[i]:g}" for vals, i in zip(result.axis_values, idx_tuple, strict=True)
             ]
             out_cell = f"{result.values[idx_tuple]:.6f}"
             typer.echo("\t".join([*axis_cells, out_cell]))
@@ -74,9 +73,7 @@ def register_all(app: typer.Typer) -> None:
         typer.echo("name\tt_max\tt_mean\tt_j_max")
         typer.echo("-" * 48)
         for row in result.rows:
-            typer.echo(
-                f"{row.name}\t{row.t_max:.2f}\t{row.t_mean:.2f}\t{row.t_j_max:.2f}"
-            )
+            typer.echo(f"{row.name}\t{row.t_max:.2f}\t{row.t_mean:.2f}\t{row.t_j_max:.2f}")
 
 
 def _iter_indices(shape: tuple[int, ...]):

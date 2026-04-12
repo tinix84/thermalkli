@@ -57,9 +57,9 @@ class MultiSimRow:
 
     name: str
     t_ambient: float
-    t_max: float          # [K] peak baseplate temperature
-    t_mean: float         # [K] mean baseplate temperature
-    t_j_max: float        # [K] peak junction temperature
+    t_max: float  # [K] peak baseplate temperature
+    t_mean: float  # [K] mean baseplate temperature
+    t_j_max: float  # [K] peak junction temperature
     t_j_per_device: dict[str, float] = field(default_factory=dict)
 
 

@@ -51,6 +51,8 @@ def parse_axis_spec(spec: Any) -> np.ndarray:
         start = float(rg["start"])
         stop = float(rg["stop"])
         step = float(rg["step"])
+        if step == 0:
+            raise ValueError("range 'step' must be nonzero")
         vals = np.arange(start, stop + 0.5 * step, step)
         return vals
 

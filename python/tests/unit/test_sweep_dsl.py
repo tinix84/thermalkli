@@ -38,6 +38,10 @@ class TestParseAxisSpec:
         with pytest.raises(ValueError, match="start"):
             parse_axis_spec({"linspace": {"stop": 1.0, "steps": 5}})
 
+    def test_range_missing_key_raises(self):
+        with pytest.raises(ValueError, match="start"):
+            parse_axis_spec({"range": {"stop": 1.0, "step": 0.25}})
+
 
 class TestParseSweepConfig:
     def test_basic(self):

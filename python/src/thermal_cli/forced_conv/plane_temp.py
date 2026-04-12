@@ -22,31 +22,31 @@ class PlaneTempConfig:
     Spatial dimensions in meters (SI). Temperatures in Kelvin. Conductivities in W/(m·K).
     """
 
-    rth_fin: float          # equivalent fin thermal resistance [K/W]
-    h_eq: float             # equivalent heat-transfer coeff over footprint [W/(m²·K)]
+    rth_fin: float  # equivalent fin thermal resistance [K/W]
+    h_eq: float  # equivalent heat-transfer coeff over footprint [W/(m²·K)]
     sources: list[dict[str, Any]]  # each: name, x_m, y_m, width_m, height_m, power_w
-    t_air_k: float          # mean air temperature [K]
-    t_inlet_k: float        # inlet air temperature [K]
-    a_m: float              # heatsink X dimension (perpendicular to fins) [m]
-    b_m: float              # heatsink Y dimension (parallel to fins) [m]
-    k_plate: float          # baseplate thermal conductivity [W/(m·K)]
-    tb_m: float             # baseplate thickness [m]
+    t_air_k: float  # mean air temperature [K]
+    t_inlet_k: float  # inlet air temperature [K]
+    a_m: float  # heatsink X dimension (perpendicular to fins) [m]
+    b_m: float  # heatsink Y dimension (parallel to fins) [m]
+    k_plate: float  # baseplate thermal conductivity [W/(m·K)]
+    tb_m: float  # baseplate thickness [m]
     has_piastra: bool = False
     k_piastra: float = 0.0  # copper spreading-plate conductivity [W/(m·K)]
-    tr_m: float = 0.0       # copper plate thickness [m]
-    n_fourier: int = 25     # number of Fourier terms per direction
+    tr_m: float = 0.0  # copper plate thickness [m]
+    n_fourier: int = 25  # number of Fourier terms per direction
 
 
 @dataclass
 class PlaneTempResult:
     """Result of a Fourier-series plane temperature calculation."""
 
-    t_base_k: float         # base plate temperature T_h_BP [K]
-    t_max_k: float          # peak surface temperature [K]
-    t_fluid_out_k: float    # fluid outlet temperature [K]
-    t_grid_k: np.ndarray    # shape (len(y_pts), len(x_pts)) [K]
-    x_grid_m: np.ndarray    # x coordinates [m]
-    y_grid_m: np.ndarray    # y coordinates [m]
+    t_base_k: float  # base plate temperature T_h_BP [K]
+    t_max_k: float  # peak surface temperature [K]
+    t_fluid_out_k: float  # fluid outlet temperature [K]
+    t_grid_k: np.ndarray  # shape (len(y_pts), len(x_pts)) [K]
+    x_grid_m: np.ndarray  # x coordinates [m]
+    y_grid_m: np.ndarray  # y coordinates [m]
 
 
 # ---------------------------------------------------------------------------
@@ -110,8 +110,12 @@ def _theta_x(
     x = x_m
     total = 0.0
     psi_kw = dict(
-        k_plate=k_plate, k_piastra=k_piastra, tb_m=tb_m,
-        tr_m=tr_m, h_eq=h_eq, has_piastra=has_piastra,
+        k_plate=k_plate,
+        k_piastra=k_piastra,
+        tb_m=tb_m,
+        tr_m=tr_m,
+        h_eq=h_eq,
+        has_piastra=has_piastra,
     )
     for m in range(1, n_fourier + 1):
         lam = m * math.pi / a
@@ -146,8 +150,12 @@ def _theta_y(
     y = y_m
     total = 0.0
     psi_kw = dict(
-        k_plate=k_plate, k_piastra=k_piastra, tb_m=tb_m,
-        tr_m=tr_m, h_eq=h_eq, has_piastra=has_piastra,
+        k_plate=k_plate,
+        k_piastra=k_piastra,
+        tb_m=tb_m,
+        tr_m=tr_m,
+        h_eq=h_eq,
+        has_piastra=has_piastra,
     )
     for n in range(1, n_fourier + 1):
         delta = n * math.pi / b
@@ -189,8 +197,12 @@ def _theta_xy(
     y = y_m
     total = 0.0
     psi_kw = dict(
-        k_plate=k_plate, k_piastra=k_piastra, tb_m=tb_m,
-        tr_m=tr_m, h_eq=h_eq, has_piastra=has_piastra,
+        k_plate=k_plate,
+        k_piastra=k_piastra,
+        tb_m=tb_m,
+        tr_m=tr_m,
+        h_eq=h_eq,
+        has_piastra=has_piastra,
     )
     for m in range(1, n_fourier + 1):
         lam = m * math.pi / a
@@ -199,9 +211,12 @@ def _theta_xy(
             beta = math.sqrt(lam**2 + delta**2)
             psi = _psi(beta, **psi_kw)
             num = (
-                16.0 * power_w
-                * math.cos(lam * xc) * math.sin(lam * wid / 2)
-                * math.cos(delta * yc) * math.sin(delta * hgt / 2)
+                16.0
+                * power_w
+                * math.cos(lam * xc)
+                * math.sin(lam * wid / 2)
+                * math.cos(delta * yc)
+                * math.sin(delta * hgt / 2)
             )
             denom = a_m * b_m * wid_m * hgt_m * k_plate * beta * lam * delta * psi
             a3 = num / denom

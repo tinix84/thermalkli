@@ -28,35 +28,35 @@ from thermal_cli.heatsinks.profiles_db import lookup_fan, lookup_hs_material, lo
 class ForcedConvConfig:
     """Configuration for ``run_forced_conv_sim``. All units SI (m, K, W)."""
 
-    hs_profile: str                     # key in db/hs_profiles.csv
-    hs_material: str                    # key in db/hs_materials.csv
-    length_x_m: float                   # a [m] — heatsink dim perp. to fins
-    length_y_m: float                   # b [m] — heatsink dim parallel to fins
-    copper_plate_thickness_m: float     # tr [m]; 0 = no spreading plate
-    fan_model: str                      # key in db/fans.csv
-    fan_count: int                      # fans in parallel
-    ventilation: str                    # 'push' or 'impinge'
-    impinge_gap_m: float                # s [m] — inlet aperture (impinge only)
-    sources: list[dict[str, Any]]       # name, x_m, y_m, width_m, height_m, power_w
-    t_inlet_k: float                    # inlet air temperature [K]
-    nx: int = 41                        # grid points along X
-    ny: int = 41                        # grid points along Y
-    n_fourier: int = 25                 # Fourier series terms
+    hs_profile: str  # key in db/hs_profiles.csv
+    hs_material: str  # key in db/hs_materials.csv
+    length_x_m: float  # a [m] — heatsink dim perp. to fins
+    length_y_m: float  # b [m] — heatsink dim parallel to fins
+    copper_plate_thickness_m: float  # tr [m]; 0 = no spreading plate
+    fan_model: str  # key in db/fans.csv
+    fan_count: int  # fans in parallel
+    ventilation: str  # 'push' or 'impinge'
+    impinge_gap_m: float  # s [m] — inlet aperture (impinge only)
+    sources: list[dict[str, Any]]  # name, x_m, y_m, width_m, height_m, power_w
+    t_inlet_k: float  # inlet air temperature [K]
+    nx: int = 41  # grid points along X
+    ny: int = 41  # grid points along Y
+    n_fourier: int = 25  # Fourier series terms
 
 
 @dataclass
 class ForcedConvResult:
     """Result of a forced-convection single-scenario simulation. All units SI."""
 
-    t_base_max_k: float     # peak baseplate temperature [K]
-    t_fluid_out_k: float    # fluid outlet temperature [K]
+    t_base_max_k: float  # peak baseplate temperature [K]
+    t_fluid_out_k: float  # fluid outlet temperature [K]
     q_operating_m3s: float  # fan operating flow rate [m³/s]
-    re_hydraulic: float     # average hydraulic Reynolds number
-    rth_fin_kw: float       # fin thermal resistance [K/W]
-    h_eq_wm2k: float        # equivalent h over footprint [W/(m²·K)]
-    t_grid_k: np.ndarray    # shape (ny, nx) [K]
-    x_grid_m: np.ndarray    # [m]
-    y_grid_m: np.ndarray    # [m]
+    re_hydraulic: float  # average hydraulic Reynolds number
+    rth_fin_kw: float  # fin thermal resistance [K/W]
+    h_eq_wm2k: float  # equivalent h over footprint [W/(m²·K)]
+    t_grid_k: np.ndarray  # shape (ny, nx) [K]
+    x_grid_m: np.ndarray  # [m]
+    y_grid_m: np.ndarray  # [m]
 
 
 def run_forced_conv_sim(cfg: ForcedConvConfig) -> ForcedConvResult:

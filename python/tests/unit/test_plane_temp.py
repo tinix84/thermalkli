@@ -14,8 +14,12 @@ def _single_source_cfg(**kwargs) -> PlaneTempConfig:
         h_eq=100.0,
         sources=[
             {
-                "name": "Q1", "x_m": 0.15, "y_m": 0.1,
-                "width_m": 0.05, "height_m": 0.03, "power_w": 100.0,
+                "name": "Q1",
+                "x_m": 0.15,
+                "y_m": 0.1,
+                "width_m": 0.05,
+                "height_m": 0.03,
+                "power_w": 100.0,
             }
         ],
         t_air_k=323.15,
@@ -65,8 +69,16 @@ class TestCalcPlaneTempBasic:
         """Doubling source power must increase peak temperature."""
         cfg_low = _single_source_cfg()
         cfg_high = _single_source_cfg(
-            sources=[{"name": "Q1", "x_m": 0.15, "y_m": 0.1,
-                      "width_m": 0.05, "height_m": 0.03, "power_w": 200.0}]
+            sources=[
+                {
+                    "name": "Q1",
+                    "x_m": 0.15,
+                    "y_m": 0.1,
+                    "width_m": 0.05,
+                    "height_m": 0.03,
+                    "power_w": 200.0,
+                }
+            ]
         )
         x = np.linspace(0, 0.3, 11)
         y = np.linspace(0, 0.2, 9)
@@ -81,12 +93,20 @@ class TestCalcPlaneTempBasic:
             h_eq=100.0,
             sources=[
                 {
-                    "name": "Q1", "x_m": 0.075, "y_m": 0.1,
-                    "width_m": 0.03, "height_m": 0.03, "power_w": 100.0,
+                    "name": "Q1",
+                    "x_m": 0.075,
+                    "y_m": 0.1,
+                    "width_m": 0.03,
+                    "height_m": 0.03,
+                    "power_w": 100.0,
                 },
                 {
-                    "name": "Q2", "x_m": 0.225, "y_m": 0.1,
-                    "width_m": 0.03, "height_m": 0.03, "power_w": 100.0,
+                    "name": "Q2",
+                    "x_m": 0.225,
+                    "y_m": 0.1,
+                    "width_m": 0.03,
+                    "height_m": 0.03,
+                    "power_w": 100.0,
                 },
             ],
             t_air_k=323.15,
@@ -100,7 +120,7 @@ class TestCalcPlaneTempBasic:
             tr_m=0.0,
             n_fourier=15,
         )
-        x = np.linspace(0, 0.3, 13)   # odd number so x=0.15 is in the grid
+        x = np.linspace(0, 0.3, 13)  # odd number so x=0.15 is in the grid
         y = np.linspace(0, 0.2, 9)
         result = calc_plane_temp(cfg, x, y)
         # T at x[i] should equal T at x[-(i+1)] for all rows

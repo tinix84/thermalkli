@@ -17,8 +17,14 @@ class TestPlaneTempLiterature:
             rth_fin=0.05,
             h_eq=100.0,
             sources=[
-                {"name": "Q1", "x_m": 0.1, "y_m": 0.075,
-                 "width_m": 0.03, "height_m": 0.02, "power_w": 0.0}
+                {
+                    "name": "Q1",
+                    "x_m": 0.1,
+                    "y_m": 0.075,
+                    "width_m": 0.03,
+                    "height_m": 0.02,
+                    "power_w": 0.0,
+                }
             ],
             t_air_k=323.15,
             t_inlet_k=313.15,
@@ -35,12 +41,21 @@ class TestPlaneTempLiterature:
 
     def test_temperature_increases_with_source_power(self):
         """Peak temperature must scale monotonically with total power."""
+
         def peak(p: float) -> float:
             cfg = PlaneTempConfig(
                 rth_fin=0.05,
                 h_eq=80.0,
-                sources=[{"name": "Q1", "x_m": 0.1, "y_m": 0.075,
-                           "width_m": 0.03, "height_m": 0.02, "power_w": p}],
+                sources=[
+                    {
+                        "name": "Q1",
+                        "x_m": 0.1,
+                        "y_m": 0.075,
+                        "width_m": 0.03,
+                        "height_m": 0.02,
+                        "power_w": p,
+                    }
+                ],
                 t_air_k=318.15,
                 t_inlet_k=313.15,
                 a_m=0.2,
@@ -63,8 +78,16 @@ class TestPlaneTempLiterature:
         cfg = PlaneTempConfig(
             rth_fin=0.04,
             h_eq=120.0,
-            sources=[{"name": "Q1", "x_m": 0.1, "y_m": 0.075,
-                       "width_m": 0.04, "height_m": 0.03, "power_w": 100.0}],
+            sources=[
+                {
+                    "name": "Q1",
+                    "x_m": 0.1,
+                    "y_m": 0.075,
+                    "width_m": 0.04,
+                    "height_m": 0.03,
+                    "power_w": 100.0,
+                }
+            ],
             t_air_k=323.15,
             t_inlet_k=313.15,
             a_m=0.2,

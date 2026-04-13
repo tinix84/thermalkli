@@ -76,7 +76,7 @@ def load_tim_db() -> list[TimEntry]:
         for row in csv.DictReader(fh):
             entries.append(
                 TimEntry(
-                    active=row["active"].strip().lower() == "yes",
+                    active=_bool_yn(row["active"]),
                     manufacturer=row["manufacturer"].strip(),
                     type=row["type"].strip(),
                     description=row["description"].strip(),

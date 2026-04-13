@@ -135,3 +135,11 @@ class TestCalcPlaneTempBasic:
         r_no = calc_plane_temp(cfg_no, x, y)
         r_yes = calc_plane_temp(cfg_yes, x, y)
         assert r_yes.t_base_k > r_no.t_base_k
+
+    def test_has_piastra_true_with_zero_k_piastra_no_crash(self):
+        """has_piastra=True with k_piastra=0 should not crash (treated as no piastra)."""
+        cfg = _single_source_cfg(has_piastra=True, k_piastra=0.0, tr_m=0.0)
+        x = np.linspace(0, 0.3, 5)
+        y = np.linspace(0, 0.2, 5)
+        result = calc_plane_temp(cfg, x, y)
+        assert result.t_max_k > 0

@@ -71,6 +71,13 @@ def run_forced_conv_sim(cfg: ForcedConvConfig) -> ForcedConvResult:
     6. Compute fin thermal resistance at actual conditions.
     7. Evaluate Fourier-series plane temperature on (nx x ny) grid.
     """
+    if cfg.fan_count < 1:
+        raise ValueError(f"fan_count must be >= 1, got {cfg.fan_count}")
+    if cfg.nx < 1 or cfg.ny < 1:
+        raise ValueError(f"nx and ny must be >= 1, got nx={cfg.nx}, ny={cfg.ny}")
+    if cfg.n_fourier < 1:
+        raise ValueError(f"n_fourier must be >= 1, got {cfg.n_fourier}")
+
     # 1. DB lookups
     prof = lookup_hs_profile(cfg.hs_profile)
     mat = lookup_hs_material(cfg.hs_material)
@@ -132,6 +139,7 @@ def run_forced_conv_sim(cfg: ForcedConvConfig) -> ForcedConvResult:
     x_pts = np.linspace(0.0, a_m, cfg.nx)
     y_pts = np.linspace(0.0, b_m, cfg.ny)
 
+    effective_has_piastra = mat.has_piastra and cfg.copper_plate_thickness_m > 0
     plane_cfg = PlaneTempConfig(
         rth_fin=fin.rth,
         h_eq=fin.h_eq,
@@ -142,7 +150,7 @@ def run_forced_conv_sim(cfg: ForcedConvConfig) -> ForcedConvResult:
         b_m=b_m,
         k_plate=mat.k_plate,
         tb_m=tb_m,
-        has_piastra=mat.has_piastra,
+        has_piastra=effective_has_piastra,
         k_piastra=mat.k_piastra,
         tr_m=cfg.copper_plate_thickness_m,
         n_fourier=cfg.n_fourier,

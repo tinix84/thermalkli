@@ -44,6 +44,11 @@ def register_all(app: typer.Typer) -> None:
 
         t_inlet_c = float(env.get("t_inlet_c", 40.0))
 
+        sources_raw = raw.get("sources") or []
+        if not isinstance(sources_raw, list):
+            typer.echo("Error: 'sources' in config must be a list", err=True)
+            raise typer.Exit(1)
+
         cfg = ForcedConvConfig(
             hs_profile=hs["profile"],
             hs_material=hs["material"],
@@ -54,7 +59,7 @@ def register_all(app: typer.Typer) -> None:
             fan_count=int(fan.get("count", 1)),
             ventilation=fan.get("ventilation", "push"),
             impinge_gap_m=float(fan.get("impinge_gap_mm", 0.0)) / 1000.0,
-            sources=[_src_to_si(s) for s in raw.get("sources", [])],
+            sources=[_src_to_si(s) for s in sources_raw],
             t_inlet_k=t_inlet_c + 273.15,
             nx=int(grid.get("nx", 41)),
             ny=int(grid.get("ny", 41)),

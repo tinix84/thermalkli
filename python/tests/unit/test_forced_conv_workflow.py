@@ -76,3 +76,11 @@ class TestRunForcedConvSim:
     def test_unknown_fan_raises(self):
         with pytest.raises(ValueError, match="not found"):
             run_forced_conv_sim(_vh_cfg(fan_model="DoesNotExist"))
+
+    def test_fan_count_zero_raises(self):
+        with pytest.raises(ValueError, match="fan_count"):
+            run_forced_conv_sim(_vh_cfg(fan_count=0))
+
+    def test_invalid_nx_raises(self):
+        with pytest.raises(ValueError, match="nx"):
+            run_forced_conv_sim(_vh_cfg(nx=0))

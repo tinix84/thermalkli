@@ -316,12 +316,15 @@ def calc_plane_temp(
         exp_term = math.exp(dt / lmtd)
         t_h_bp = (cfg.t_inlet_k - t_fluid_out * exp_term) / (1.0 - exp_term) - lmtd
 
+    # Guard: treat as no-piastra if conductivity or thickness is zero
+    effective_has_piastra = cfg.has_piastra and cfg.k_piastra > 0 and cfg.tr_m > 0
+
     # Effective base-plate surface temperature: add average piastra resistance
     # when a copper spreading plate is present.  The Ao term in _temp_at_point
     # already contains the distributed piastra contribution, so t_h_bp_eff is
     # used only as the reported base temperature — it is NOT passed to
     # _temp_at_point (which still receives t_h_bp).
-    if cfg.has_piastra and cfg.k_piastra > 0.0 and cfg.tr_m > 0.0:
+    if effective_has_piastra:
         a_hs = cfg.a_m * cfg.b_m  # footprint area [m²]
         rth_piastra_avg = cfg.tr_m / (cfg.k_piastra * a_hs)
         t_base_reported = t_h_bp + rth_piastra_avg * total_power
@@ -337,7 +340,7 @@ def calc_plane_temp(
         tb_m=cfg.tb_m,
         tr_m=cfg.tr_m,
         h_eq=cfg.h_eq,
-        has_piastra=cfg.has_piastra,
+        has_piastra=effective_has_piastra,
         n_fourier=cfg.n_fourier,
     )
     ny, nx = len(y_pts_m), len(x_pts_m)

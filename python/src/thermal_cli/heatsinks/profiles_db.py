@@ -38,6 +38,8 @@ class HsMaterial:
     name: str
     k_fin: float  # fin thermal conductivity [W/(m·K)]
     k_plate: float  # base-plate thermal conductivity [W/(m·K)]
+    k_piastra: float = 0.0  # copper spreading plate conductivity [W/(m·K)]; 0 if absent
+    has_piastra: bool = False  # True when a copper spreading plate is present
 
 
 @dataclass
@@ -117,6 +119,8 @@ def lookup_hs_material(name: str) -> HsMaterial:
                     name=row["name"],
                     k_fin=float(row["k_fin"]),
                     k_plate=float(row["k_plate"]),
+                    k_piastra=float(row["k_piastra"]),
+                    has_piastra=row["has_piastra"].strip().lower() == "yes",
                 )
     raise ValueError(
         f"Heatsink material '{name}' not found in database. Check db/hs_materials.csv."

@@ -243,3 +243,56 @@ def run_multi_sim_two_scenarios() -> dict:
         "al_t_j_max": row_al.t_j_max,
         "cu_t_j_max": row_cu.t_j_max,
     }
+
+
+# ---------------------------------------------------------------------------
+# M10 forced-conv-sim wrappers
+# ---------------------------------------------------------------------------
+
+
+def run_forced_conv_basic() -> dict:
+    """Regression wrapper: VH small heatsink, JF0825 fan, 2 sources (push).
+
+    Config in SI (m, K) matching fixtures/forced_conv_sim/basic.yaml description.
+    """
+    from thermal_cli.forced_conv.workflow import ForcedConvConfig, run_forced_conv_sim
+
+    cfg = ForcedConvConfig(
+        hs_profile="VHSmallHeatsink28mm",
+        hs_material="all_aluminum",
+        length_x_m=0.063,
+        length_y_m=0.130,
+        copper_plate_thickness_m=0.0,
+        fan_model="JF0825-1H-02",
+        fan_count=1,
+        ventilation="push",
+        impinge_gap_m=0.0,
+        sources=[
+            {
+                "name": "Q1",
+                "x_m": 0.0165,
+                "y_m": 0.011,
+                "width_m": 0.013,
+                "height_m": 0.013,
+                "power_w": 30.0,
+            },
+            {
+                "name": "Q2",
+                "x_m": 0.0165,
+                "y_m": 0.0355,
+                "width_m": 0.013,
+                "height_m": 0.013,
+                "power_w": 30.0,
+            },
+        ],
+        t_inlet_k=313.15,
+        nx=11,
+        ny=11,
+        n_fourier=10,
+    )
+    result = run_forced_conv_sim(cfg)
+    return {
+        "t_base_max_k": result.t_base_max_k,
+        "q_operating_m3s": result.q_operating_m3s,
+        "rth_fin_kw": result.rth_fin_kw,
+    }

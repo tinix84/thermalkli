@@ -1,0 +1,7 @@
+command: forced-conv-sim
+description: VH small heatsink, JF0825 fan (push), 2x30W sources (all-aluminum).
+python_only: true
+python_call:
+  module: tests.regression.helpers
+  function: run_forced_conv_basic
+  args: {}

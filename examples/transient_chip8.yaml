@@ -1,0 +1,11 @@
+network:
+  kind: intelec2003_chip8_cauer
+  # The fixture reference is the local substrate/base boundary, not room ambient.
+  ambient_k: 293.15
+waveform:
+  times_s: [0.0, 0.001, 0.5, 1.0]
+  powers_w:
+    - [0, 0, 0]
+    - [0, 0, 10]
+    - [0, 0, 10]
+    - [0, 0, 0]

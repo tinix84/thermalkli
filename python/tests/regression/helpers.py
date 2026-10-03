@@ -158,7 +158,18 @@ def run_cspi_optimize_aluminum() -> dict:
     from thermal_cli.cspi.optimizer import cspi_optimize
 
     r = cspi_optimize(lambda_hs=200.0, a_chip=10e-4, c=0.040, p_fan_max=5.0)
-    return {"cspi": r.cspi, "rth": r.rth, "n": float(r.n), "s": r.s}
+    return {
+        "cspi": r.cspi,
+        "rth_system_K_W": r.rth,
+        "volume_system_L": r.vol,
+        "channel_count": float(r.n),
+        "channel_width_m": r.s,
+        "fin_thickness_m": r.t,
+        "operating_point_status": r.operating_point_status,
+        "fan_curve_model": r.fan_curve_model,
+        "flow_rate_m3_s": r.flow_rate_m3_s,
+        "pressure_drop_pa": r.pressure_drop_pa,
+    }
 
 
 def layer_spreading_isotropic(

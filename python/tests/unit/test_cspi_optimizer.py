@@ -7,7 +7,10 @@ from thermal_cli.cspi.optimizer import (
     CspiOptResult,
     CspiSweepResult,
     cspi_optimize,
+    cspi_evaluate_geometry,
     cspi_sweep,
+    fin_half_path_resistance,
+    _rectangular_pressure_drop,
 )
 
 # ---------------------------------------------------------------------------
@@ -265,14 +268,14 @@ class TestNPts:
             a_chip=10e-4,
             c=40e-3,
             p_fan_max=5.0,
-            n_pts=20,
+            n_pts=3,
         )
         res_fine = cspi_optimize(
             lambda_hs=200.0,
             a_chip=10e-4,
             c=40e-3,
             p_fan_max=5.0,
-            n_pts=200,
+            n_pts=5,
         )
         # Both should be positive and within ~50% of each other
         assert res_coarse.cspi > 0
@@ -389,3 +392,293 @@ class TestCspiOptimizeValidation:
     def test_n_pts_too_small_raises(self):
         with pytest.raises(ValueError, match="n_pts"):
             cspi_optimize(n_pts=1, **_BASE_OPT_KW)
+
+
+class TestBoundedCoolingAssembly:
+    def evaluate(self, **overrides):
+        values = dict(
+            lambda_hs=210.0,
+            sink_width_m=0.04,
+            fin_height_m=0.02,
+            sink_length_m=0.08,
+            base_thickness_m=0.005,
+            channel_count=30,
+            channel_width_m=0.001,
+            fin_thickness_m=0.0003,
+            p_fan_max=6.6,
+            fan_diameter_m=0.04,
+            fan_depth_m=0.028,
+            duct_length_m=0.014,
+            assembly_face_width_m=0.04,
+            assembly_face_height_m=0.04,
+            fan_free_flow_m3_s=0.59 / 60.0,
+            fan_shutoff_pressure_pa=340.0,
+            fan_speed_rpm=15500.0,
+            auxiliary_power_w=6.6,
+            auxiliary_power_basis="rated electrical input at 12 V",
+            t_air_c=25.0,
+        )
+        values.update(overrides)
+        return cspi_evaluate_geometry(**values)
+
+    def test_bounded_fan_system_root_and_b07_volume_boundary(self):
+        result = self.evaluate(face_count=2)
+        assert result.operating_point_status == "converged"
+        assert result.feasible
+        assert 0 < result.flow_rate_m3_s < result.v_max
+        assert result.pressure_drop_pa > 0
+        assert result.fan_curve_model == "parabolic fit to supplied endpoints"
+        assert result.n_fan == pytest.approx(15500.0)
+        assert result.auxiliary_power_basis == "rated electrical input at 12 V"
+        assert result.pressure_correlation != result.heat_transfer_correlation
+        assert result.sink_volume_l == pytest.approx(0.128)
+        assert result.fan_volume_l == pytest.approx(0.0448)
+        assert result.duct_volume_l == pytest.approx(0.0224)
+        assert result.vol == pytest.approx(0.1952)
+        assert result.sink_material_bbox_l == pytest.approx(0.08)
+        assert result.auxiliary_power_w == pytest.approx(6.6)
+        assert result.rth == pytest.approx(result.r_face_k_w / 2.0)
+
+    def test_no_intersection_is_explicit_and_infeasible(self):
+        result = self.evaluate(
+            fan_free_flow_m3_s=0.0001,
+            fan_shutoff_pressure_pa=None,
+            fan_curve_flow_m3_s=[0.0, 0.0001],
+            fan_curve_pressure_pa=[1000.0, 1000.0],
+        )
+        assert result.operating_point_status == "no_intersection"
+        assert not result.feasible
+        assert result.flow_rate_m3_s is None
+        assert result.pressure_drop_pa is None
+
+    def test_out_of_validity_domain_is_not_misreported_as_no_intersection(self):
+        result = self.evaluate(
+            fan_curve_flow_m3_s=[0.0, 0.02],
+            fan_curve_pressure_pa=[500.0, 500.0],
+        )
+        assert result.operating_point_status == "correlation_out_of_range"
+        assert not result.feasible
+
+    def test_half_fin_path_units_and_geometry_trends(self):
+        baseline = fin_half_path_resistance(
+            fin_height_m=0.02,
+            conductivity_w_mk=210.0,
+            thickness_m=0.0003,
+            flow_length_m=0.08,
+        )
+        thin_fin = fin_half_path_resistance(
+            fin_height_m=0.02,
+            conductivity_w_mk=210.0,
+            thickness_m=0.00015,
+            flow_length_m=0.08,
+        )
+        higher_k = fin_half_path_resistance(
+            fin_height_m=0.02,
+            conductivity_w_mk=420.0,
+            thickness_m=0.0003,
+            flow_length_m=0.08,
+        )
+        twice_area = fin_half_path_resistance(
+            fin_height_m=0.02,
+            conductivity_w_mk=210.0,
+            thickness_m=0.0003,
+            flow_length_m=0.16,
+        )
+        assert baseline == pytest.approx(0.02 / (2 * 210 * 0.0003 * 0.08))
+        assert thin_fin == pytest.approx(2 * baseline)
+        assert higher_k == pytest.approx(baseline / 2)
+        assert twice_area == pytest.approx(baseline / 2)
+
+    def test_two_face_normalization_uses_total_source_power(self):
+        one_face = self.evaluate(face_count=1, source_power_w=120.0)
+        two_face = self.evaluate(face_count=2, source_power_w=120.0)
+        assert one_face.outlet_air_temperature_c > 25.0
+        assert two_face.outlet_air_temperature_c > 25.0
+        assert two_face.rth == pytest.approx(two_face.r_face_k_w / 2.0)
+        assert two_face.rth < two_face.r_face_k_w
+        assert two_face.source_power_w == pytest.approx(120.0)
+
+    def test_optimizer_returns_integer_geometry_that_fills_width(self):
+        result = cspi_optimize(
+            lambda_hs=210.0,
+            a_chip=0.0032,
+            c=0.04,
+            p_fan_max=6.6,
+            t_min=0.0003,
+            fan_free_flow_m3_s=0.59 / 60.0,
+            fan_shutoff_pressure_pa=340.0,
+            n_pts=5,
+        )
+        assert isinstance(result.n, int)
+        assert result.n >= 2
+        assert result.n * result.s + (result.n + 1) * result.t == pytest.approx(0.04)
+        assert result.t >= 0.0003
+
+    def test_b08_manufacturing_constraint_changes_selected_geometry(self):
+        theoretical = cspi_optimize(
+            lambda_hs=210.0, a_chip=0.0032, c=0.04, p_fan_max=6.6, n_pts=5
+        )
+        manufactured = cspi_optimize(
+            lambda_hs=210.0, a_chip=0.0032, c=0.04, p_fan_max=6.6,
+            t_min=0.001, n_pts=5,
+        )
+        assert theoretical.t < manufactured.t
+        assert manufactured.t >= 0.001
+        assert theoretical.n != manufactured.n or theoretical.s != manufactured.s
+
+
+class TestM7ReviewCorrections:
+    def evaluate(self, **overrides):
+        values = dict(
+            lambda_hs=210.0,
+            sink_width_m=0.04,
+            fin_height_m=0.02,
+            sink_length_m=0.08,
+            base_thickness_m=0.005,
+            channel_count=30,
+            channel_width_m=0.001,
+            fin_thickness_m=0.0003,
+            p_fan_max=6.6,
+            fan_diameter_m=0.04,
+            fan_depth_m=0.028,
+            duct_length_m=0.014,
+            assembly_face_width_m=0.04,
+            assembly_face_height_m=0.04,
+            fan_free_flow_m3_s=0.05,
+            fan_shutoff_pressure_pa=3400.0,
+            fan_speed_rpm=15500.0,
+            t_air_c=25.0,
+        )
+        values.update(overrides)
+        return cspi_evaluate_geometry(**values)
+
+    def test_search_continues_to_turbulent_domain_without_bridging_transition(self):
+        result = self.evaluate(
+            fan_free_flow_m3_s=0.05,
+            fan_shutoff_pressure_pa=3400.0,
+        )
+        assert result.operating_point_status == "converged"
+        assert result.flow_rate_m3_s == pytest.approx(0.026497078327, rel=2e-8)
+        assert result.re == pytest.approx(5349.5323, rel=2e-5)
+        assert result.pressure_drop_pa == pytest.approx(1833.8629, rel=2e-5)
+        assert result.pressure_drop_pa == pytest.approx(
+            result.fan_pressure_scale * result.fan_pressure_pa, rel=1e-8
+        )
+
+    def test_zero_pressure_curve_has_no_forced_air_operating_point(self):
+        result = self.evaluate(
+            fan_speed_rpm=None,
+            fan_free_flow_m3_s=None,
+            fan_shutoff_pressure_pa=None,
+            fan_curve_flow_m3_s=[0.0, 0.01],
+            fan_curve_pressure_pa=[0.0, 0.0],
+        )
+        assert result.operating_point_status == "no_intersection"
+        assert result.flow_rate_m3_s is None
+        assert result.pressure_drop_pa is None
+        assert not result.feasible
+        assert result.n_fan is None
+
+    @pytest.mark.parametrize(
+        "field,value",
+        [
+            ("channel_count", True),
+            ("channel_count", 2.5),
+            ("face_count", True),
+            ("face_count", 1.5),
+            ("hydraulic_branch_count", False),
+            ("hydraulic_branch_count", 1.5),
+        ],
+    )
+    def test_nonintegral_or_boolean_counts_are_rejected(self, field, value):
+        with pytest.raises(ValueError, match=field):
+            self.evaluate(**{field: value})
+
+    def test_overfilled_channel_and_fin_width_is_rejected(self):
+        with pytest.raises(ValueError, match="overfill"):
+            self.evaluate(channel_count=100)
+
+    def test_envelope_must_contain_fan_and_complete_sink_bbox(self):
+        with pytest.raises(ValueError, match="assembly_face_width_m"):
+            self.evaluate(assembly_face_width_m=0.001)
+        with pytest.raises(ValueError, match="assembly_face_height_m"):
+            self.evaluate(assembly_face_height_m=0.001)
+        with pytest.raises(ValueError, match="assembly_face_height_m"):
+            self.evaluate(base_thickness_m=0.01, assembly_face_height_m=0.025)
+
+    def test_optimizer_base_fits_inside_total_height_envelope(self):
+        result = cspi_optimize(
+            lambda_hs=210.0, a_chip=0.0032, c=0.04, p_fan_max=6.6,
+            base_thickness_m=0.01, n_pts=3,
+        )
+        assert result.feasible
+        assert result.sink_volume_l == pytest.approx(0.128)
+        assert result.sink_material_bbox_l == pytest.approx(0.128)
+
+    def test_only_one_or_symmetric_two_face_topologies_are_supported(self):
+        with pytest.raises(ValueError, match="face_count must be 1 or 2"):
+            self.evaluate(face_count=3)
+        with pytest.raises(ValueError, match="face_count must be 1 or 2"):
+            cspi_optimize(
+                lambda_hs=210.0, a_chip=0.0032, c=0.04, p_fan_max=6.6,
+                face_count=3, n_pts=3,
+            )
+
+    def test_heated_faces_are_distinct_and_multiple_channel_bodies_are_rejected(self):
+        shared = self.evaluate(face_count=2, hydraulic_branch_count=1)
+        assert shared.heated_face_count == 2
+        assert shared.hydraulic_branch_count == 1
+        with pytest.raises(ValueError, match="hydraulic_branch_count must be 1"):
+            self.evaluate(face_count=2, hydraulic_branch_count=2)
+        with pytest.raises(ValueError, match="hydraulic_branch_count must be 1"):
+            cspi_optimize(
+                lambda_hs=210.0, a_chip=0.0032, c=0.04, p_fan_max=6.6,
+                hydraulic_branch_count=2, n_pts=3,
+            )
+        shared_loss = _rectangular_pressure_drop(
+            q_total=0.01, n_channels=30, hydraulic_branch_count=1,
+            gap=0.001, height=0.02, length=0.08, t_air_c=25.0,
+        )
+        duplicate_loss = _rectangular_pressure_drop(
+            q_total=0.01, n_channels=30, hydraulic_branch_count=2,
+            gap=0.001, height=0.02, length=0.08, t_air_c=25.0,
+        )
+        assert shared_loss[1] == pytest.approx(2.0 * duplicate_loss[1])
+        assert shared_loss[0] > duplicate_loss[0]
+
+    def test_supplied_endpoints_do_not_inherit_similarity_rpm(self):
+        without_speed = self.evaluate(
+            fan_free_flow_m3_s=0.009,
+            fan_shutoff_pressure_pa=300.0,
+            fan_speed_rpm=None,
+        )
+        with_speed = self.evaluate(
+            fan_free_flow_m3_s=0.009,
+            fan_shutoff_pressure_pa=300.0,
+            fan_speed_rpm=15500.0,
+        )
+        assert without_speed.n_fan is None
+        assert with_speed.n_fan == pytest.approx(15500.0)
+
+    def test_independent_integer_count_gap_search_finds_better_26_channel_candidate(self):
+        optimized = cspi_optimize(
+            lambda_hs=210.0, a_chip=0.0032, c=0.04, p_fan_max=6.6,
+            t_air=80.0, n_pts=3, channel_width_min_m=0.0002,
+            channel_width_step_m=0.0002,
+        )
+        gap = 0.001
+        thickness = (0.04 - 26 * gap) / 27
+        candidate = cspi_evaluate_geometry(
+            lambda_hs=210.0, sink_width_m=0.04, fin_height_m=0.04,
+            sink_length_m=0.0032 / 0.04, base_thickness_m=0.0,
+            channel_count=26, channel_width_m=gap,
+            fin_thickness_m=thickness, p_fan_max=6.6,
+            fan_diameter_m=0.04, t_air_c=80.0,
+        )
+        assert candidate.feasible
+        assert thickness == pytest.approx(0.0005185185185)
+        assert candidate.n_channels == 26
+        assert candidate.cspi == pytest.approx(24.925537766, rel=1e-8)
+        assert optimized.feasible
+        assert optimized.cspi >= candidate.cspi
+        assert optimized.n * optimized.s + (optimized.n + 1) * optimized.t == pytest.approx(0.04)

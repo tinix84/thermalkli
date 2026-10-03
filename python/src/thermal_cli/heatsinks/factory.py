@@ -6,19 +6,9 @@ Ported from ``mfiles/Thermal/Model/heatsinkFactory.m``.
 from __future__ import annotations
 
 import csv
-from pathlib import Path
 
+from thermal_cli.database import open_database_csv
 from thermal_cli.heatsinks.extruded_fin import ExtrudedFin
-
-
-def _find_db_dir() -> Path:
-    """Locate the db/ directory at the repo root."""
-    here = Path(__file__).resolve()
-    for parent in here.parents:
-        candidate = parent / "db"
-        if (candidate / "heatsinks_extruded.csv").exists():
-            return candidate
-    raise FileNotFoundError("No db/heatsinks_extruded.csv found in any parent directory")
 
 
 def heatsink_factory(heatsink_ref: str) -> ExtrudedFin:
@@ -36,11 +26,8 @@ def heatsink_factory(heatsink_ref: str) -> ExtrudedFin:
     ValueError
         If the reference is not found in the database.
     """
-    db_dir = _find_db_dir()
-
     # Search extruded database
-    extruded_path = db_dir / "heatsinks_extruded.csv"
-    with open(extruded_path) as f:
+    with open_database_csv("heatsinks_extruded.csv") as f:
         reader = csv.DictReader(f)
         for row in reader:
             if row["heatsinkRef"] == heatsink_ref:

@@ -1,6 +1,11 @@
 command: cspi-optimize
-description: Aluminum HS, A_chip=10cm2, c=40mm, P_fan=5W.
-octave_script: |
+description: >-
+  Current bounded geometry prediction. The former Octave half-free-flow
+  comparison was a distinct legacy heuristic and is retained below only as
+  historical source; it is not a parity oracle for the M7 model.
+python_only: true
+octave_script: null
+legacy_octave_script: |
   addpath('lib');
   r = cspi_optimize(200, 10e-4, 0.040, 5);
   disp(jsonencode(struct('cspi', r.cspi, 'rth', r.rth, 'n', r.n, 's', r.s)));

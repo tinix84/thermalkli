@@ -6,20 +6,10 @@ Ported from ``mfiles/Thermal/Model/GasProperty.m``.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from pathlib import Path
 
 import numpy as np
 
-
-def _find_db_path(fluid_ref: str) -> Path:
-    """Locate the CSV data file for a fluid reference string."""
-    # Walk up from this file to find db/ at repo root
-    here = Path(__file__).resolve()
-    for parent in here.parents:
-        candidate = parent / "db" / f"fluid_{fluid_ref}.csv"
-        if candidate.exists():
-            return candidate
-    raise FileNotFoundError(f"No CSV found for fluid '{fluid_ref}' in any parent db/ directory")
+from thermal_cli.database import open_database_csv
 
 
 @dataclass
@@ -39,8 +29,8 @@ class GasProperty:
     _pressure_ref: float = field(repr=False, init=False)
 
     def __post_init__(self) -> None:
-        path = _find_db_path(self.fluid_ref)
-        data = np.genfromtxt(path, delimiter=",", skip_header=1, filling_values=np.nan)
+        with open_database_csv(f"fluid_{self.fluid_ref}.csv") as stream:
+            data = np.genfromtxt(stream, delimiter=",", skip_header=1, filling_values=np.nan)
         self._temperature = data[:, 0]
         self._pressure_ref = float(data[0, 1])
         self._cp = data[:, 2]

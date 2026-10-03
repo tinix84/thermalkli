@@ -1,0 +1,5 @@
+name,k_fin,k_plate,k_piastra,price_kg,has_piastra,rho_plate,rho_fin,rho_piastra
+all_aluminum,200,200,0,10,no,2700,2700,8230
+all_copper,350,350,0,22,no,8230,8230,8230
+plate_al_fin_cu,350,200,0,18,no,2700,8230,8230
+all_alum_piastra_rame,200,200,350,18,yes,2700,2700,8230

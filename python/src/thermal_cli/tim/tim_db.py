@@ -15,7 +15,8 @@ from __future__ import annotations
 
 import csv
 from dataclasses import dataclass
-from pathlib import Path
+
+from thermal_cli.database import open_database_csv
 
 
 @dataclass(frozen=True)
@@ -39,18 +40,6 @@ class TimEntry:
     notes: str                          # free-text notes
 
 
-def _find_db_dir() -> Path:
-    """Locate the ``db/`` directory by walking up from this file's location."""
-    here = Path(__file__).resolve()
-    for parent in here.parents:
-        candidate = parent / "db"
-        if (candidate / "tim.csv").exists():
-            return candidate
-    raise FileNotFoundError(
-        f"db/tim.csv not found in any parent directory of {__file__}"
-    )
-
-
 def _opt_float(s: str) -> float | None:
     """Parse an optional float from a CSV cell (empty string → None)."""
     s = s.strip()
@@ -70,9 +59,8 @@ def load_tim_db() -> list[TimEntry]:
     list[TimEntry]
         All 38 TIM database records.
     """
-    db_dir = _find_db_dir()
     entries: list[TimEntry] = []
-    with open(db_dir / "tim.csv", newline="") as fh:
+    with open_database_csv("tim.csv") as fh:
         for row in csv.DictReader(fh):
             entries.append(
                 TimEntry(

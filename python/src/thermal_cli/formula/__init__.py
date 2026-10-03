@@ -14,6 +14,13 @@ from thermal_cli.formula.radiation import (
     parallel_planes,
     small_convex,
 )
+from thermal_cli.formula.waffler import (
+    waffler_friction_factor,
+    waffler_heat_transfer_coefficient,
+    waffler_laminar_nusselt,
+    waffler_nusselt,
+    waffler_turbulent_nusselt,
+)
 
 __all__ = [
     "STEFAN_BOLTZMANN",
@@ -26,4 +33,9 @@ __all__ = [
     "h_radiation_linearized",
     "parallel_planes",
     "small_convex",
+    "waffler_friction_factor",
+    "waffler_heat_transfer_coefficient",
+    "waffler_laminar_nusselt",
+    "waffler_nusselt",
+    "waffler_turbulent_nusselt",
 ]

@@ -1,0 +1,19 @@
+# Source: SANYO DENKI Technical Report No.48, Fig. 6, PDF p.8 / printed p.5 (2019).
+# Model: 109P0412K3013; adjacent Table 1: 15,500 rpm, 0.59 m3/min free flow, 340 Pa shutoff, 6.6 W, 40x40x28 mm.
+# Fig. 6 does not print voltage/speed. Association with 15,500 rpm / rated 12 V is inferred from adjacent table/catalog and Technical Report No.40.
+# Interior points are digitized at approximately 0.05 m3/min; per-point graph uncertainty: +/-0.005 m3/min and +/-10 Pa.
+# Endpoints use exact adjacent table values. Source curve remains an approximation; no measured thermal parity is implied.
+flow_m3_min,pressure_pa
+0,340
+0.05,308.9
+0.10,271.4
+0.15,230.2
+0.20,188.0
+0.25,140.0
+0.30,119.6
+0.35,114.7
+0.40,110.2
+0.45,89.7
+0.50,63.7
+0.55,30.5
+0.59,0

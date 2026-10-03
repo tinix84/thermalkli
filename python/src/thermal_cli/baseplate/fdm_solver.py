@@ -1,139 +1,265 @@
-"""2.5D FDM solver for baseplate temperature distribution.
+"""Conservative 2.5D baseplate solver using vertex-centered control volumes.
 
-Solves the steady-state PDE:
-    -k * t * nabla^2(T) + (T - T_inf) / R''_vert = q''(x, y)
-
-where:
-    k = baseplate conductivity [W/(m K)]
-    t = baseplate thickness [m]
-    R''_vert = R_sa / A_base [K m^2 / W] (vertical sink resistance per area)
-    q'' = heat flux from devices [W/m^2]
-
-Discretized on a uniform rectangular grid with adiabatic (Neumann) BCs.
-Uses scipy sparse direct solver (spsolve).
+The grid retains nx-by-ny temperature unknowns at coordinates including each
+plate edge. Dual control volumes at edge nodes have half-width/height. Lateral
+face conductances and distributed vertical extraction are integrated over
+those exact control-volume measures; the perimeter is adiabatic.
 """
 
 from __future__ import annotations
 
+import math
+
 import numpy as np
-from scipy.sparse import lil_matrix
+from scipy.sparse import coo_matrix
 from scipy.sparse.linalg import spsolve
 
-from thermal_cli.baseplate.types import BaseplateConfig, BaseplateResult, DeviceResult
+from thermal_cli.baseplate.types import BaseplateConfig, BaseplateResult, Device, DeviceResult
+
+
+def _require_finite_number(name: str, value: object) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float, np.integer, np.floating)):
+        raise ValueError(f"{name} must be a finite number")
+    numeric_value = float(value)
+    if not math.isfinite(numeric_value):
+        raise ValueError(f"{name} must be a finite number")
+    return numeric_value
+
+
+def _control_volume_bounds(points: np.ndarray, extent: float) -> np.ndarray:
+    """Return dual-cell bounds for point samples that include both plate edges."""
+    bounds = np.empty(points.size + 1, dtype=float)
+    bounds[0] = 0.0
+    bounds[-1] = extent
+    bounds[1:-1] = 0.5 * (points[:-1] + points[1:])
+    return bounds
+
+
+def _overlap_lengths(bounds: np.ndarray, center: float, extent: float) -> np.ndarray:
+    """Intersect a centered interval with cells without subtracting close endpoints."""
+    half_extent = extent / 2.0
+    interval_min = center - half_extent
+    interval_max = center + half_extent
+    overlaps = np.zeros(bounds.size - 1, dtype=float)
+
+    for index, (cell_min, cell_max) in enumerate(zip(bounds[:-1], bounds[1:], strict=True)):
+        if interval_max <= cell_min or interval_min >= cell_max:
+            continue
+        if cell_min <= interval_min and interval_max <= cell_max:
+            # Preserve the declared interval measure when one cell contains it.
+            overlap = extent
+        elif interval_min <= cell_min and cell_max <= interval_max:
+            overlap = cell_max - cell_min
+        elif interval_min < cell_min:
+            # The interval starts before this cell and ends inside it.
+            overlap = half_extent + (center - cell_min)
+        else:
+            # The interval starts inside this cell and ends beyond it.
+            overlap = half_extent + (cell_max - center)
+        overlaps[index] = overlap
+
+    return overlaps
+
+
+def _device_footprint(device: Device, lx: float, ly: float) -> tuple[float, float, float, float, float]:
+    x = _require_finite_number(f"device {device.name!r} x", device.x)
+    y = _require_finite_number(f"device {device.name!r} y", device.y)
+    width = _require_finite_number(f"device {device.name!r} width", device.width)
+    height = _require_finite_number(f"device {device.name!r} height", device.height)
+    power = _require_finite_number(f"device {device.name!r} power", device.power)
+    r_jc = _require_finite_number(f"device {device.name!r} r_jc", device.r_jc)
+    r_interface = _require_finite_number(
+        f"device {device.name!r} r_interface", device.r_interface
+    )
+    if width <= 0.0 or height <= 0.0:
+        raise ValueError(f"device {device.name!r} footprint dimensions must be positive")
+    if power < 0.0 or r_jc < 0.0 or r_interface < 0.0:
+        raise ValueError(f"device {device.name!r} power and resistances must be nonnegative")
+
+    x_min = x - width / 2.0
+    x_max = x + width / 2.0
+    y_min = y - height / 2.0
+    y_max = y + height / 2.0
+    if x_min < 0.0 or y_min < 0.0 or x_max > lx or y_max > ly:
+        raise ValueError(
+            f"device {device.name!r} footprint must be fully inside the baseplate; "
+            "footprints are not clipped or renormalized"
+        )
+    return x_min, x_max, y_min, y_max, width * height
 
 
 def solve_fdm(config: BaseplateConfig) -> BaseplateResult:
-    """Solve the 2.5D baseplate PDE via finite differences.
+    """Solve the steady 2.5D baseplate model with conservative finite volumes.
 
-    Parameters
-    ----------
-    config : BaseplateConfig
-        Baseplate geometry, material, devices, and grid resolution.
-
-    Returns
-    -------
-    BaseplateResult
-        Temperature field and per-device junction temperatures.
+    nx and ny remain the number of vertex-centered unknowns, including nodes
+    on the plate perimeter. Boundary nodes own half-width/half-height dual
+    control volumes. Device base temperatures are area-weighted over their
+    complete thermal footprints; t_max is the maximum grid-point temperature.
     """
-    nx, ny = config.nx, config.ny
-    lx, ly = config.lx, config.ly
-    k = config.conductivity
-    t = config.thickness
-    r_sa = config.r_sa
-    t_inf = config.t_ambient
+    lx = _require_finite_number("lx", config.lx)
+    ly = _require_finite_number("ly", config.ly)
+    thickness = _require_finite_number("thickness", config.thickness)
+    conductivity = _require_finite_number("conductivity", config.conductivity)
+    r_sa = _require_finite_number("r_sa", config.r_sa)
+    t_reference = _require_finite_number("t_ambient", config.t_ambient)
+    if t_reference < 0.0:
+        raise ValueError("t_ambient must be an absolute temperature in Kelvin")
+    if min(lx, ly, thickness, conductivity, r_sa) <= 0.0:
+        raise ValueError("plate dimensions, thickness, conductivity, and r_sa must be positive")
+    if (
+        isinstance(config.nx, bool)
+        or not isinstance(config.nx, (int, np.integer))
+        or isinstance(config.ny, bool)
+        or not isinstance(config.ny, (int, np.integer))
+        or config.nx < 2
+        or config.ny < 2
+    ):
+        raise ValueError("nx and ny must be integers of at least 2")
 
+    nx, ny = int(config.nx), int(config.ny)
+    x_grid = np.linspace(0.0, lx, nx)
+    y_grid = np.linspace(0.0, ly, ny)
     dx = lx / (nx - 1)
     dy = ly / (ny - 1)
-    x = np.linspace(0, lx, nx)
-    y = np.linspace(0, ly, ny)
 
-    # Total baseplate area for R''_vert conversion
-    a_base = lx * ly
-    r_vert = r_sa / a_base  # [K m^2 / W]
+    x_bounds = _control_volume_bounds(x_grid, lx)
+    y_bounds = _control_volume_bounds(y_grid, ly)
+    x_widths = np.diff(x_bounds)
+    y_widths = np.diff(y_bounds)
+    cell_areas = np.outer(y_widths, x_widths)
+    baseplate_area = lx * ly
+    if not math.isfinite(baseplate_area) or baseplate_area <= 0.0:
+        raise ValueError("baseplate area must be finite and positive")
+    sheet_conductance = conductivity * thickness
+    if not math.isfinite(sheet_conductance) or sheet_conductance <= 0.0:
+        raise ValueError("conductivity times thickness must be finite and positive")
 
-    # Coefficient for vertical sink coupling
-    alpha = 1.0 / (r_vert * k * t) if r_vert > 0 else 0.0
+    source_power = np.zeros((ny, nx), dtype=float)
+    requested_power = math.fsum(
+        _require_finite_number(f"device {device.name!r} power", device.power)
+        for device in config.devices
+    )
+    for device in config.devices:
+        x_min, x_max, y_min, y_max, footprint_area = _device_footprint(device, lx, ly)
+        overlap_x = _overlap_lengths(x_bounds, device.x, device.width)
+        overlap_y = _overlap_lengths(y_bounds, device.y, device.height)
+        intersection_areas = np.outer(overlap_y, overlap_x)
+        source_power += float(device.power) * intersection_areas / footprint_area
 
-    n = nx * ny
-    a_mat = lil_matrix((n, n), dtype=np.float64)
-    rhs = np.zeros(n)
+    heat_input = float(np.sum(source_power, dtype=np.float64))
+    source_tolerance = 64.0 * np.finfo(float).eps * max(
+        abs(requested_power), np.finfo(float).tiny
+    )
+    if abs(heat_input - requested_power) > source_tolerance:
+        raise RuntimeError("control-volume source mapping did not conserve device power")
 
-    def idx(i: int, j: int) -> int:
+    r_area = r_sa * baseplate_area
+    if not math.isfinite(r_area) or r_area <= 0.0:
+        raise ValueError("R_area = r_sa * baseplate area must be finite and positive")
+    sink_conductance = cell_areas / r_area
+
+    node_count = nx * ny
+    diagonal = sink_conductance.ravel().copy()
+    rows: list[int] = []
+    columns: list[int] = []
+    values: list[float] = []
+
+    def node_index(i: int, j: int) -> int:
         return j * nx + i
 
-    # Build heat source map q''(x, y) [W/m^2]
-    q = np.zeros((ny, nx))
-    for dev in config.devices:
-        x_min = dev.x - dev.width / 2
-        x_max = dev.x + dev.width / 2
-        y_min = dev.y - dev.height / 2
-        y_max = dev.y + dev.height / 2
-        area = dev.width * dev.height
-        flux = dev.power / area if area > 0 else 0.0
-        for j in range(ny):
-            for i in range(nx):
-                if x_min <= x[i] <= x_max and y_min <= y[j] <= y_max:
-                    q[j, i] = flux
-
-    # Assemble sparse system (positive-definite form: A T = b)
-    # PDE: -k*t*nabla^2(T) + (T - T_inf)/R_vert = q
-    # Discretized: (2cx + 2cy + alpha)*T_ij - cx*neighbors = q/(k*t) + alpha*T_inf
-    cx = 1.0 / dx**2
-    cy = 1.0 / dy**2
-
+    # Each shared face contributes one symmetric conductance. There are no
+    # perimeter faces, which implements the adiabatic boundary condition.
+    x_face_conductance = sheet_conductance * y_widths / dx
     for j in range(ny):
+        for i in range(nx - 1):
+            first = node_index(i, j)
+            second = node_index(i + 1, j)
+            conductance = float(x_face_conductance[j])
+            diagonal[first] += conductance
+            diagonal[second] += conductance
+            rows.extend((first, second))
+            columns.extend((second, first))
+            values.extend((-conductance, -conductance))
+
+    y_face_conductance = sheet_conductance * x_widths / dy
+    for j in range(ny - 1):
         for i in range(nx):
-            p = idx(i, j)
-            rhs[p] = q[j, i] / (k * t) + alpha * t_inf
+            first = node_index(i, j)
+            second = node_index(i, j + 1)
+            conductance = float(y_face_conductance[i])
+            diagonal[first] += conductance
+            diagonal[second] += conductance
+            rows.extend((first, second))
+            columns.extend((second, first))
+            values.extend((-conductance, -conductance))
 
-            center = 2.0 * cx + 2.0 * cy + alpha
+    rows.extend(range(node_count))
+    columns.extend(range(node_count))
+    values.extend(diagonal.tolist())
+    matrix = coo_matrix(
+        (values, (rows, columns)), shape=(node_count, node_count), dtype=float
+    ).tocsr()
+    right_hand_side = source_power.ravel()
+    temperature_rise_flat = np.asarray(spsolve(matrix, right_hand_side), dtype=float)
+    if not np.all(np.isfinite(temperature_rise_flat)):
+        raise RuntimeError("baseplate solve produced a nonfinite temperature rise")
+    temperature_rise = temperature_rise_flat.reshape((ny, nx))
+    temperature = t_reference + temperature_rise
 
-            # Neumann BCs: dT/dn = 0 → ghost node = interior → double the coeff
-            if i == 0:
-                a_mat[p, idx(i + 1, j)] = -2 * cx
-            elif i == nx - 1:
-                a_mat[p, idx(i - 1, j)] = -2 * cx
-            else:
-                a_mat[p, idx(i - 1, j)] = -cx
-                a_mat[p, idx(i + 1, j)] = -cx
+    residual = matrix @ temperature_rise_flat - right_hand_side
+    residual_inf = float(np.linalg.norm(residual, ord=np.inf))
+    matrix_inf = float(np.max(np.asarray(abs(matrix).sum(axis=1)).ravel()))
+    rise_inf = float(np.linalg.norm(temperature_rise_flat, ord=np.inf))
+    rhs_inf = float(np.linalg.norm(right_hand_side, ord=np.inf))
+    residual_scale = matrix_inf * rise_inf + rhs_inf
+    linear_residual_norm = residual_inf / residual_scale if residual_scale else residual_inf
 
-            if j == 0:
-                a_mat[p, idx(i, j + 1)] = -2 * cy
-            elif j == ny - 1:
-                a_mat[p, idx(i, j - 1)] = -2 * cy
-            else:
-                a_mat[p, idx(i, j - 1)] = -cy
-                a_mat[p, idx(i, j + 1)] = -cy
-
-            a_mat[p, p] = center
-
-    # Solve
-    a_csr = a_mat.tocsr()
-    t_flat = spsolve(a_csr, rhs)
-    t_field = t_flat.reshape((ny, nx))
-
-    # Per-device results
+    heat_rejected = float(
+        np.sum(temperature_rise * sink_conductance, dtype=np.float64)
+    )
+    heat_scale = max(abs(heat_input), abs(heat_rejected))
+    heat_balance_relative_error = (
+        abs(heat_input - heat_rejected) / heat_scale if heat_scale else 0.0
+    )
     device_results = []
-    for dev in config.devices:
-        # Find nearest grid point to device center
-        i_dev = int(np.argmin(np.abs(x - dev.x)))
-        j_dev = int(np.argmin(np.abs(y - dev.y)))
-        t_base = float(t_field[j_dev, i_dev])
-        t_case = t_base + dev.power * dev.r_interface
-        t_junction = t_case + dev.power * dev.r_jc
+    for device in config.devices:
+        x_min, x_max, y_min, y_max, footprint_area = _device_footprint(device, lx, ly)
+        overlap_x = _overlap_lengths(x_bounds, device.x, device.width)
+        overlap_y = _overlap_lengths(y_bounds, device.y, device.height)
+        footprint_areas = np.outer(overlap_y, overlap_x)
+        t_base = float(np.sum(temperature * footprint_areas) / footprint_area)
+        t_case = t_base + float(device.power) * float(device.r_interface)
+        t_junction = t_case + float(device.power) * float(device.r_jc)
         device_results.append(
-            DeviceResult(name=dev.name, t_base=t_base, t_case=t_case, t_junction=t_junction)
+            DeviceResult(
+                name=device.name,
+                t_base=t_base,
+                t_case=t_case,
+                t_junction=t_junction,
+            )
         )
 
-    t_js = [d.t_junction for d in device_results]
+    junction_temperatures = [device.t_junction for device in device_results]
     return BaseplateResult(
-        t_field=t_field,
-        x_grid=x,
-        y_grid=y,
+        t_field=temperature,
+        x_grid=x_grid,
+        y_grid=y_grid,
         devices=device_results,
-        t_max=float(np.max(t_field)),
-        t_mean=float(np.mean(t_field)),
-        t_j_max=max(t_js) if t_js else 0.0,
-        t_j_mean=sum(t_js) / len(t_js) if t_js else 0.0,
-        t_j_spread=(max(t_js) - min(t_js)) if len(t_js) > 1 else 0.0,
+        t_max=float(np.max(temperature)),
+        t_mean=float(np.sum(temperature * cell_areas) / baseplate_area),
+        t_j_max=max(junction_temperatures) if junction_temperatures else 0.0,
+        t_j_mean=(
+            sum(junction_temperatures) / len(junction_temperatures)
+            if junction_temperatures
+            else 0.0
+        ),
+        t_j_spread=(
+            max(junction_temperatures) - min(junction_temperatures)
+            if len(junction_temperatures) > 1
+            else 0.0
+        ),
+        heat_input_W=heat_input,
+        heat_rejected_W=heat_rejected,
+        heat_balance_relative_error=heat_balance_relative_error,
+        linear_residual_norm=linear_residual_norm,
     )

@@ -11,9 +11,10 @@ from __future__ import annotations
 import csv
 import json
 from dataclasses import dataclass
-from pathlib import Path
 
 import numpy as np
+
+from thermal_cli.database import open_database_csv
 
 # ---------------------------------------------------------------------------
 # Dataclasses
@@ -56,16 +57,6 @@ class FanCurve:
 # ---------------------------------------------------------------------------
 
 
-def _find_db_dir() -> Path:
-    """Locate the ``db/`` directory by walking up from this file's location."""
-    here = Path(__file__).resolve()
-    for parent in here.parents:
-        candidate = parent / "db"
-        if (candidate / "hs_profiles.csv").exists():
-            return candidate
-    raise FileNotFoundError(f"db/hs_profiles.csv not found in any parent directory of {__file__}")
-
-
 # ---------------------------------------------------------------------------
 # Public lookup functions
 # ---------------------------------------------------------------------------
@@ -84,8 +75,7 @@ def lookup_hs_profile(name: str) -> HsProfile:
     ValueError
         If *name* is not found in the database.
     """
-    db_dir = _find_db_dir()
-    with open(db_dir / "hs_profiles.csv", newline="") as f:
+    with open_database_csv("hs_profiles.csv") as f:
         for row in csv.DictReader(f):
             if row["name"] == name:
                 return HsProfile(
@@ -111,8 +101,7 @@ def lookup_hs_material(name: str) -> HsMaterial:
     ValueError
         If *name* is not found in the database.
     """
-    db_dir = _find_db_dir()
-    with open(db_dir / "hs_materials.csv", newline="") as f:
+    with open_database_csv("hs_materials.csv") as f:
         for row in csv.DictReader(f):
             if row["name"] == name:
                 return HsMaterial(
@@ -142,8 +131,7 @@ def lookup_fan(name: str) -> FanCurve:
     ValueError
         If *name* is not found in the database.
     """
-    db_dir = _find_db_dir()
-    with open(db_dir / "fans.csv", newline="") as f:
+    with open_database_csv("fans.csv") as f:
         for row in csv.DictReader(f):
             if row["name"] == name:
                 qv = np.array(json.loads(row["qv_m3s"]), dtype=float)

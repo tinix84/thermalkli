@@ -57,7 +57,8 @@ class BaseplateConfig:
     devices : list[Device]
         Heat sources on the baseplate.
     nx, ny : int
-        Grid resolution for FDM solver.
+        Number of vertex-centered unknowns including plate-edge points. Boundary dual cells
+        span half the spacing between adjacent grid coordinates.
     """
 
     lx: float
@@ -76,7 +77,7 @@ class DeviceResult:
     """Thermal result for a single device."""
 
     name: str
-    t_base: float  # [K] baseplate temperature under device center
+    t_base: float  # [K] area-weighted mean over the device thermal footprint
     t_case: float  # [K] case temperature (t_base + P * r_interface)
     t_junction: float  # [K] junction temperature (t_case + P * r_jc)
 
@@ -89,8 +90,12 @@ class BaseplateResult:
     x_grid: object  # numpy 1D array [m]
     y_grid: object  # numpy 1D array [m]
     devices: list[DeviceResult] = field(default_factory=list)
-    t_max: float = 0.0  # [K]
-    t_mean: float = 0.0  # [K]
+    t_max: float = 0.0  # [K], maximum grid-point temperature
+    t_mean: float = 0.0  # [K], control-volume area-weighted mean
     t_j_max: float = 0.0  # [K]
     t_j_mean: float = 0.0  # [K]
     t_j_spread: float = 0.0  # [K]
+    heat_input_W: float = 0.0  # [W], integrated control-volume source power
+    heat_rejected_W: float = 0.0  # [W], integrated distributed-sink power
+    heat_balance_relative_error: float = 0.0
+    linear_residual_norm: float = 0.0  # normalized residual of A * delta_T = source_power

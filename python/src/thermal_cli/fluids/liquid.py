@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-from thermal_cli.fluids.gas import _find_db_path
+from thermal_cli.database import open_database_csv
 
 
 @dataclass
@@ -30,8 +30,8 @@ class LiquidProperty:
     _density: np.ndarray = field(repr=False, init=False)
 
     def __post_init__(self) -> None:
-        path = _find_db_path(self.fluid_ref)
-        data = np.genfromtxt(path, delimiter=",", skip_header=1, filling_values=np.nan)
+        with open_database_csv(f"fluid_{self.fluid_ref}.csv") as stream:
+            data = np.genfromtxt(stream, delimiter=",", skip_header=1, filling_values=np.nan)
         self._temperature = data[:, 0]
         self._cp = data[:, 2]
         self._dyn_visc = data[:, 3]

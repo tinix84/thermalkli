@@ -23,21 +23,21 @@ from thermal_cli.database import open_database_csv
 class TimEntry:
     """Single TIM database record."""
 
-    active: bool                        # preferred/selected in original DB
+    active: bool  # preferred/selected in original DB
     manufacturer: str
     type: str
     description: str
-    v_iso_kvac: float | None            # isolation voltage [kVAC]
-    thickness_mm: float | None          # no-pressure thickness [mm]
-    surface_interface: bool             # has surface interface treatment
-    mounting: bool                      # adhesive mounting
-    k_wm1k1: float | None              # thermal conductivity [W/(m·K)]
-    rth_area_no_press: float | None    # Rth x Area at no pressure [mm²·K/W]
-    rth_area_35n: float | None         # Rth x Area @ 35 N/cm² [mm²·K/W]
-    rth_area_max: float | None         # Rth x Area at max pressure [mm²·K/W]
-    max_pressure_ncm2: float | None    # max application pressure [N/cm²]
-    eps_r: float | None                # relative dielectric constant
-    notes: str                          # free-text notes
+    v_iso_kvac: float | None  # isolation voltage [kVAC]
+    thickness_mm: float | None  # no-pressure thickness [mm]
+    surface_interface: bool  # has surface interface treatment
+    mounting: bool  # adhesive mounting
+    k_wm1k1: float | None  # thermal conductivity [W/(m·K)]
+    rth_area_no_press: float | None  # Rth x Area at no pressure [mm²·K/W]
+    rth_area_35n: float | None  # Rth x Area @ 35 N/cm² [mm²·K/W]
+    rth_area_max: float | None  # Rth x Area at max pressure [mm²·K/W]
+    max_pressure_ncm2: float | None  # max application pressure [N/cm²]
+    eps_r: float | None  # relative dielectric constant
+    notes: str  # free-text notes
 
 
 def _opt_float(s: str) -> float | None:
@@ -103,7 +103,5 @@ def search_tim(keyword: str) -> list[TimEntry]:
     return [
         e
         for e in load_tim_db()
-        if kw in e.manufacturer.lower()
-        or kw in e.type.lower()
-        or kw in e.description.lower()
+        if kw in e.manufacturer.lower() or kw in e.type.lower() or kw in e.description.lower()
     ]

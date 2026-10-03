@@ -6,11 +6,11 @@ import pytest
 from thermal_cli.cspi.optimizer import (
     CspiOptResult,
     CspiSweepResult,
-    cspi_optimize,
+    _rectangular_pressure_drop,
     cspi_evaluate_geometry,
+    cspi_optimize,
     cspi_sweep,
     fin_half_path_resistance,
-    _rectangular_pressure_drop,
 )
 
 # ---------------------------------------------------------------------------
@@ -515,12 +515,14 @@ class TestBoundedCoolingAssembly:
         assert result.t >= 0.0003
 
     def test_b08_manufacturing_constraint_changes_selected_geometry(self):
-        theoretical = cspi_optimize(
-            lambda_hs=210.0, a_chip=0.0032, c=0.04, p_fan_max=6.6, n_pts=5
-        )
+        theoretical = cspi_optimize(lambda_hs=210.0, a_chip=0.0032, c=0.04, p_fan_max=6.6, n_pts=5)
         manufactured = cspi_optimize(
-            lambda_hs=210.0, a_chip=0.0032, c=0.04, p_fan_max=6.6,
-            t_min=0.001, n_pts=5,
+            lambda_hs=210.0,
+            a_chip=0.0032,
+            c=0.04,
+            p_fan_max=6.6,
+            t_min=0.001,
+            n_pts=5,
         )
         assert theoretical.t < manufactured.t
         assert manufactured.t >= 0.001
@@ -608,8 +610,12 @@ class TestM7ReviewCorrections:
 
     def test_optimizer_base_fits_inside_total_height_envelope(self):
         result = cspi_optimize(
-            lambda_hs=210.0, a_chip=0.0032, c=0.04, p_fan_max=6.6,
-            base_thickness_m=0.01, n_pts=3,
+            lambda_hs=210.0,
+            a_chip=0.0032,
+            c=0.04,
+            p_fan_max=6.6,
+            base_thickness_m=0.01,
+            n_pts=3,
         )
         assert result.feasible
         assert result.sink_volume_l == pytest.approx(0.128)
@@ -620,8 +626,12 @@ class TestM7ReviewCorrections:
             self.evaluate(face_count=3)
         with pytest.raises(ValueError, match="face_count must be 1 or 2"):
             cspi_optimize(
-                lambda_hs=210.0, a_chip=0.0032, c=0.04, p_fan_max=6.6,
-                face_count=3, n_pts=3,
+                lambda_hs=210.0,
+                a_chip=0.0032,
+                c=0.04,
+                p_fan_max=6.6,
+                face_count=3,
+                n_pts=3,
             )
 
     def test_heated_faces_are_distinct_and_multiple_channel_bodies_are_rejected(self):
@@ -632,16 +642,30 @@ class TestM7ReviewCorrections:
             self.evaluate(face_count=2, hydraulic_branch_count=2)
         with pytest.raises(ValueError, match="hydraulic_branch_count must be 1"):
             cspi_optimize(
-                lambda_hs=210.0, a_chip=0.0032, c=0.04, p_fan_max=6.6,
-                hydraulic_branch_count=2, n_pts=3,
+                lambda_hs=210.0,
+                a_chip=0.0032,
+                c=0.04,
+                p_fan_max=6.6,
+                hydraulic_branch_count=2,
+                n_pts=3,
             )
         shared_loss = _rectangular_pressure_drop(
-            q_total=0.01, n_channels=30, hydraulic_branch_count=1,
-            gap=0.001, height=0.02, length=0.08, t_air_c=25.0,
+            q_total=0.01,
+            n_channels=30,
+            hydraulic_branch_count=1,
+            gap=0.001,
+            height=0.02,
+            length=0.08,
+            t_air_c=25.0,
         )
         duplicate_loss = _rectangular_pressure_drop(
-            q_total=0.01, n_channels=30, hydraulic_branch_count=2,
-            gap=0.001, height=0.02, length=0.08, t_air_c=25.0,
+            q_total=0.01,
+            n_channels=30,
+            hydraulic_branch_count=2,
+            gap=0.001,
+            height=0.02,
+            length=0.08,
+            t_air_c=25.0,
         )
         assert shared_loss[1] == pytest.approx(2.0 * duplicate_loss[1])
         assert shared_loss[0] > duplicate_loss[0]
@@ -662,18 +686,29 @@ class TestM7ReviewCorrections:
 
     def test_independent_integer_count_gap_search_finds_better_26_channel_candidate(self):
         optimized = cspi_optimize(
-            lambda_hs=210.0, a_chip=0.0032, c=0.04, p_fan_max=6.6,
-            t_air=80.0, n_pts=3, channel_width_min_m=0.0002,
+            lambda_hs=210.0,
+            a_chip=0.0032,
+            c=0.04,
+            p_fan_max=6.6,
+            t_air=80.0,
+            n_pts=3,
+            channel_width_min_m=0.0002,
             channel_width_step_m=0.0002,
         )
         gap = 0.001
         thickness = (0.04 - 26 * gap) / 27
         candidate = cspi_evaluate_geometry(
-            lambda_hs=210.0, sink_width_m=0.04, fin_height_m=0.04,
-            sink_length_m=0.0032 / 0.04, base_thickness_m=0.0,
-            channel_count=26, channel_width_m=gap,
-            fin_thickness_m=thickness, p_fan_max=6.6,
-            fan_diameter_m=0.04, t_air_c=80.0,
+            lambda_hs=210.0,
+            sink_width_m=0.04,
+            fin_height_m=0.04,
+            sink_length_m=0.0032 / 0.04,
+            base_thickness_m=0.0,
+            channel_count=26,
+            channel_width_m=gap,
+            fin_thickness_m=thickness,
+            p_fan_max=6.6,
+            fan_diameter_m=0.04,
+            t_air_c=80.0,
         )
         assert candidate.feasible
         assert thickness == pytest.approx(0.0005185185185)

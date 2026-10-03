@@ -73,10 +73,19 @@ def test_cspi_optimize_reports_no_fan_system_intersection():
     result = runner.invoke(
         app,
         [
-            "cspi-optimize", "--lambda", "200", "--a-chip", "10e-4",
-            "--c", "0.04", "--p-fan", "5",
-            "--fan-flow-curve", "0,0.0001",
-            "--fan-pressure-curve", "0,0",
+            "cspi-optimize",
+            "--lambda",
+            "200",
+            "--a-chip",
+            "10e-4",
+            "--c",
+            "0.04",
+            "--p-fan",
+            "5",
+            "--fan-flow-curve",
+            "0,0.0001",
+            "--fan-pressure-curve",
+            "0,0",
         ],
     )
     assert result.exit_code == 0, result.output
@@ -144,17 +153,29 @@ def test_cspi_optimize_reports_heated_faces_hydraulic_branches_and_unspecified_r
     result = runner.invoke(
         app,
         [
-            "cspi-optimize", "--lambda", "200", "--a-chip", "10e-4",
-            "--c", "0.04", "--p-fan", "5", "--face-count", "2",
-            "--hydraulic-branch-count", "1", "--fan-free-flow", "0.009",
-            "--fan-shutoff-pressure", "300",
+            "cspi-optimize",
+            "--lambda",
+            "200",
+            "--a-chip",
+            "10e-4",
+            "--c",
+            "0.04",
+            "--p-fan",
+            "5",
+            "--face-count",
+            "2",
+            "--hydraulic-branch-count",
+            "1",
+            "--fan-free-flow",
+            "0.009",
+            "--fan-shutoff-pressure",
+            "300",
         ],
     )
     assert result.exit_code == 0, result.output
     assert "heated_faces=2" in result.output
     assert "hydraulic_branches=1" in result.output
     assert "N_fan=unspecified" in result.output
-
 
 
 def test_cspi_sweep_forwards_strict_face_and_hydraulic_counts(tmp_path, monkeypatch):
@@ -213,6 +234,7 @@ def test_cspi_sweep_rejects_fractional_or_boolean_counts(tmp_path, field, value)
 
     assert result.exit_code != 0
     assert f"{field} must be an integer >= 1" in result.output
+
 
 def test_cspi_sweep_rejects_multiple_hydraulic_bodies(tmp_path):
     cfg = tmp_path / "sweep.yaml"

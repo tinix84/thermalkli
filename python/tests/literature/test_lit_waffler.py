@@ -21,13 +21,11 @@ from thermal_cli.formula.waffler import (
 )
 def test_printed_equations_4_146_to_4_150_fixture(reynolds: float, expected: float) -> None:
     """Literal formula fixture, using the printed example's Pr and d/L."""
-    assert math.isclose(
-        waffler_nusselt(reynolds, 1.98, 0.002, 0.010), expected, rel_tol=1e-12
-    )
+    assert math.isclose(waffler_nusselt(reynolds, 1.98, 0.002, 0.010), expected, rel_tol=1e-12)
 
 
 def test_reported_nu_28_remains_distinct_from_literal_printed_equation() -> None:
-    """Printed p.272 reports 28; its report is not substituted into eqs.4.146–4.150."""
+    """Printed p.272 reports 28; its report is not substituted into eqs.4.146-4.150."""
     nu_printed = waffler_nusselt(5568.0, 1.98, 0.002, 0.010)
     h_printed = waffler_heat_transfer_coefficient(5568.0, 1.98, 0.002, 0.010, 0.674)
     h_from_reported_nu = 28.0 * 0.674 / 0.002
@@ -60,7 +58,10 @@ def test_b03_source_geometry_power_and_eq_4_154_estimate() -> None:
     assert math.isclose(case.effective_metal_path_m, 0.001599284449, rel_tol=1e-9)
     assert math.isclose(case.analytic_metal_temperature_rise_K, 0.399821112314, rel_tol=1e-9)
     assert len(case.top_sample_points_xy_m) == 3
-    assert all(0.0 < x < case.channel_pitch_m and 0.0 < y < case.plate_height_m for x, y in case.top_sample_points_xy_m)
+    assert all(
+        0.0 < x < case.channel_pitch_m and 0.0 < y < case.plate_height_m
+        for x, y in case.top_sample_points_xy_m
+    )
 
 
 def test_positive_inputs_and_singular_friction_expression_are_checked() -> None:

@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from contextlib import contextmanager
 from importlib.resources import files
 from pathlib import Path
-from typing import Iterator, TextIO
+from typing import TextIO
 
 
 def _source_database_path(filename: str) -> Path | None:

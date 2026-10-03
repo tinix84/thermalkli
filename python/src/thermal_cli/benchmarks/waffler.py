@@ -9,8 +9,8 @@ rise, so this absolute offset does not change the conduction rise.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import math
+from dataclasses import dataclass
 
 
 @dataclass(frozen=True, slots=True)
@@ -44,18 +44,18 @@ class WafflerB03Fixture:
     def effective_metal_path_m(self) -> float:
         """Waffler eq. 4.154 effective path, with ``f_hs=s_t/h_CP``."""
         f_hs = self.channel_pitch_m / self.plate_height_m
-        return self.plate_height_m / 4.0 * (
-            math.sqrt(f_hs**2 + 1.0)
-            + math.log(f_hs + math.sqrt(f_hs**2 + 1.0)) / f_hs
-        ) - self.channel_diameter_m / 2.0
+        return (
+            self.plate_height_m
+            / 4.0
+            * (math.sqrt(f_hs**2 + 1.0) + math.log(f_hs + math.sqrt(f_hs**2 + 1.0)) / f_hs)
+            - self.channel_diameter_m / 2.0
+        )
 
     @property
     def analytic_metal_temperature_rise_K(self) -> float:
         """Eq. 4.152/4.154 one-dimensional path estimate; not an FEA result."""
         return (
-            self.top_heat_flux_W_m2
-            * self.effective_metal_path_m
-            / self.aluminum_conductivity_W_m_K
+            self.top_heat_flux_W_m2 * self.effective_metal_path_m / self.aluminum_conductivity_W_m_K
         )
 
 

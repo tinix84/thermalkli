@@ -219,7 +219,7 @@ def test_subcell_edge_and_overlapping_sources_conserve_power_additively() -> Non
 def test_out_of_bounds_footprint_is_rejected_without_clipping() -> None:
     device = Device(name="outside", x=0.003, y=0.02, width=0.008, height=0.01, power=10.0)
 
-    with pytest.raises(ValueError, match="fully inside.*not clipped or renormalized"):
+    with pytest.raises(ValueError, match=r"fully inside.*not clipped or renormalized"):
         solve_fdm(_make_config(devices=[device]))
 
 
@@ -258,7 +258,7 @@ def test_tiny_out_of_bounds_footprint_is_still_rejected() -> None:
         power=1.0,
     )
 
-    with pytest.raises(ValueError, match="fully inside.*not clipped or renormalized"):
+    with pytest.raises(ValueError, match=r"fully inside.*not clipped or renormalized"):
         solve_fdm(_make_config(nx=7, ny=5, devices=[device]))
 
 
@@ -279,24 +279,15 @@ def test_device_base_temperature_is_area_weighted_and_grid_max_is_separate() -> 
     )
     result = solve_fdm(config)
 
-    x_bounds = np.concatenate(
-        ([0.0], 0.5 * (result.x_grid[:-1] + result.x_grid[1:]), [config.lx])
-    )
-    y_bounds = np.concatenate(
-        ([0.0], 0.5 * (result.y_grid[:-1] + result.y_grid[1:]), [config.ly])
-    )
+    x_bounds = np.concatenate(([0.0], 0.5 * (result.x_grid[:-1] + result.x_grid[1:]), [config.lx]))
+    y_bounds = np.concatenate(([0.0], 0.5 * (result.y_grid[:-1] + result.y_grid[1:]), [config.ly]))
     device = config.devices[0]
     x_min, x_max = device.x - device.width / 2.0, device.x + device.width / 2.0
     y_min, y_max = device.y - device.height / 2.0, device.y + device.height / 2.0
-    overlap_x = np.maximum(
-        0.0, np.minimum(x_bounds[1:], x_max) - np.maximum(x_bounds[:-1], x_min)
-    )
-    overlap_y = np.maximum(
-        0.0, np.minimum(y_bounds[1:], y_max) - np.maximum(y_bounds[:-1], y_min)
-    )
+    overlap_x = np.maximum(0.0, np.minimum(x_bounds[1:], x_max) - np.maximum(x_bounds[:-1], x_min))
+    overlap_y = np.maximum(0.0, np.minimum(y_bounds[1:], y_max) - np.maximum(y_bounds[:-1], y_min))
     expected_base_temperature = float(
-        np.sum(result.t_field * np.outer(overlap_y, overlap_x))
-        / (device.width * device.height)
+        np.sum(result.t_field * np.outer(overlap_y, overlap_x)) / (device.width * device.height)
     )
 
     assert result.devices[0].t_base == pytest.approx(expected_base_temperature, abs=1e-12)
@@ -328,10 +319,7 @@ def test_nonuniform_device_temperature_converges_under_three_refinements() -> No
         ),
     ]
     resolutions = [(17, 13), (33, 25), (65, 49), (129, 97)]
-    results = [
-        solve_fdm(_make_config(nx=nx, ny=ny, devices=devices))
-        for nx, ny in resolutions
-    ]
+    results = [solve_fdm(_make_config(nx=nx, ny=ny, devices=devices)) for nx, ny in resolutions]
 
     for result in results:
         _assert_solver_diagnostics(result, 72.0)

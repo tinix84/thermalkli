@@ -66,19 +66,50 @@ def _cspi_optimize_command(
         float, typer.Option("--k3", help="Fan scaling coeff k3: P_FAN = k3·N^3·D^5")
     ] = 30e-6,
     t_air: Annotated[float, typer.Option("--t-air", help="Reference air temperature [°C]")] = 80.0,
-    face_count: Annotated[int, typer.Option("--face-count", help="Number of thermally heated faces sharing total source power")]=1,
-    hydraulic_branch_count: Annotated[int, typer.Option("--hydraulic-branch-count", help="Hydraulic channel bodies (only 1 is currently supported)")]=1,
-    source_power_w: Annotated[float, typer.Option("--source-power", help="Total heat applied to all faces [W]")]=0.0,
-    base_thickness_m: Annotated[float, typer.Option("--base-thickness", help="Sink base thickness [m]")]=0.0,
-    fan_depth_m: Annotated[float, typer.Option("--fan-depth", help="Fan axial depth [m]")]=0.0,
-    duct_length_m: Annotated[float, typer.Option("--duct-length", help="Duct axial length [m]")]=0.0,
-    fan_curve_flow: str | None = typer.Option(None, "--fan-flow-curve", help="Comma-separated fan flow points [m^3/s]"),
-    fan_curve_pressure: str | None = typer.Option(None, "--fan-pressure-curve", help="Comma-separated fan pressure points [Pa]"),
-    fan_free_flow: float | None = typer.Option(None, "--fan-free-flow", help="Estimated/fitted fan free flow [m^3/s]"),
-    fan_shutoff_pressure: float | None = typer.Option(None, "--fan-shutoff-pressure", help="Estimated/fitted fan shutoff pressure [Pa]"),
-    fan_speed_rpm: float | None = typer.Option(None, "--fan-speed-rpm", help="Known fan speed [rpm]"),
-    auxiliary_power_w: float | None = typer.Option(None, "--auxiliary-power", help="Known rated/evaluated fan input power [W]"),
-    auxiliary_power_basis: str | None = typer.Option(None, "--auxiliary-power-basis", help="Provenance/meaning of auxiliary power"),
+    face_count: Annotated[
+        int,
+        typer.Option(
+            "--face-count", help="Number of thermally heated faces sharing total source power"
+        ),
+    ] = 1,
+    hydraulic_branch_count: Annotated[
+        int,
+        typer.Option(
+            "--hydraulic-branch-count",
+            help="Hydraulic channel bodies (only 1 is currently supported)",
+        ),
+    ] = 1,
+    source_power_w: Annotated[
+        float, typer.Option("--source-power", help="Total heat applied to all faces [W]")
+    ] = 0.0,
+    base_thickness_m: Annotated[
+        float, typer.Option("--base-thickness", help="Sink base thickness [m]")
+    ] = 0.0,
+    fan_depth_m: Annotated[float, typer.Option("--fan-depth", help="Fan axial depth [m]")] = 0.0,
+    duct_length_m: Annotated[
+        float, typer.Option("--duct-length", help="Duct axial length [m]")
+    ] = 0.0,
+    fan_curve_flow: str | None = typer.Option(
+        None, "--fan-flow-curve", help="Comma-separated fan flow points [m^3/s]"
+    ),
+    fan_curve_pressure: str | None = typer.Option(
+        None, "--fan-pressure-curve", help="Comma-separated fan pressure points [Pa]"
+    ),
+    fan_free_flow: float | None = typer.Option(
+        None, "--fan-free-flow", help="Estimated/fitted fan free flow [m^3/s]"
+    ),
+    fan_shutoff_pressure: float | None = typer.Option(
+        None, "--fan-shutoff-pressure", help="Estimated/fitted fan shutoff pressure [Pa]"
+    ),
+    fan_speed_rpm: float | None = typer.Option(
+        None, "--fan-speed-rpm", help="Known fan speed [rpm]"
+    ),
+    auxiliary_power_w: float | None = typer.Option(
+        None, "--auxiliary-power", help="Known rated/evaluated fan input power [W]"
+    ),
+    auxiliary_power_basis: str | None = typer.Option(
+        None, "--auxiliary-power-basis", help="Provenance/meaning of auxiliary power"
+    ),
 ) -> None:
     """Optimize discrete sink geometry with a bounded fan/system operating point."""
     from thermal_cli.cspi.optimizer import cspi_optimize
@@ -131,7 +162,10 @@ def _cspi_optimize_command(
     _out("V_MAX", res.v_max)
     _out("dp_MAX", res.dp_max)
     _out("fin_spacing_ratio_k", res.fin_spacing_ratio)
-    typer.echo("pressure_mapping=channel inlet pressure = k * fan static pressure; fan/channel aggregate flow equality assumes no bypass")
+    typer.echo(
+        "pressure_mapping=channel inlet pressure = k * fan static pressure; "
+        "fan/channel aggregate flow equality assumes no bypass"
+    )
     typer.echo(f"operating_point_status={res.operating_point_status}")
     typer.echo(f"fan_curve_model={res.fan_curve_model}")
     if res.flow_rate_m3_s is not None:
@@ -156,7 +190,7 @@ def _cspi_optimize_command(
     _out("fan_volume_L", res.fan_volume_l)
     _out("duct_volume_L", res.duct_volume_l)
     _out("system_volume_L", res.vol)
-    typer.echo(f"volume_boundary=sink envelope + fan envelope + duct envelope")
+    typer.echo("volume_boundary=sink envelope + fan envelope + duct envelope")
     typer.echo(f"pressure_correlation={res.pressure_correlation}")
     typer.echo(f"heat_transfer_correlation={res.heat_transfer_correlation}")
     _out("fin_efficiency", res.fin_efficiency)
@@ -227,9 +261,18 @@ def _cspi_sweep_command(
 
     # Forward any extra kwargs recognised by cspi_optimize
     extra_keys = {
-        "k1", "k2", "k3", "t_air", "source_power_w", "base_thickness_m",
-        "fan_depth_m", "duct_length_m", "fan_free_flow_m3_s",
-        "fan_shutoff_pressure_pa", "fan_speed_rpm", "auxiliary_power_w",
+        "k1",
+        "k2",
+        "k3",
+        "t_air",
+        "source_power_w",
+        "base_thickness_m",
+        "fan_depth_m",
+        "duct_length_m",
+        "fan_free_flow_m3_s",
+        "fan_shutoff_pressure_pa",
+        "fan_speed_rpm",
+        "auxiliary_power_w",
     }
     kwargs = {k: float(cfg[k]) for k in extra_keys if k in cfg}
     for key in ("face_count", "hydraulic_branch_count"):
@@ -246,7 +289,8 @@ def _cspi_sweep_command(
             raise typer.BadParameter(f"{key} must be an integer >= 1")
         if key == "hydraulic_branch_count" and value != 1:
             raise typer.BadParameter(
-                "hydraulic_branch_count must be 1; multiple hydraulic channel bodies are unsupported"
+                "hydraulic_branch_count must be 1; "
+                "multiple hydraulic channel bodies are unsupported"
             )
         kwargs[key] = int(value)
     for key in ("fan_curve_flow_m3_s", "fan_curve_pressure_pa"):

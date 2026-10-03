@@ -9,6 +9,7 @@ those exact control-volume measures; the perimeter is adiabatic.
 from __future__ import annotations
 
 import math
+from itertools import pairwise
 
 import numpy as np
 from scipy.sparse import coo_matrix
@@ -42,7 +43,7 @@ def _overlap_lengths(bounds: np.ndarray, center: float, extent: float) -> np.nda
     interval_max = center + half_extent
     overlaps = np.zeros(bounds.size - 1, dtype=float)
 
-    for index, (cell_min, cell_max) in enumerate(zip(bounds[:-1], bounds[1:], strict=True)):
+    for index, (cell_min, cell_max) in enumerate(pairwise(bounds)):
         if interval_max <= cell_min or interval_min >= cell_max:
             continue
         if cell_min <= interval_min and interval_max <= cell_max:
@@ -61,16 +62,16 @@ def _overlap_lengths(bounds: np.ndarray, center: float, extent: float) -> np.nda
     return overlaps
 
 
-def _device_footprint(device: Device, lx: float, ly: float) -> tuple[float, float, float, float, float]:
+def _device_footprint(
+    device: Device, lx: float, ly: float
+) -> tuple[float, float, float, float, float]:
     x = _require_finite_number(f"device {device.name!r} x", device.x)
     y = _require_finite_number(f"device {device.name!r} y", device.y)
     width = _require_finite_number(f"device {device.name!r} width", device.width)
     height = _require_finite_number(f"device {device.name!r} height", device.height)
     power = _require_finite_number(f"device {device.name!r} power", device.power)
     r_jc = _require_finite_number(f"device {device.name!r} r_jc", device.r_jc)
-    r_interface = _require_finite_number(
-        f"device {device.name!r} r_interface", device.r_interface
-    )
+    r_interface = _require_finite_number(f"device {device.name!r} r_interface", device.r_interface)
     if width <= 0.0 or height <= 0.0:
         raise ValueError(f"device {device.name!r} footprint dimensions must be positive")
     if power < 0.0 or r_jc < 0.0 or r_interface < 0.0:
@@ -140,16 +141,14 @@ def solve_fdm(config: BaseplateConfig) -> BaseplateResult:
         for device in config.devices
     )
     for device in config.devices:
-        x_min, x_max, y_min, y_max, footprint_area = _device_footprint(device, lx, ly)
+        _, _, _, _, footprint_area = _device_footprint(device, lx, ly)
         overlap_x = _overlap_lengths(x_bounds, device.x, device.width)
         overlap_y = _overlap_lengths(y_bounds, device.y, device.height)
         intersection_areas = np.outer(overlap_y, overlap_x)
         source_power += float(device.power) * intersection_areas / footprint_area
 
     heat_input = float(np.sum(source_power, dtype=np.float64))
-    source_tolerance = 64.0 * np.finfo(float).eps * max(
-        abs(requested_power), np.finfo(float).tiny
-    )
+    source_tolerance = 64.0 * np.finfo(float).eps * max(abs(requested_power), np.finfo(float).tiny)
     if abs(heat_input - requested_power) > source_tolerance:
         raise RuntimeError("control-volume source mapping did not conserve device power")
 
@@ -214,16 +213,14 @@ def solve_fdm(config: BaseplateConfig) -> BaseplateResult:
     residual_scale = matrix_inf * rise_inf + rhs_inf
     linear_residual_norm = residual_inf / residual_scale if residual_scale else residual_inf
 
-    heat_rejected = float(
-        np.sum(temperature_rise * sink_conductance, dtype=np.float64)
-    )
+    heat_rejected = float(np.sum(temperature_rise * sink_conductance, dtype=np.float64))
     heat_scale = max(abs(heat_input), abs(heat_rejected))
     heat_balance_relative_error = (
         abs(heat_input - heat_rejected) / heat_scale if heat_scale else 0.0
     )
     device_results = []
     for device in config.devices:
-        x_min, x_max, y_min, y_max, footprint_area = _device_footprint(device, lx, ly)
+        _, _, _, _, footprint_area = _device_footprint(device, lx, ly)
         overlap_x = _overlap_lengths(x_bounds, device.x, device.width)
         overlap_y = _overlap_lengths(y_bounds, device.y, device.height)
         footprint_areas = np.outer(overlap_y, overlap_x)

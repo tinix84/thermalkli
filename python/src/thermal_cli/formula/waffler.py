@@ -1,4 +1,4 @@
-"""Literal printed Waffler 2013 liquid-channel correlations (eqs. 4.146–4.150).
+"""Literal printed Waffler 2013 liquid-channel correlations (eqs. 4.146-4.150).
 
 Inputs are dimensionless Reynolds/Prandtl numbers and SI lengths. This module
 keeps Waffler's stated transition interpolation distinct from the legacy

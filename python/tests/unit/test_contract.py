@@ -87,7 +87,7 @@ def scenario_data() -> dict:
                 "operating_conditions": "synthetic fixed ambient reference",
                 "provenance": "synthetic test input",
                 "spatial_approximation": "uniform_area_extraction",
-            }
+            },
         },
         "devices": [device("SYNTH-Q1", 0.03), device("SYNTH-Q2", 0.07)],
         "assumptions": ["synthetic inputs; contract test only"],
@@ -208,7 +208,9 @@ def test_result_margin_residual_and_device_order_are_consistent() -> None:
             {
                 "device_id": "SYNTH-Q1",
                 "baseplate_temperature_K": 330.0,
-                "baseplate_temperature_sampling": "area_weighted_mean_over_thermal_contact_footprint",
+                "baseplate_temperature_sampling": (
+                    "area_weighted_mean_over_thermal_contact_footprint"
+                ),
                 "case_bottom_temperature_K": 331.5,
                 "junction_temperature_K": 343.5,
                 "junction_temperature_interpretation": "steady_state_estimate",
@@ -283,6 +285,7 @@ def test_rtheta_ja_cannot_occupy_the_rjc_network_field() -> None:
     with pytest.raises(ValidationError):
         ThermalScenarioV1.model_validate(data)
 
+
 def _location_contains_field_path(location: tuple[object, ...], path: tuple[object, ...]) -> bool:
     parts = iter(location)
     return all(any(part == candidate for candidate in parts) for part in path)
@@ -294,18 +297,36 @@ def _location_contains_field_path(location: tuple[object, ...], path: tuple[obje
         (("scenario_id",), ("scenario_id",)),
         (("baseplate", "material_id"), ("baseplate", "material_id")),
         (("baseplate", "material_provenance"), ("baseplate", "material_provenance")),
-        (("sink", "baseplate_to_sink_contact", "provenance"), ("sink", "baseplate_to_sink_contact", "provenance")),
-        (("sink", "r_theta_sa", "operating_conditions"), ("sink", "r_theta_sa", "operating_conditions")),
+        (
+            ("sink", "baseplate_to_sink_contact", "provenance"),
+            ("sink", "baseplate_to_sink_contact", "provenance"),
+        ),
+        (
+            ("sink", "r_theta_sa", "operating_conditions"),
+            ("sink", "r_theta_sa", "operating_conditions"),
+        ),
         (("sink", "r_theta_sa", "provenance"), ("sink", "r_theta_sa", "provenance")),
         (("devices", 0, "id"), ("devices", 0, "id")),
         (("devices", 0, "geometry_provenance"), ("devices", 0, "geometry_provenance")),
-        (("devices", 0, "r_theta_jc", "test_conditions"), ("devices", 0, "r_theta_jc", "test_conditions")),
+        (
+            ("devices", 0, "r_theta_jc", "test_conditions"),
+            ("devices", 0, "r_theta_jc", "test_conditions"),
+        ),
         (("devices", 0, "r_theta_jc", "provenance"), ("devices", 0, "r_theta_jc", "provenance")),
-        (("devices", 0, "contact_resistance", "provenance"), ("devices", 0, "contact_resistance", "provenance")),
+        (
+            ("devices", 0, "contact_resistance", "provenance"),
+            ("devices", 0, "contact_resistance", "provenance"),
+        ),
         (("devices", 0, "junction_limit_provenance"), ("devices", 0, "junction_limit_provenance")),
         (("assumptions", 0), ("assumptions", 0)),
-        (("devices", 0, "observed_metrics", 0, "test_conditions"), ("devices", 0, "observed_metrics", 0, "test_conditions")),
-        (("devices", 0, "observed_metrics", 0, "provenance"), ("devices", 0, "observed_metrics", 0, "provenance")),
+        (
+            ("devices", 0, "observed_metrics", 0, "test_conditions"),
+            ("devices", 0, "observed_metrics", 0, "test_conditions"),
+        ),
+        (
+            ("devices", 0, "observed_metrics", 0, "provenance"),
+            ("devices", 0, "observed_metrics", 0, "provenance"),
+        ),
     ],
 )
 def test_mandatory_scenario_text_rejects_whitespace_only_with_field_location(
@@ -346,8 +367,7 @@ def test_engineering_scenario_rejects_whitespace_only_provenance() -> None:
         ThermalScenarioV1.model_validate(data)
 
     assert any(
-        error["loc"] == ("baseplate", "material_provenance")
-        for error in exc_info.value.errors()
+        error["loc"] == ("baseplate", "material_provenance") for error in exc_info.value.errors()
     )
 
 
@@ -373,8 +393,7 @@ def test_boolean_orientation_is_rejected(orientation: bool) -> None:
         ThermalScenarioV1.model_validate(data)
 
     assert any(
-        error["loc"] == ("devices", 0, "orientation_deg")
-        and "not a boolean" in error["msg"]
+        error["loc"] == ("devices", 0, "orientation_deg") and "not a boolean" in error["msg"]
         for error in exc_info.value.errors()
     )
 
@@ -411,7 +430,9 @@ def test_result_mandatory_text_rejects_whitespace_only_with_field_location(
             {
                 "device_id": "Q1",
                 "baseplate_temperature_K": 300.0,
-                "baseplate_temperature_sampling": "area_weighted_mean_over_thermal_contact_footprint",
+                "baseplate_temperature_sampling": (
+                    "area_weighted_mean_over_thermal_contact_footprint"
+                ),
                 "case_bottom_temperature_K": 301.0,
                 "junction_temperature_K": 310.0,
                 "junction_temperature_interpretation": "steady_state_estimate",

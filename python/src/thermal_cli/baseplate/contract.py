@@ -18,11 +18,12 @@ from pydantic import (
     model_validator,
 )
 
-
 FiniteFloat = Annotated[float, Field(strict=True, allow_inf_nan=False)]
 PositiveFloat = Annotated[float, Field(strict=True, gt=0, allow_inf_nan=False)]
 NonNegativeFloat = Annotated[float, Field(strict=True, ge=0, allow_inf_nan=False)]
 PositiveInt = Annotated[int, Field(strict=True, ge=2)]
+
+
 def _require_nonblank_text(value: str) -> str:
     if not value.strip():
         raise ValueError("must contain non-whitespace text")
@@ -144,6 +145,7 @@ class DeviceSpec(ContractModel):
         if isinstance(value, bool):
             raise ValueError("orientation_deg must be an integer cardinal angle, not a boolean")
         return value
+
     package_envelope: RectangularGeometry
     thermal_contact_footprint: RectangularGeometry
     mounting_clearance_m: NonNegativeFloat
@@ -241,11 +243,7 @@ class ThermalScenarioV1(ContractModel):
                 for metric in device.observed_metrics:
                     evidence.extend([metric.test_conditions, metric.provenance])
             incomplete_markers = ("unknown", "unspecified", "synthetic", "legacy")
-            if any(
-                marker in item.lower()
-                for item in evidence
-                for marker in incomplete_markers
-            ):
+            if any(marker in item.lower() for item in evidence for marker in incomplete_markers):
                 raise ValueError(
                     "engineering scenarios require sourced inputs and explicit operating conditions"
                 )
@@ -256,9 +254,7 @@ class ThermalScenarioV1(ContractModel):
 class DeviceThermalResultV1(ContractModel):
     device_id: NonEmptyString
     baseplate_temperature_K: AbsoluteTemperatureK
-    baseplate_temperature_sampling: Literal[
-        "area_weighted_mean_over_thermal_contact_footprint"
-    ]
+    baseplate_temperature_sampling: Literal["area_weighted_mean_over_thermal_contact_footprint"]
     case_bottom_temperature_K: AbsoluteTemperatureK
     junction_temperature_K: AbsoluteTemperatureK
     junction_temperature_interpretation: Literal["steady_state_estimate"]

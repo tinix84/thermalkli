@@ -149,14 +149,24 @@ def _fan_curve_model(
         q = np.asarray(fan_curve_flow_m3_s, dtype=float)
         dp = np.asarray(fan_curve_pressure_pa, dtype=float)
         if q.ndim != 1 or dp.ndim != 1 or len(q) < 2 or len(q) != len(dp):
-            raise ValueError("fan curve arrays must be equal one-dimensional arrays with >=2 points")
+            raise ValueError(
+                "fan curve arrays must be equal one-dimensional arrays with >=2 points"
+            )
         if not np.all(np.isfinite(q)) or not np.all(np.isfinite(dp)):
             raise ValueError("fan curve points must be finite")
         if not math.isclose(float(q[0]), 0.0, abs_tol=1e-14) or q[-1] <= 0:
             raise ValueError("fan curve must start at zero flow and end at positive flow")
         if np.any(np.diff(q) <= 0) or np.any(np.diff(dp) > 1e-12) or np.any(dp < 0):
-            raise ValueError("fan flow must increase and pressure must be nonincreasing/nonnegative")
-        return reference_speed, float(q[-1]), float(dp[0]), "user supplied piecewise-linear curve", lambda x: float(np.interp(x, q, dp))
+            raise ValueError(
+                "fan flow must increase and pressure must be nonincreasing/nonnegative"
+            )
+        return (
+            reference_speed,
+            float(q[-1]),
+            float(dp[0]),
+            "user supplied piecewise-linear curve",
+            lambda x: float(np.interp(x, q, dp)),
+        )
     if (fan_free_flow_m3_s is None) != (fan_shutoff_pressure_pa is None):
         raise ValueError("fan free-flow and shutoff-pressure endpoints must be supplied together")
     if fan_free_flow_m3_s is None:
@@ -199,8 +209,11 @@ def _rectangular_pressure_drop(
         return math.inf, re, velocity, "invalid_zero_flow"
     if re < 2300.0:
         poiseuille = 96.0 * (
-            1.0 - 1.3553 * aspect + 1.9467 * aspect**2
-            - 1.7012 * aspect**3 + 0.9564 * aspect**4
+            1.0
+            - 1.3553 * aspect
+            + 1.9467 * aspect**2
+            - 1.7012 * aspect**3
+            + 0.9564 * aspect**4
             - 0.2537 * aspect**5
         )
         f_darcy = poiseuille / re
@@ -240,7 +253,9 @@ def _bounded_operating_point(
         return "no_intersection", None, None, None, None
 
     def flow_at_reynolds(reynolds: float) -> float:
-        return reynolds * n_channels * hydraulic_branch_count * area * fluid.kinematic_viscosity / dh
+        return (
+            reynolds * n_channels * hydraulic_branch_count * area * fluid.kinematic_viscosity / dh
+        )
 
     def residual(q: float):
         dp_system, re, _, regime = _rectangular_pressure_drop(
@@ -287,7 +302,9 @@ def _bounded_operating_point(
             fm, dp_mid, re_mid, regime_mid = residual(mid)
             if regime_mid != expected_regime:
                 break
-            if abs(fm) <= max(1e-7, abs(dp_mid) * 1e-8) or right - left <= max(1e-13, q_max * 1e-11):
+            if abs(fm) <= max(1e-7, abs(dp_mid) * 1e-8) or right - left <= max(
+                1e-13, q_max * 1e-11
+            ):
                 roots.append((mid, dp_mid, re_mid, regime_mid))
                 break
             if fleft * fm <= 0.0:
@@ -319,7 +336,13 @@ def _bounded_operating_point(
     q_re = q_max * dh / (n_channels * hydraulic_branch_count * area * fluid.kinematic_viscosity)
     if 2300.0 <= q_re < 3000.0 and laminar_hi > q_floor:
         excluded_crossing = excluded_crossing or residual(laminar_hi)[0] >= 0.0
-    return ("correlation_out_of_range" if excluded_crossing else "no_intersection"), None, None, None, None
+    return (
+        ("correlation_out_of_range" if excluded_crossing else "no_intersection"),
+        None,
+        None,
+        None,
+        None,
+    )
 
 
 def cspi_evaluate_geometry(
@@ -366,11 +389,17 @@ def cspi_evaluate_geometry(
     face_count = _validated_face_count(face_count)
     hydraulic_branch_count = _validated_hydraulic_branch_count(hydraulic_branch_count)
     positive = {
-        "lambda_hs": lambda_hs, "sink_width_m": sink_width_m,
-        "fin_height_m": fin_height_m, "sink_length_m": sink_length_m,
-        "channel_width_m": channel_width_m, "fin_thickness_m": fin_thickness_m,
-        "fan_diameter_m": fan_diameter_m, "p_fan_max": p_fan_max,
-        "k1": k1, "k2": k2, "k3": k3,
+        "lambda_hs": lambda_hs,
+        "sink_width_m": sink_width_m,
+        "fin_height_m": fin_height_m,
+        "sink_length_m": sink_length_m,
+        "channel_width_m": channel_width_m,
+        "fin_thickness_m": fin_thickness_m,
+        "fan_diameter_m": fan_diameter_m,
+        "p_fan_max": p_fan_max,
+        "k1": k1,
+        "k2": k2,
+        "k3": k3,
     }
     for name, value in positive.items():
         if not math.isfinite(value) or value <= 0:
@@ -387,7 +416,8 @@ def cspi_evaluate_geometry(
     width_tolerance = max(1e-12, sink_width_m * 1e-12)
     if occupied_width > sink_width_m + width_tolerance:
         raise ValueError(
-            f"channel and fin widths overfill sink_width_m: {occupied_width:g} m > {sink_width_m:g} m"
+            f"channel and fin widths overfill sink_width_m: {occupied_width:g} m > "
+            f"{sink_width_m:g} m"
         )
     physical_height = base_thickness_m + fin_height_m
     required_face_width = max(sink_width_m, fan_diameter_m)
@@ -399,10 +429,16 @@ def cspi_evaluate_geometry(
     if face_w + width_tolerance < required_face_width:
         raise ValueError("assembly_face_width_m must contain sink width and fan diameter")
     if face_h + width_tolerance < required_face_height:
-        raise ValueError("assembly_face_height_m must contain full base/fin height and fan diameter")
+        raise ValueError(
+            "assembly_face_height_m must contain full base/fin height and fan diameter"
+        )
 
     speed, qmax, dpmax, fan_model, fan_dp = _fan_curve_model(
-        diameter=fan_diameter_m, p_fan_max=p_fan_max, k1=k1, k2=k2, k3=k3,
+        diameter=fan_diameter_m,
+        p_fan_max=p_fan_max,
+        k1=k1,
+        k2=k2,
+        k3=k3,
         fan_curve_flow_m3_s=fan_curve_flow_m3_s,
         fan_curve_pressure_pa=fan_curve_pressure_pa,
         fan_free_flow_m3_s=fan_free_flow_m3_s,
@@ -416,11 +452,15 @@ def cspi_evaluate_geometry(
     # model assumption because the source uses separate V and V_lam symbols.
     fin_spacing_ratio = channel_count * channel_width_m / sink_width_m
     status, flow, dp, re, regime = _bounded_operating_point(
-        q_max=qmax, fan_dp=fan_dp, fan_pressure_scale=fin_spacing_ratio,
+        q_max=qmax,
+        fan_dp=fan_dp,
+        fan_pressure_scale=fin_spacing_ratio,
         n_channels=channel_count,
         hydraulic_branch_count=hydraulic_branch_count,
-        gap=channel_width_m, height=fin_height_m,
-        length=sink_length_m, t_air_c=t_air_c,
+        gap=channel_width_m,
+        height=fin_height_m,
+        length=sink_length_m,
+        t_air_c=t_air_c,
     )
     sink_vol = face_w * face_h * sink_length_m * 1000.0
     fan_vol = face_w * face_h * fan_depth_m * 1000.0
@@ -430,45 +470,69 @@ def cspi_evaluate_geometry(
     half_fin_r = fin_height_m / (2.0 * lambda_hs * fin_thickness_m * sink_length_m)
     validity = (
         "one smooth rectangular channel body; equal flow split among its parallel channels",
-        "heated-face count controls thermal normalization and does not duplicate hydraulic channels",
-        "available channel-inlet pressure is fin_spacing_ratio times fan static pressure per PCC 2007 Eq. 6; aggregate fan/channel flow equality assumes no bypass or leakage",
-        "pressure drop is fully developed Darcy-Weisbach; entrance/exit, plenum, duct and leakage losses excluded",
-        "laminar rectangular Poiseuille for Re < 2300; transition 2300-3000 rejected; smooth Gnielinski friction for 3000-100000",
+        "heated-face count controls thermal normalization and does not duplicate "
+        "hydraulic channels",
+        "available channel-inlet pressure is fin_spacing_ratio times fan static pressure "
+        "per PCC 2007 Eq. 6; aggregate fan/channel flow equality assumes no bypass or leakage",
+        "pressure drop is fully developed Darcy-Weisbach; entrance/exit, plenum, duct "
+        "and leakage losses excluded",
+        "laminar rectangular Poiseuille for Re < 2300; transition 2300-3000 rejected; "
+        "smooth Gnielinski friction for 3000-100000",
         "forced-air feasibility excludes the zero-flow endpoint; positive roots only",
-        "heat transfer reuses thermal_cli.channel_rth; its source correlation ranges remain an independent validity condition",
+        "heat transfer reuses thermal_cli.channel_rth; its source correlation ranges "
+        "remain an independent validity condition",
         "fin conduction is distributed with the constant-cross-section fin-efficiency primitive",
-        "sink volume uses the declared envelope containing the complete base/fin bounding box; fan and duct use that same envelope",
-        "two-face normalization uses total power; multiple hydraulic channel bodies are unsupported",
+        "sink volume uses the declared envelope containing the complete base/fin "
+        "bounding box; fan and duct use that same envelope",
+        "two-face normalization uses total power; multiple hydraulic channel bodies "
+        "are unsupported",
     )
     if auxiliary_power_w is None:
         reported_auxiliary_power = p_fan_max
-        reported_auxiliary_basis = "p_fan_max shaft-power proxy; not electrical input at the operating point"
+        reported_auxiliary_basis = (
+            "p_fan_max shaft-power proxy; not electrical input at the operating point"
+        )
     else:
         if not math.isfinite(auxiliary_power_w) or auxiliary_power_w < 0:
             raise ValueError("auxiliary_power_w must be finite and >= 0")
         reported_auxiliary_power = auxiliary_power_w
         reported_auxiliary_basis = auxiliary_power_basis or "caller-supplied auxiliary power"
-    validity = validity + (f"auxiliary power basis: {reported_auxiliary_basis}",)
+    validity = (*validity, f"auxiliary power basis: {reported_auxiliary_basis}")
     common = dict(
-        n=channel_count, s=channel_width_m, t=fin_thickness_m, n_fan=speed,
-        length=sink_length_m, v_max=qmax, dp_max=dpmax,
-        operating_point_status=status, fan_curve_model=fan_model,
+        n=channel_count,
+        s=channel_width_m,
+        t=fin_thickness_m,
+        n_fan=speed,
+        length=sink_length_m,
+        v_max=qmax,
+        dp_max=dpmax,
+        operating_point_status=status,
+        fan_curve_model=fan_model,
         fan_pressure_pa=fan_dp(flow) if flow is not None else None,
         fin_spacing_ratio=fin_spacing_ratio,
         fan_pressure_scale=fin_spacing_ratio,
-        flow_rate_m3_s=flow, pressure_drop_pa=dp, auxiliary_power_w=reported_auxiliary_power,
+        flow_rate_m3_s=flow,
+        pressure_drop_pa=dp,
+        auxiliary_power_w=reported_auxiliary_power,
         auxiliary_power_basis=reported_auxiliary_basis,
-        temperature_reference_c=t_air_c, source_power_w=source_power_w,
-        face_count=face_count, hydraulic_branch_count=hydraulic_branch_count,
-        sink_volume_l=sink_vol, fan_volume_l=fan_vol,
-        duct_volume_l=duct_vol, sink_material_bbox_l=material_bbox,
-        fin_half_path_rth_k_w=half_fin_r, correlation=regime or "not evaluated",
+        temperature_reference_c=t_air_c,
+        source_power_w=source_power_w,
+        face_count=face_count,
+        hydraulic_branch_count=hydraulic_branch_count,
+        sink_volume_l=sink_vol,
+        fan_volume_l=fan_vol,
+        duct_volume_l=duct_vol,
+        sink_material_bbox_l=material_bbox,
+        fin_half_path_rth_k_w=half_fin_r,
+        correlation=regime or "not evaluated",
         pressure_correlation=regime or "not evaluated",
         heat_transfer_correlation="not evaluated",
         validity=validity,
     )
     if status != "converged" or flow is None:
-        return CspiOptResult(cspi=0.0, rth=math.inf, vol=total_vol, re=re or 0.0, feasible=False, **common)
+        return CspiOptResult(
+            cspi=0.0, rth=math.inf, vol=total_vol, re=re or 0.0, feasible=False, **common
+        )
 
     fluid = air_properties(t_air_c)
     outlet = t_air_c
@@ -478,8 +542,11 @@ def cspi_evaluate_geometry(
         fluid = air_properties(0.5 * (t_air_c + outlet))
     q_channel = flow / (hydraulic_branch_count * channel_count)
     _, heat_re, _, h = channel_rth(
-        width=channel_width_m, height=fin_height_m, length=sink_length_m,
-        flow_rate=q_channel, fluid=fluid,
+        width=channel_width_m,
+        height=fin_height_m,
+        length=sink_length_m,
+        flow_rate=q_channel,
+        fluid=fluid,
     )
     heat_correlation = (
         "Sieder-Tate/Shah-London laminar developing"
@@ -490,15 +557,20 @@ def cspi_evaluate_geometry(
         common["operating_point_status"] = "heat_transfer_correlation_out_of_range"
         common["correlation"] = f"{regime}; heat Re={heat_re:g}"
         common["heat_transfer_correlation"] = heat_correlation
-        return CspiOptResult(cspi=0.0, rth=math.inf, vol=total_vol, re=heat_re, feasible=False, **common)
+        return CspiOptResult(
+            cspi=0.0, rth=math.inf, vol=total_vol, re=heat_re, feasible=False, **common
+        )
 
     n_fins = channel_count + 1
     fin_height_per_face_m = fin_height_m / face_count
     fin_area = 2.0 * n_fins * sink_length_m * fin_height_per_face_m
     bare_area = (sink_width_m - n_fins * fin_thickness_m) * sink_length_m
     eta = fin_efficiency(
-        L=fin_height_per_face_m, h=h, A=2.0 * sink_length_m * fin_height_per_face_m,
-        k=lambda_hs, Ac=fin_thickness_m * sink_length_m,
+        L=fin_height_per_face_m,
+        h=h,
+        A=2.0 * sink_length_m * fin_height_per_face_m,
+        k=lambda_hs,
+        Ac=fin_thickness_m * sink_length_m,
     )
     r_conv = 1.0 / (h * (bare_area + eta * fin_area))
     q_face = flow / face_count
@@ -513,7 +585,10 @@ def cspi_evaluate_geometry(
     common["heat_transfer_correlation"] = heat_correlation
     cspi = cspi_calc(rth=r_system, vol_cs=total_vol) if total_vol > 0 else 0.0
     return CspiOptResult(
-        cspi=cspi, rth=r_system, vol=total_vol, re=heat_re,
+        cspi=cspi,
+        rth=r_system,
+        vol=total_vol,
+        re=heat_re,
         feasible=math.isfinite(r_system) and r_system > 0 and cspi > 0,
         **common,
     )
@@ -569,7 +644,9 @@ def cspi_optimize(
     if not math.isfinite(source_power_w) or source_power_w < 0:
         raise ValueError("source_power_w must be finite and >= 0")
     if not math.isfinite(base_thickness_m) or base_thickness_m < 0 or base_thickness_m >= c:
-        raise ValueError("base_thickness_m must be finite, >= 0, and smaller than total sink height c")
+        raise ValueError(
+            "base_thickness_m must be finite, >= 0, and smaller than total sink height c"
+        )
     if not math.isfinite(channel_width_min_m) or channel_width_min_m <= 0:
         raise ValueError("channel_width_min_m must be finite and > 0")
     if not math.isfinite(channel_width_step_m) or channel_width_step_m <= 0:
@@ -582,38 +659,56 @@ def cspi_optimize(
     fin_height = c - base_thickness_m
     maximum_count = int(c / channel_width_min_m)
     candidates = []
-    gap_step_count = int(math.floor((c - channel_width_min_m) / channel_width_step_m)) + 1
-    explicit_gaps = [channel_width_min_m + index * channel_width_step_m for index in range(gap_step_count)]
+    gap_step_count = math.floor((c - channel_width_min_m) / channel_width_step_m) + 1
+    explicit_gaps = [
+        channel_width_min_m + index * channel_width_step_m for index in range(gap_step_count)
+    ]
     for channels in range(2, maximum_count + 1):
         maximum_gap = (c - (channels + 1) * t_min) / channels
         if maximum_gap < channel_width_min_m:
             continue
         uniform = np.linspace(channel_width_min_m, maximum_gap, n_pts)
         gaps = {float(value) for value in uniform}
-        gaps.update(value for value in explicit_gaps if value <= maximum_gap + max(1e-12, c * 1e-12))
+        gaps.update(
+            value for value in explicit_gaps if value <= maximum_gap + max(1e-12, c * 1e-12)
+        )
         gaps.add(float(maximum_gap))
         for gap in sorted(gaps):
             thickness = (c - channels * gap) / (channels + 1)
             if thickness < t_min or thickness <= 0:
                 continue
-            candidates.append(cspi_evaluate_geometry(
-                lambda_hs=lambda_hs, sink_width_m=c, fin_height_m=fin_height,
-                sink_length_m=length, base_thickness_m=base_thickness_m,
-                channel_count=channels, channel_width_m=gap, fin_thickness_m=thickness,
-                p_fan_max=p_fan_max, fan_diameter_m=c, fan_depth_m=fan_depth_m,
-                duct_length_m=duct_length_m, face_count=face_count,
-                hydraulic_branch_count=hydraulic_branch_count, t_air_c=t_air,
-                source_power_w=source_power_w,
-                fan_curve_flow_m3_s=fan_curve_flow_m3_s,
-                fan_curve_pressure_pa=fan_curve_pressure_pa,
-                fan_free_flow_m3_s=fan_free_flow_m3_s,
-                fan_shutoff_pressure_pa=fan_shutoff_pressure_pa,
-                fan_speed_rpm=fan_speed_rpm,
-                auxiliary_power_w=auxiliary_power_w,
-                auxiliary_power_basis=auxiliary_power_basis,
-                k1=k1, k2=k2, k3=k3,
-                assembly_face_width_m=c, assembly_face_height_m=c,
-            ))
+            candidates.append(
+                cspi_evaluate_geometry(
+                    lambda_hs=lambda_hs,
+                    sink_width_m=c,
+                    fin_height_m=fin_height,
+                    sink_length_m=length,
+                    base_thickness_m=base_thickness_m,
+                    channel_count=channels,
+                    channel_width_m=gap,
+                    fin_thickness_m=thickness,
+                    p_fan_max=p_fan_max,
+                    fan_diameter_m=c,
+                    fan_depth_m=fan_depth_m,
+                    duct_length_m=duct_length_m,
+                    face_count=face_count,
+                    hydraulic_branch_count=hydraulic_branch_count,
+                    t_air_c=t_air,
+                    source_power_w=source_power_w,
+                    fan_curve_flow_m3_s=fan_curve_flow_m3_s,
+                    fan_curve_pressure_pa=fan_curve_pressure_pa,
+                    fan_free_flow_m3_s=fan_free_flow_m3_s,
+                    fan_shutoff_pressure_pa=fan_shutoff_pressure_pa,
+                    fan_speed_rpm=fan_speed_rpm,
+                    auxiliary_power_w=auxiliary_power_w,
+                    auxiliary_power_basis=auxiliary_power_basis,
+                    k1=k1,
+                    k2=k2,
+                    k3=k3,
+                    assembly_face_width_m=c,
+                    assembly_face_height_m=c,
+                )
+            )
     if not candidates:
         raise ValueError("no integer channel/gap geometries satisfy width and manufacturing bounds")
     feasible = [item for item in candidates if item.feasible]

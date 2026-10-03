@@ -1,0 +1,18 @@
+fluid: H2OGly50
+inlet_temperature_k: 313.15
+heat_w: 150
+pump_curve:
+  flow_m3_s: [0.0, 0.00001, 0.00002, 0.00003]
+  pressure_pa: [14000, 11000, 7000, 2000]
+  provenance: illustrative only; replace with measured system data
+geometry:
+  type: slot
+  length_m: 0.02
+  width_m: 0.0192
+  gap_m: 0.0003
+  channel_count: 1
+volume:
+  cold_plate_m3: 0.00002
+  pump_m3: 0.0007
+  pipes_m3: 0.0001
+  heat_exchanger_m3: 0.001

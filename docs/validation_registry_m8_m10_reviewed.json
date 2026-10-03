@@ -1,0 +1,369 @@
+{
+  "created_utc": "2026-10-03T15:17:39.680118+00:00",
+  "package_version": "0.0.1",
+  "records": [
+    {
+      "acceptance_criteria": "steady_max_abs_error_k_w <= steady_reference_tolerance_k_w",
+      "acceptance_error": null,
+      "acceptance_status": "passed",
+      "capability": "grounded coupled package RC network",
+      "case_id": "B01",
+      "conditions": {
+        "nodes": 16,
+        "power_inputs": "independent MOS and controller nodes"
+      },
+      "error": null,
+      "evidence_status": "steady_coefficients_checked; transient source-curve comparison pending",
+      "execution_status": "passed",
+      "limitations": [
+        "Published steady coefficients are reported; digitized transient samples are not bundled."
+      ],
+      "outputs": {
+        "controller_mos_mutual_k_w": 29.726780727399625,
+        "controller_self_k_w": 63.50326790033006,
+        "mos_controller_mutual_k_w": 29.72678072739962,
+        "mos_self_k_w": 47.00011085553123,
+        "shortest_network_time_constant_s": 2.9891974109621177e-07,
+        "steady_max_abs_error_k_w": 6.790033005898977e-05,
+        "steady_reference_tolerance_k_w": 0.0001,
+        "steady_reference_within_tolerance": true
+      },
+      "source": "onsemi AND8215/D Rev. 1, Tables 1-2",
+      "status": "passed"
+    },
+    {
+      "acceptance_criteria": "DC and final step resistance errors <= 1e-8 K/W",
+      "acceptance_error": null,
+      "acceptance_status": "passed",
+      "capability": "Cauer ladder step response",
+      "case_id": "B02",
+      "conditions": {
+        "capacitances_j_k": [
+          0.0223,
+          0.0215,
+          0.253
+        ],
+        "input": "1 W step at junction node",
+        "resistances_k_w": [
+          0.196,
+          0.633,
+          0.297
+        ]
+      },
+      "error": null,
+      "evidence_status": "Cauer_step_executed; digitized transient comparison pending",
+      "execution_status": "passed",
+      "limitations": [
+        "Cauer topology is retained as a ladder and is not treated as Foster branches."
+      ],
+      "outputs": {
+        "dc_resistance_error_k_w": 0.0,
+        "network_dc_rth_k_w": 1.126,
+        "resistance_sum_k_w": 1.126,
+        "step_equilibrium_error_k_w": 2.353672812205332e-14,
+        "step_response_final_K_per_W": 1.1259999999999764,
+        "step_response_samples_K_per_W": [
+          0.0,
+          5.704721451138539e-05,
+          0.0007825385620208181,
+          0.010490284210277423,
+          0.11908813558443399,
+          0.7002952517477752,
+          1.1255198502775556,
+          1.1259999999999764
+        ],
+        "step_response_times_s": [
+          0.0,
+          1.272338036115737e-06,
+          1.748549068910327e-05,
+          0.00024029964990444276,
+          0.003566984771646403,
+          0.04902036820592464,
+          0.6736772520436857,
+          10.0
+        ]
+      },
+      "source": "Drofenik et al., INTELEC 2003, Table 3/Fig. 10, chip 8",
+      "status": "passed"
+    },
+    {
+      "acceptance_criteria": null,
+      "acceptance_error": null,
+      "acceptance_status": "not_checked",
+      "capability": "Waffler periodic solid-conduction channel fixture",
+      "case_id": "B03",
+      "conditions": {
+        "channel_diameter_m": 0.002,
+        "channel_pitch_m": 0.006,
+        "conductivity_w_m_k": 160.0,
+        "extrusion_depth_m": 0.01,
+        "plate_height_m": 0.004,
+        "top_heat_flux_w_m2": 40000.0
+      },
+      "error": null,
+      "evidence_status": "source_fixture_and_analytic_estimate_recorded; FEMM/source-field parity pending",
+      "execution_status": "passed",
+      "limitations": [
+        "The analytic metal path is a correlation estimate, not a FEMM result; the fixed channel-wall boundary is an explicit fixture choice."
+      ],
+      "outputs": {
+        "analytic_metal_temperature_rise_k": 0.39982111231418355,
+        "applied_power_w": 2.4,
+        "channel_diameter_m": 0.002,
+        "channel_pitch_m": 0.006,
+        "channel_wall_temperature_k": 363.15,
+        "effective_metal_path_m": 0.001599284449256734,
+        "extrusion_depth_m": 0.01,
+        "plate_height_m": 0.004,
+        "top_heat_flux_w_m2": 40000.0,
+        "top_sample_points_xy_m": [
+          [
+            0.0005,
+            0.0039000000000000003
+          ],
+          [
+            0.003,
+            0.0039000000000000003
+          ],
+          [
+            0.0055,
+            0.0039000000000000003
+          ]
+        ]
+      },
+      "source": "Waffler, Fig. 4.46 and Eqs. 4.152/4.154",
+      "status": "recorded"
+    },
+    {
+      "acceptance_criteria": "ideal and calibrated operating points and calibrated thermal energy balance are ok",
+      "acceptance_error": null,
+      "acceptance_status": "passed",
+      "capability": "pump-limited ideal and calibrated slot",
+      "case_id": "B05",
+      "conditions": {
+        "flow_basis": "total loop flow; one channel",
+        "slot_gap_m": 0.00025,
+        "slot_length_m": 0.02,
+        "slot_width_m": 0.0192,
+        "thermal_resistance_basis": "small-signal at 313.15 K; heat_w=0",
+        "water_temperature_k": 313.15
+      },
+      "error": null,
+      "evidence_status": "model_output_executed; PESC source parity pending",
+      "execution_status": "passed",
+      "limitations": [
+        "The calibrated port fit is source-specific and requires the original inlet/outlet geometry. Resistance outputs use constant water properties at 313.15 K and zero-load small-signal evaluation."
+      ],
+      "outputs": {
+        "calibrated_flow_m3_s": 1.3860873685426534e-05,
+        "calibrated_operating_point_status": "ok",
+        "calibrated_plate_to_inlet_rth_k_w": 0.11360731485163139,
+        "calibrated_port_loss_pa": 2678.6596670520094,
+        "calibrated_pressure_pa": 9977.7152194014,
+        "channel_gap_m": 0.00025,
+        "flow_area_rth_k_w": 1.0,
+        "ideal_channel_reynolds": 2454.0517366109184,
+        "ideal_flow_m3_s": 1.57035997651601e-05,
+        "ideal_operating_point_status": "ok",
+        "ideal_pressure_pa": 8948.265668365802,
+        "ideal_slot_to_inlet_rth_k_w": 0.11393788519124189,
+        "ideal_slot_wall_to_bulk_rth_k_w": 0.1062542121121024,
+        "pump_domain_m3_s": [
+          0.0,
+          2.763682150343493e-05
+        ],
+        "pump_provenance": "Drofenik et al., PESC 2004, Eq. 1",
+        "thermal_energy_balance_error_w": 0.0,
+        "thermal_energy_status": "ok",
+        "thermal_heat_w": 0.0,
+        "thermal_outlet_temperature_k": 313.15
+      },
+      "source": "Drofenik et al., PESC 2004, Eqs. 1-13 and Fig. 2",
+      "status": "passed"
+    },
+    {
+      "acceptance_criteria": null,
+      "acceptance_error": null,
+      "acceptance_status": "not_checked",
+      "capability": "liquid-cooler measured reference",
+      "case_id": "B06",
+      "conditions": {
+        "baseplate": "25 x 34 mm",
+        "flow_m3_s": 1.9999999999999998e-05,
+        "pressure_pa": 8000.0
+      },
+      "error": null,
+      "evidence_status": "source_observation_retained; model reproduction unresolved",
+      "execution_status": "passed",
+      "limitations": [
+        "Matching geometry and boundary/contact data are not present."
+      ],
+      "outputs": {
+        "measured_flow_m3_s": 1.9999999999999998e-05,
+        "measured_pressure_pa": 8000.0,
+        "measured_thermal_resistance_k_w": 0.1,
+        "source_conditions": "approximately 80 mbar, 1.2 L/min, and 0.10 K/W; 25 x 34 mm baseplate; preserve measured/source basis and do not label as this model's prediction",
+        "thermal_reference": "baseplate-to-coolant reference reported by the source"
+      },
+      "source": "Drofenik et al., IEEE TPEL 2005, conclusion",
+      "status": "recorded"
+    },
+    {
+      "acceptance_criteria": "operating point converged and |R_face/0.56 - 1| <= 0.20",
+      "acceptance_error": null,
+      "acceptance_status": "passed",
+      "capability": "bounded fan operating point and two-face CSPI",
+      "case_id": "B07",
+      "conditions": {
+        "base_thickness_m": 0.005,
+        "channel_count": 30,
+        "channel_width_m": 0.001,
+        "fan_curve": "109P0412K3013 digitized; exact endpoints and ~0.05 m3/min interior samples",
+        "fin_thickness_m": 0.0003,
+        "heated_faces": 2,
+        "sink_m": [
+          0.08,
+          0.04,
+          0.025
+        ]
+      },
+      "error": null,
+      "evidence_status": "source-mapped operating case executed; fixture-specific resistance criterion only; exact source parity not claimed",
+      "execution_status": "passed",
+      "limitations": [
+        "Interior fan-curve digitization uncertainty is approximately \u00b10.005 m3/min and \u00b110 Pa; speed attribution is inferred. The 20% resistance criterion is B07-specific, not a general accuracy bound."
+      ],
+      "outputs": {
+        "auxiliary_power_basis": "Sanyo rated input at 12 V; rpm attribution is inferred",
+        "auxiliary_power_w": 6.6,
+        "channel_pressure_drop_pa": 127.658974847055,
+        "cspi_w_k_l": 17.89743536057499,
+        "fan_curve_digitization_uncertainty": {
+          "flow_m3_min": 0.005,
+          "pressure_pa": 10.0,
+          "speed_rpm_association": "inferred from adjacent table/catalog"
+        },
+        "fan_static_pressure_pa": 170.21196600208907,
+        "feasible": true,
+        "fin_spacing_pressure_scale": 0.75,
+        "flow_m3_s": 0.0036421533680192873,
+        "measured_one_face_resistance_k_w": 0.56,
+        "measured_resistance_relative_error": 0.02228350368589682,
+        "one_face_model_resistance_k_w": 0.5724787620641023,
+        "operating_point_status": "converged",
+        "system_resistance_k_w": 0.28623938103205115,
+        "system_volume_l": 0.19520000000000004
+      },
+      "source": "Drofenik & Kolar, PCC 2007, Figs. 6-9 and Eqs. 1-18; Sanyo Technical Report 48, Fig. 6",
+      "status": "passed"
+    },
+    {
+      "acceptance_criteria": "both model cases feasible; 1 mm minimum-fin constraint is satisfied and raises R",
+      "acceptance_error": null,
+      "acceptance_status": "passed",
+      "capability": "theoretical and manufacturing-constrained CSPI optima",
+      "case_id": "B08",
+      "conditions": {
+        "a_chip_m2": 0.0032,
+        "conductivity_w_m_k": 210.0,
+        "sink_height_m": 0.04
+      },
+      "error": null,
+      "evidence_status": "both current-model searches executed; source-reported geometry parity pending",
+      "execution_status": "passed",
+      "limitations": [
+        "Current pressure and heat-transfer model outputs differ from the reported B08 geometries; they are kept side by side and not presented as reproduction."
+      ],
+      "outputs": {
+        "minimum_fin_1mm_model": {
+          "channel_width_m": 0.0012941176470588234,
+          "channels": 17,
+          "cspi_w_k_l": 20.26804980188859,
+          "feasible": true,
+          "fin_thickness_m": 0.001,
+          "fins": 18,
+          "resistance_k_w": 0.38545889103114517
+        },
+        "source_reported_manufacturing": {
+          "channel_width_m": 0.0015,
+          "fin_thickness_m": 0.001,
+          "fins": 16,
+          "resistance_k_w": 0.3
+        },
+        "source_reported_theoretical": {
+          "channel_width_m": 0.001,
+          "fin_thickness_m": 0.00054,
+          "fins": 26,
+          "resistance_k_w": 0.26
+        },
+        "unconstrained_model": {
+          "channel_width_m": 0.001,
+          "channels": 31,
+          "cspi_w_k_l": 24.59917746792055,
+          "feasible": true,
+          "fin_thickness_m": 0.00028125000000000003,
+          "fins": 32,
+          "resistance_k_w": 0.31759191990009306
+        }
+      },
+      "source": "Drofenik & Kolar, PCC 2007, Fig. 7 and reported practical geometry",
+      "status": "passed"
+    },
+    {
+      "acceptance_criteria": "energy error <= 1e-8 W and positive-heat zero-flow is invalid",
+      "acceptance_error": null,
+      "acceptance_status": "passed",
+      "capability": "temperature-dependent liquid energy balance",
+      "case_id": "M8-ENERGY",
+      "conditions": {
+        "flow_m3_s": 2e-05,
+        "heat_w": 150.0,
+        "inlet_temperature_k": 313.15
+      },
+      "error": null,
+      "evidence_status": "energy_balance_and_zero_flow_behavior_executed",
+      "execution_status": "passed",
+      "limitations": [],
+      "outputs": {
+        "energy_balance_error_w": 1.4210854715202004e-13,
+        "energy_status": "ok",
+        "inlet_temperature_k": 313.15,
+        "mass_flow_kg_s": 0.02118548837723783,
+        "outlet_temperature_k": 315.1974203823002,
+        "positive_heat_zero_flow_status": "invalid_flow"
+      },
+      "source": "M8 conservation equation Q=m_dot*cp(T_mean)*(Tout-Tin)",
+      "status": "passed"
+    },
+    {
+      "acceptance_criteria": "source superposition <= 1e-8 K, waveform-grid delta <= 1e-5 K, periodic convergence and short-pulse rejection",
+      "acceptance_error": null,
+      "acceptance_status": "passed",
+      "capability": "waveform-grid refinement, independent sources, periodic convergence, pulse limit",
+      "case_id": "M9-DYNAMICS",
+      "conditions": {
+        "cauer_fixture": "INTELEC 2003 chip 8",
+        "onsemi_nodes": 16
+      },
+      "error": null,
+      "evidence_status": "behavioral_acceptance_executed; source waveform parity pending",
+      "execution_status": "passed",
+      "limitations": [],
+      "outputs": {
+        "declared_minimum_pulse_s": 2.9891970418906074e-07,
+        "independent_source_superposition_max_error_k": 5.684341886080802e-14,
+        "periodic_cycles": 5,
+        "periodic_state_converged": true,
+        "unsupported_short_pulse_rejected": true,
+        "waveform_grid_refinement_delta_at_0_1_s_k": 0.0
+      },
+      "source": "M9 grounded nodal RC solver acceptance",
+      "status": "passed"
+    }
+  ],
+  "runtime": {
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "python": "3.12.3"
+  }
+}

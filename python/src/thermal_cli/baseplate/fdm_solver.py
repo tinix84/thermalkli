@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import math
 from itertools import pairwise
+from typing import Any
 
 import numpy as np
 from scipy.sparse import coo_matrix
@@ -29,7 +30,7 @@ def _require_finite_number(name: str, value: object) -> float:
 
 def _control_volume_bounds(points: np.ndarray, extent: float) -> np.ndarray:
     """Return dual-cell bounds for point samples that include both plate edges."""
-    bounds = np.empty(points.size + 1, dtype=float)
+    bounds: np.ndarray = np.empty(points.size + 1, dtype=float)
     bounds[0] = 0.0
     bounds[-1] = extent
     bounds[1:-1] = 0.5 * (points[:-1] + points[1:])
@@ -41,7 +42,7 @@ def _overlap_lengths(bounds: np.ndarray, center: float, extent: float) -> np.nda
     half_extent = extent / 2.0
     interval_min = center - half_extent
     interval_max = center + half_extent
-    overlaps = np.zeros(bounds.size - 1, dtype=float)
+    overlaps: np.ndarray = np.zeros(bounds.size - 1, dtype=float)
 
     for index, (cell_min, cell_max) in enumerate(pairwise(bounds)):
         if interval_max <= cell_min or interval_min >= cell_max:
@@ -87,6 +88,74 @@ def _device_footprint(
             "footprints are not clipped or renormalized"
         )
     return x_min, x_max, y_min, y_max, width * height
+
+
+def _map_fdm_sources(
+    config: BaseplateConfig,
+    *,
+    lx: float,
+    ly: float,
+    x_bounds: np.ndarray,
+    y_bounds: np.ndarray,
+) -> tuple[np.ndarray, float, float]:
+    """Distribute complete device power over the vertex-centered dual cells."""
+    nx, ny = int(config.nx), int(config.ny)
+    source_power: np.ndarray = np.zeros((ny, nx), dtype=float)
+    requested_power = math.fsum(
+        _require_finite_number(f"device {device.name!r} power", device.power)
+        for device in config.devices
+    )
+    for device in config.devices:
+        _, _, _, _, footprint_area = _device_footprint(device, lx, ly)
+        overlap_x = _overlap_lengths(x_bounds, device.x, device.width)
+        overlap_y = _overlap_lengths(y_bounds, device.y, device.height)
+        intersection_areas = np.outer(overlap_y, overlap_x)
+        source_power += float(device.power) * intersection_areas / footprint_area
+
+    heat_input = float(np.sum(source_power, dtype=np.float64))
+    epsilon = float(np.finfo(float).eps)
+    smallest_positive = float(np.finfo(float).tiny)
+    source_tolerance = 64.0 * epsilon * max(abs(requested_power), smallest_positive)
+    if abs(heat_input - requested_power) > source_tolerance:
+        raise RuntimeError("control-volume source mapping did not conserve device power")
+    return source_power, heat_input, requested_power
+
+
+def _assemble_fdm_matrix(
+    *,
+    nx: int,
+    ny: int,
+    sheet_conductance: float,
+    x_widths: np.ndarray,
+    y_widths: np.ndarray,
+    dx: float,
+    dy: float,
+    sink_conductance: np.ndarray,
+) -> Any:
+    """Assemble the conservative sparse conductance matrix, excluding the solve."""
+    node_count = nx * ny
+    diagonal = sink_conductance.ravel().copy()
+    x_face_conductance = sheet_conductance * y_widths / dx
+    y_face_conductance = sheet_conductance * x_widths / dy
+    node_grid = np.arange(node_count).reshape((ny, nx))
+    x_first = node_grid[:, :-1].ravel()
+    x_second = node_grid[:, 1:].ravel()
+    x_values = np.broadcast_to(x_face_conductance[:, None], (ny, nx - 1)).ravel()
+    y_first = node_grid[:-1, :].ravel()
+    y_second = node_grid[1:, :].ravel()
+    y_values = np.broadcast_to(y_face_conductance[None, :], (ny - 1, nx)).ravel()
+
+    np.add.at(diagonal, x_first, x_values)
+    np.add.at(diagonal, x_second, x_values)
+    np.add.at(diagonal, y_first, y_values)
+    np.add.at(diagonal, y_second, y_values)
+    all_nodes = np.arange(node_count)
+    rows = np.concatenate((x_first, x_second, y_first, y_second, all_nodes))
+    columns = np.concatenate((x_second, x_first, y_second, y_first, all_nodes))
+    values = np.concatenate((-x_values, -x_values, -y_values, -y_values, diagonal))
+    return coo_matrix(
+        (values, (rows, columns)), shape=(node_count, node_count), dtype=float
+    ).tocsr()
 
 
 def solve_fdm(config: BaseplateConfig) -> BaseplateResult:
@@ -135,69 +204,29 @@ def solve_fdm(config: BaseplateConfig) -> BaseplateResult:
     if not math.isfinite(sheet_conductance) or sheet_conductance <= 0.0:
         raise ValueError("conductivity times thickness must be finite and positive")
 
-    source_power = np.zeros((ny, nx), dtype=float)
-    requested_power = math.fsum(
-        _require_finite_number(f"device {device.name!r} power", device.power)
-        for device in config.devices
+    source_power, heat_input, _ = _map_fdm_sources(
+        config,
+        lx=lx,
+        ly=ly,
+        x_bounds=x_bounds,
+        y_bounds=y_bounds,
     )
-    for device in config.devices:
-        _, _, _, _, footprint_area = _device_footprint(device, lx, ly)
-        overlap_x = _overlap_lengths(x_bounds, device.x, device.width)
-        overlap_y = _overlap_lengths(y_bounds, device.y, device.height)
-        intersection_areas = np.outer(overlap_y, overlap_x)
-        source_power += float(device.power) * intersection_areas / footprint_area
-
-    heat_input = float(np.sum(source_power, dtype=np.float64))
-    source_tolerance = 64.0 * np.finfo(float).eps * max(abs(requested_power), np.finfo(float).tiny)
-    if abs(heat_input - requested_power) > source_tolerance:
-        raise RuntimeError("control-volume source mapping did not conserve device power")
 
     r_area = r_sa * baseplate_area
     if not math.isfinite(r_area) or r_area <= 0.0:
         raise ValueError("R_area = r_sa * baseplate area must be finite and positive")
     sink_conductance = cell_areas / r_area
 
-    node_count = nx * ny
-    diagonal = sink_conductance.ravel().copy()
-    rows: list[int] = []
-    columns: list[int] = []
-    values: list[float] = []
-
-    def node_index(i: int, j: int) -> int:
-        return j * nx + i
-
-    # Each shared face contributes one symmetric conductance. There are no
-    # perimeter faces, which implements the adiabatic boundary condition.
-    x_face_conductance = sheet_conductance * y_widths / dx
-    for j in range(ny):
-        for i in range(nx - 1):
-            first = node_index(i, j)
-            second = node_index(i + 1, j)
-            conductance = float(x_face_conductance[j])
-            diagonal[first] += conductance
-            diagonal[second] += conductance
-            rows.extend((first, second))
-            columns.extend((second, first))
-            values.extend((-conductance, -conductance))
-
-    y_face_conductance = sheet_conductance * x_widths / dy
-    for j in range(ny - 1):
-        for i in range(nx):
-            first = node_index(i, j)
-            second = node_index(i, j + 1)
-            conductance = float(y_face_conductance[i])
-            diagonal[first] += conductance
-            diagonal[second] += conductance
-            rows.extend((first, second))
-            columns.extend((second, first))
-            values.extend((-conductance, -conductance))
-
-    rows.extend(range(node_count))
-    columns.extend(range(node_count))
-    values.extend(diagonal.tolist())
-    matrix = coo_matrix(
-        (values, (rows, columns)), shape=(node_count, node_count), dtype=float
-    ).tocsr()
+    matrix = _assemble_fdm_matrix(
+        nx=nx,
+        ny=ny,
+        sheet_conductance=sheet_conductance,
+        x_widths=x_widths,
+        y_widths=y_widths,
+        dx=dx,
+        dy=dy,
+        sink_conductance=sink_conductance,
+    )
     right_hand_side = source_power.ravel()
     temperature_rise_flat = np.asarray(spsolve(matrix, right_hand_side), dtype=float)
     if not np.all(np.isfinite(temperature_rise_flat)):

@@ -11,7 +11,7 @@ import math
 from numbers import Real
 
 
-def _positive_finite(name: str, value: Real) -> float:
+def _positive_finite(name: str, value: float) -> float:
     if isinstance(value, bool) or not isinstance(value, Real):
         raise ValueError(f"{name} must be a finite positive number")
     result = float(value)
@@ -41,7 +41,7 @@ def waffler_laminar_nusselt(
     diameter = _positive_finite("hydraulic_diameter_m", hydraulic_diameter_m)
     length = _positive_finite("channel_length_m", channel_length_m)
     entry_term = (re * diameter / length) ** 1.5
-    return (3.657**3 + 0.644**3 * pr * entry_term) ** (1.0 / 3.0)
+    return float((3.657**3 + 0.644**3 * pr * entry_term) ** (1.0 / 3.0))
 
 
 def waffler_turbulent_nusselt(
@@ -61,7 +61,7 @@ def waffler_turbulent_nusselt(
     if denominator == 0.0:
         raise ValueError("inputs make the printed turbulent-correlation denominator zero")
     length_correction = 1.0 + (diameter / length) ** (2.0 / 3.0)
-    return (zeta_eighth * re * pr / denominator) * length_correction
+    return float((zeta_eighth * re * pr / denominator) * length_correction)
 
 
 def waffler_nusselt(

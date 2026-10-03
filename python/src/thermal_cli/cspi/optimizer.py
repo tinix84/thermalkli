@@ -9,8 +9,10 @@ CIPS 2006 / PCC 2007.
 from __future__ import annotations
 
 import math
+from collections.abc import Callable
 from dataclasses import dataclass
 from numbers import Real
+from typing import Any
 
 import numpy as np
 
@@ -136,7 +138,7 @@ def _fan_curve_model(
     fan_free_flow_m3_s: float | None,
     fan_shutoff_pressure_pa: float | None,
     fan_speed_rpm: float | None,
-):
+) -> tuple[float | None, float, float, str, Callable[[float], float]]:
     reference_speed = None
     if fan_speed_rpm is not None:
         if not math.isfinite(fan_speed_rpm) or fan_speed_rpm <= 0:
@@ -176,6 +178,7 @@ def _fan_curve_model(
         model = "parabolic fit to similarity endpoints"
         reported_speed = speed
     else:
+        assert fan_shutoff_pressure_pa is not None
         qmax = float(fan_free_flow_m3_s)
         dp0 = float(fan_shutoff_pressure_pa)
         model = "parabolic fit to supplied endpoints"
@@ -194,7 +197,7 @@ def _rectangular_pressure_drop(
     height: float,
     length: float,
     t_air_c: float,
-):
+) -> tuple[float, float, float, str]:
     """Smooth rectangular-duct Darcy loss; manifold and minor losses excluded."""
     fluid = air_properties(t_air_c)
     q_ch = q_total / (n_channels * hydraulic_branch_count)
@@ -230,7 +233,7 @@ def _rectangular_pressure_drop(
 def _bounded_operating_point(
     *,
     q_max: float,
-    fan_dp,
+    fan_dp: Callable[[float], float],
     fan_pressure_scale: float,
     n_channels: int,
     hydraulic_branch_count: int,
@@ -238,7 +241,7 @@ def _bounded_operating_point(
     height: float,
     length: float,
     t_air_c: float,
-):
+) -> tuple[str, float | None, float | None, float | None, str | None]:
     """Find a root only inside contiguous supported Reynolds-number domains.
 
     Re 2300--3000 is deliberately excluded. A sign change across that gap is
@@ -257,7 +260,7 @@ def _bounded_operating_point(
             reynolds * n_channels * hydraulic_branch_count * area * fluid.kinematic_viscosity / dh
         )
 
-    def residual(q: float):
+    def residual(q: float) -> tuple[float, float, float, str]:
         dp_system, re, _, regime = _rectangular_pressure_drop(
             q_total=q,
             n_channels=n_channels,
@@ -279,7 +282,7 @@ def _bounded_operating_point(
         (q_floor, laminar_hi, "laminar rectangular Poiseuille"),
         (turbulent_lo, turbulent_hi, "smooth Gnielinski friction"),
     )
-    roots = []
+    roots: list[tuple[float, float, float, str]] = []
     for lo, hi, expected_regime in domains:
         if hi <= lo:
             continue
@@ -468,7 +471,7 @@ def cspi_evaluate_geometry(
     total_vol = sink_vol + fan_vol + duct_vol
     material_bbox = sink_width_m * physical_height * sink_length_m * 1000.0
     half_fin_r = fin_height_m / (2.0 * lambda_hs * fin_thickness_m * sink_length_m)
-    validity = (
+    validity: tuple[str, ...] = (
         "one smooth rectangular channel body; equal flow split among its parallel channels",
         "heated-face count controls thermal normalization and does not duplicate "
         "hydraulic channels",
@@ -498,7 +501,7 @@ def cspi_evaluate_geometry(
         reported_auxiliary_power = auxiliary_power_w
         reported_auxiliary_basis = auxiliary_power_basis or "caller-supplied auxiliary power"
     validity = (*validity, f"auxiliary power basis: {reported_auxiliary_basis}")
-    common = dict(
+    common: dict[str, Any] = dict(
         n=channel_count,
         s=channel_width_m,
         t=fin_thickness_m,

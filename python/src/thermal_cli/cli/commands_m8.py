@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import math
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 import typer
 import yaml
@@ -168,14 +168,15 @@ def _cspi_optimize_command(
     )
     typer.echo(f"operating_point_status={res.operating_point_status}")
     typer.echo(f"fan_curve_model={res.fan_curve_model}")
-    if res.flow_rate_m3_s is not None:
-        _out("flow_m3_s", res.flow_rate_m3_s)
-        _out("fan_static_pressure_Pa", res.fan_pressure_pa)
-        _out("pressure_drop_Pa", res.pressure_drop_pa)
-    else:
-        typer.echo("flow_m3_s=unavailable")
-        typer.echo("fan_static_pressure_Pa=unavailable")
-        typer.echo("pressure_drop_Pa=unavailable")
+    for key, value in (
+        ("flow_m3_s", res.flow_rate_m3_s),
+        ("fan_static_pressure_Pa", res.fan_pressure_pa),
+        ("pressure_drop_Pa", res.pressure_drop_pa),
+    ):
+        if value is None:
+            typer.echo(f"{key}=unavailable")
+        else:
+            _out(key, value)
     _out("temperature_reference_C", res.temperature_reference_c)
     _out("source_power_total_W", res.source_power_w)
     if res.outlet_air_temperature_c is not None:
@@ -274,7 +275,7 @@ def _cspi_sweep_command(
         "fan_speed_rpm",
         "auxiliary_power_w",
     }
-    kwargs = {k: float(cfg[k]) for k in extra_keys if k in cfg}
+    kwargs: dict[str, Any] = {k: float(cfg[k]) for k in extra_keys if k in cfg}
     for key in ("face_count", "hydraulic_branch_count"):
         if key not in cfg:
             continue

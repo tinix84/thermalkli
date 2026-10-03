@@ -13,6 +13,7 @@ from thermal_cli.cli.commands_m8 import register_all as register_m8
 from thermal_cli.cli.commands_m9 import register_all as register_m9
 from thermal_cli.cli.commands_m10 import register_all as register_m10
 from thermal_cli.cli.commands_transient import register_transient_commands
+from thermal_cli.cli.commands_validation import register_validation_commands
 
 app = typer.Typer(
     name="thermal",
@@ -62,6 +63,7 @@ register_liquid_commands(app)
 register_transient_commands(app)
 register_m9(app)
 register_m10(app)
+register_validation_commands(app)
 
 
 if __name__ == "__main__":

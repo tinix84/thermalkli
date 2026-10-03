@@ -1,0 +1,180 @@
+{
+  "created_utc": "2026-10-03T13:17:22.987658+00:00",
+  "package_version": "0.0.1",
+  "records": [
+    {
+      "capability": "grounded coupled package RC network",
+      "case_id": "B01",
+      "conditions": {
+        "nodes": 16,
+        "power_inputs": "independent MOS and controller nodes"
+      },
+      "error": null,
+      "evidence_status": "steady_coefficients_checked; transient source-curve comparison pending",
+      "limitations": [
+        "Published steady coefficients are reported; digitized transient samples are not bundled."
+      ],
+      "outputs": {
+        "controller_mos_mutual_k_w": 29.726780727399625,
+        "controller_self_k_w": 63.50326790033006,
+        "mos_controller_mutual_k_w": 29.72678072739962,
+        "mos_self_k_w": 47.00011085553123,
+        "shortest_network_time_constant_s": 2.9891974109621177e-07,
+        "steady_max_abs_error_k_w": 6.790033005898977e-05,
+        "steady_reference_tolerance_k_w": 0.0001,
+        "steady_reference_within_tolerance": true
+      },
+      "source": "onsemi AND8215/D Rev. 1, Tables 1-2"
+    },
+    {
+      "capability": "Cauer ladder step response",
+      "case_id": "B02",
+      "conditions": {
+        "capacitances_j_k": [
+          0.0223,
+          0.0215,
+          0.253
+        ],
+        "input": "1 W step at junction node",
+        "resistances_k_w": [
+          0.196,
+          0.633,
+          0.297
+        ]
+      },
+      "error": null,
+      "evidence_status": "Cauer_step_executed; digitized transient comparison pending",
+      "limitations": [
+        "Cauer topology is retained as a ladder and is not treated as Foster branches."
+      ],
+      "outputs": {
+        "dc_resistance_error_k_w": 6.661338147750939e-16,
+        "network_dc_rth_k_w": 1.1260000000000006,
+        "resistance_sum_k_w": 1.126,
+        "step_equilibrium_error_k_w": 2.353672812205332e-14,
+        "step_response_final_K_per_W": 1.1259999999999764,
+        "step_response_samples_K_per_W": [
+          0.0,
+          5.028961538755539e-06,
+          6.910457807407511e-05,
+          0.0009483026616976531,
+          0.013819692225979452,
+          0.1710569947199474,
+          1.008004921159113,
+          1.1259999999999764
+        ],
+        "step_response_times_s": [
+          0.0,
+          1.272338036115737e-06,
+          1.748549068910327e-05,
+          0.00024029964990444276,
+          0.003566984771646403,
+          0.04902036820592464,
+          0.6736772520436857,
+          10.0
+        ]
+      },
+      "source": "Drofenik et al., INTELEC 2003, Table 3/Fig. 10, chip 8"
+    },
+    {
+      "capability": "pump-limited ideal and calibrated slot",
+      "case_id": "B05",
+      "conditions": {
+        "flow_basis": "total loop flow; one channel",
+        "slot_gap_m": 0.00025,
+        "slot_length_m": 0.02,
+        "slot_width_m": 0.0192,
+        "water_temperature_k": 313.15
+      },
+      "error": null,
+      "evidence_status": "model_output_executed; source reproduction pending review",
+      "limitations": [
+        "The calibrated port fit is source-specific and requires the original inlet/outlet geometry."
+      ],
+      "outputs": {
+        "calibrated_flow_m3_s": 1.3860873685426534e-05,
+        "calibrated_port_loss_pa": 2678.6596670520094,
+        "calibrated_pressure_pa": 9977.7152194014,
+        "channel_gap_m": 0.00025,
+        "ideal_channel_reynolds": 2441.981755524815,
+        "ideal_flow_m3_s": 1.562636335269107e-05,
+        "ideal_pressure_pa": 8993.316464642468,
+        "ideal_slot_wall_to_bulk_rth_k_w": 0.10666760123401905,
+        "pump_domain_m3_s": [
+          0.0,
+          2.763682150343493e-05
+        ],
+        "pump_provenance": "Drofenik et al., PESC 2004, Eq. 1"
+      },
+      "source": "Drofenik et al., PESC 2004, Eqs. 1-13 and Fig. 2"
+    },
+    {
+      "capability": "liquid-cooler measured reference",
+      "case_id": "B06",
+      "conditions": {
+        "baseplate": "25 x 34 mm",
+        "flow_m3_s": 1.9999999999999998e-05,
+        "pressure_pa": 8000.0
+      },
+      "error": null,
+      "evidence_status": "source_observation_retained; model reproduction unresolved",
+      "limitations": [
+        "Matching geometry and boundary/contact data are not present."
+      ],
+      "outputs": {
+        "measured_flow_m3_s": 1.9999999999999998e-05,
+        "measured_pressure_pa": 8000.0,
+        "measured_thermal_resistance_k_w": 0.1,
+        "source_conditions": "approximately 80 mbar, 1.2 L/min, and 0.10 K/W; 25 x 34 mm baseplate; preserve measured/source basis and do not label as this model's prediction",
+        "thermal_reference": "baseplate-to-coolant reference reported by the source"
+      },
+      "source": "Drofenik et al., IEEE TPEL 2005, conclusion"
+    },
+    {
+      "capability": "temperature-dependent liquid energy balance",
+      "case_id": "M8-ENERGY",
+      "conditions": {
+        "flow_m3_s": 2e-05,
+        "heat_w": 150.0,
+        "inlet_temperature_k": 313.15
+      },
+      "error": null,
+      "evidence_status": "energy_balance_and_zero_flow_behavior_executed",
+      "limitations": [],
+      "outputs": {
+        "energy_balance_error_w": 1.4210854715202004e-13,
+        "energy_status": "ok",
+        "inlet_temperature_k": 313.15,
+        "mass_flow_kg_s": 0.02118548837723783,
+        "outlet_temperature_k": 315.1974203823002,
+        "positive_heat_zero_flow_status": "invalid_flow"
+      },
+      "source": "M8 conservation equation Q=m_dot*cp(T_mean)*(Tout-Tin)"
+    },
+    {
+      "capability": "ODE refinement, independent sources, periodic convergence, pulse limit",
+      "case_id": "M9-DYNAMICS",
+      "conditions": {
+        "cauer_fixture": "INTELEC 2003 chip 8",
+        "onsemi_nodes": 16
+      },
+      "error": null,
+      "evidence_status": "behavioral_acceptance_executed; source waveform parity pending",
+      "limitations": [],
+      "outputs": {
+        "declared_minimum_pulse_s": 2.9891970418906074e-07,
+        "independent_source_superposition_max_error_k": 3.979039320256561e-13,
+        "ode_refinement_delta_at_0_1_s_k": 1.8826870018529007e-07,
+        "periodic_cycles": 5,
+        "periodic_state_converged": true,
+        "unsupported_short_pulse_rejected": true
+      },
+      "source": "M9 grounded nodal RC solver acceptance"
+    }
+  ],
+  "runtime": {
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "python": "3.12.3"
+  }
+}

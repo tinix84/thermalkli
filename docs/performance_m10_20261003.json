@@ -1,0 +1,822 @@
+{
+  "created_utc": "2026-10-03T15:16:35.848047+00:00",
+  "reports": [
+    {
+      "created_utc": "2026-10-03T15:16:34.720107+00:00",
+      "decision": "no_user_latency_target_declared; no Rust recommendation",
+      "iterations": 5,
+      "latency_target_s": null,
+      "optimization_evidence": null,
+      "orchestration_p95_s": 0.0023296180001125323,
+      "phases": [
+        {
+          "iterations": 5,
+          "median_s": 0.0004234689995428198,
+          "min_s": 0.0003808170004049316,
+          "operations_per_invocation": 1,
+          "operations_per_s": 2361.4479479716515,
+          "p95_s": 0.0005730680002670851,
+          "phase": "parsing",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 2.0335999579401687e-05,
+          "min_s": 1.810100002330728e-05,
+          "operations_per_invocation": 1,
+          "operations_per_s": 49173.87985259888,
+          "p95_s": 2.8748200202244333e-05,
+          "phase": "source_mapping",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 6.743800076947082e-05,
+          "min_s": 6.156000017654151e-05,
+          "operations_per_invocation": 1,
+          "operations_per_s": 14828.43483777621,
+          "p95_s": 8.260219929070444e-05,
+          "phase": "assembly",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.000532113000190293,
+          "min_s": 0.0004936300001645577,
+          "operations_per_invocation": 1,
+          "operations_per_s": 1879.3000728085622,
+          "p95_s": 0.0006171111999719869,
+          "phase": "factorization_solve",
+          "status": "measured"
+        },
+        {
+          "iterations": 0,
+          "median_s": null,
+          "min_s": null,
+          "operations_per_invocation": 1,
+          "operations_per_s": null,
+          "p95_s": null,
+          "phase": "femm",
+          "status": "not_measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.0022576309993382893,
+          "min_s": 0.0021794619997308473,
+          "operations_per_invocation": 3,
+          "operations_per_s": 1328.8265446741734,
+          "p95_s": 0.0023296180001125323,
+          "phase": "orchestration",
+          "status": "measured"
+        }
+      ],
+      "runtime": {
+        "logical_cpu_count": 24,
+        "numpy": "2.4.1",
+        "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "processor": "x86_64",
+        "python": "3.12.3",
+        "scipy": "1.17.0"
+      },
+      "workload": {
+        "device_count": 1,
+        "grid_points": 441,
+        "grid_shape": [
+          21,
+          21
+        ],
+        "orchestration_operation_unit": "complete baseplate scenarios",
+        "scenario_count": 3,
+        "workload": "conservative 2.5D baseplate"
+      }
+    },
+    {
+      "created_utc": "2026-10-03T15:16:34.760574+00:00",
+      "decision": "no_user_latency_target_declared; no Rust recommendation",
+      "iterations": 5,
+      "latency_target_s": null,
+      "optimization_evidence": null,
+      "orchestration_p95_s": 0.0036921146003805914,
+      "phases": [
+        {
+          "iterations": 5,
+          "median_s": 0.0013363899997784756,
+          "min_s": 0.0009506449996479205,
+          "operations_per_invocation": 1,
+          "operations_per_s": 748.2845577756218,
+          "p95_s": 0.0013873101997887716,
+          "phase": "parsing",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 7.100499988155207e-05,
+          "min_s": 6.920299983903533e-05,
+          "operations_per_invocation": 1,
+          "operations_per_s": 14083.515268898856,
+          "p95_s": 8.395459972234675e-05,
+          "phase": "source_mapping",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.00011669000014080666,
+          "min_s": 9.636400045565097e-05,
+          "operations_per_invocation": 1,
+          "operations_per_s": 8569.714618162028,
+          "p95_s": 0.00016670699951646382,
+          "phase": "assembly",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.0006321860000753077,
+          "min_s": 0.0006158500000310596,
+          "operations_per_invocation": 1,
+          "operations_per_s": 1581.8129472669077,
+          "p95_s": 0.0006814116002715309,
+          "phase": "factorization_solve",
+          "status": "measured"
+        },
+        {
+          "iterations": 0,
+          "median_s": null,
+          "min_s": null,
+          "operations_per_invocation": 1,
+          "operations_per_s": null,
+          "p95_s": null,
+          "phase": "femm",
+          "status": "not_measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.0036083300001337193,
+          "min_s": 0.003577376000066579,
+          "operations_per_invocation": 3,
+          "operations_per_s": 831.4095439964816,
+          "p95_s": 0.0036921146003805914,
+          "phase": "orchestration",
+          "status": "measured"
+        }
+      ],
+      "runtime": {
+        "logical_cpu_count": 24,
+        "numpy": "2.4.1",
+        "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "processor": "x86_64",
+        "python": "3.12.3",
+        "scipy": "1.17.0"
+      },
+      "workload": {
+        "device_count": 4,
+        "grid_points": 441,
+        "grid_shape": [
+          21,
+          21
+        ],
+        "orchestration_operation_unit": "complete baseplate scenarios",
+        "scenario_count": 3,
+        "workload": "conservative 2.5D baseplate"
+      }
+    },
+    {
+      "created_utc": "2026-10-03T15:16:34.815472+00:00",
+      "decision": "no_user_latency_target_declared; no Rust recommendation",
+      "iterations": 5,
+      "latency_target_s": null,
+      "optimization_evidence": null,
+      "orchestration_p95_s": 0.0032163103996936115,
+      "phases": [
+        {
+          "iterations": 5,
+          "median_s": 0.0028533889999380335,
+          "min_s": 0.0028035169998474885,
+          "operations_per_invocation": 1,
+          "operations_per_s": 350.4604524730826,
+          "p95_s": 0.003478356799860194,
+          "phase": "parsing",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.00013474499974108767,
+          "min_s": 0.00013327099986781832,
+          "operations_per_invocation": 1,
+          "operations_per_s": 7421.425670128751,
+          "p95_s": 0.00015490760033571858,
+          "phase": "source_mapping",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 5.999200038786512e-05,
+          "min_s": 5.957099983788794e-05,
+          "operations_per_invocation": 1,
+          "operations_per_s": 16668.88907745565,
+          "p95_s": 7.519300015701447e-05,
+          "phase": "assembly",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.00045363500066741835,
+          "min_s": 0.0004355060000307276,
+          "operations_per_invocation": 1,
+          "operations_per_s": 2204.4154408913173,
+          "p95_s": 0.000515535599879513,
+          "phase": "factorization_solve",
+          "status": "measured"
+        },
+        {
+          "iterations": 0,
+          "median_s": null,
+          "min_s": null,
+          "operations_per_invocation": 1,
+          "operations_per_s": null,
+          "p95_s": null,
+          "phase": "femm",
+          "status": "not_measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.0031939959999363055,
+          "min_s": 0.0030737469996893196,
+          "operations_per_invocation": 3,
+          "operations_per_s": 939.2622908919817,
+          "p95_s": 0.0032163103996936115,
+          "phase": "orchestration",
+          "status": "measured"
+        }
+      ],
+      "runtime": {
+        "logical_cpu_count": 24,
+        "numpy": "2.4.1",
+        "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "processor": "x86_64",
+        "python": "3.12.3",
+        "scipy": "1.17.0"
+      },
+      "workload": {
+        "device_count": 16,
+        "grid_points": 441,
+        "grid_shape": [
+          21,
+          21
+        ],
+        "orchestration_operation_unit": "complete baseplate scenarios",
+        "scenario_count": 3,
+        "workload": "conservative 2.5D baseplate"
+      }
+    },
+    {
+      "created_utc": "2026-10-03T15:16:34.885482+00:00",
+      "decision": "no_user_latency_target_declared; no Rust recommendation",
+      "iterations": 5,
+      "latency_target_s": null,
+      "optimization_evidence": null,
+      "orchestration_p95_s": 0.008374145600282646,
+      "phases": [
+        {
+          "iterations": 5,
+          "median_s": 0.00034936599968204973,
+          "min_s": 0.00033209999946848257,
+          "operations_per_invocation": 1,
+          "operations_per_s": 2862.3277620320177,
+          "p95_s": 0.0003858689999105991,
+          "phase": "parsing",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 2.207200031989487e-05,
+          "min_s": 2.079499972751364e-05,
+          "operations_per_invocation": 1,
+          "operations_per_s": 45306.269731186876,
+          "p95_s": 2.9984599859744775e-05,
+          "phase": "source_mapping",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 9.311499979958171e-05,
+          "min_s": 9.073999990505399e-05,
+          "operations_per_invocation": 1,
+          "operations_per_s": 10739.408281720172,
+          "p95_s": 0.00010813119970407569,
+          "phase": "assembly",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.002060011999674316,
+          "min_s": 0.001937332000125025,
+          "operations_per_invocation": 1,
+          "operations_per_s": 485.43406550937476,
+          "p95_s": 0.0029372370001510715,
+          "phase": "factorization_solve",
+          "status": "measured"
+        },
+        {
+          "iterations": 0,
+          "median_s": null,
+          "min_s": null,
+          "operations_per_invocation": 1,
+          "operations_per_s": null,
+          "p95_s": null,
+          "phase": "femm",
+          "status": "not_measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.007798591999744531,
+          "min_s": 0.007276098000147613,
+          "operations_per_invocation": 3,
+          "operations_per_s": 384.68482517078405,
+          "p95_s": 0.008374145600282646,
+          "phase": "orchestration",
+          "status": "measured"
+        }
+      ],
+      "runtime": {
+        "logical_cpu_count": 24,
+        "numpy": "2.4.1",
+        "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "processor": "x86_64",
+        "python": "3.12.3",
+        "scipy": "1.17.0"
+      },
+      "workload": {
+        "device_count": 1,
+        "grid_points": 1681,
+        "grid_shape": [
+          41,
+          41
+        ],
+        "orchestration_operation_unit": "complete baseplate scenarios",
+        "scenario_count": 3,
+        "workload": "conservative 2.5D baseplate"
+      }
+    },
+    {
+      "created_utc": "2026-10-03T15:16:34.954552+00:00",
+      "decision": "no_user_latency_target_declared; no Rust recommendation",
+      "iterations": 5,
+      "latency_target_s": null,
+      "optimization_evidence": null,
+      "orchestration_p95_s": 0.008301509800367058,
+      "phases": [
+        {
+          "iterations": 5,
+          "median_s": 0.0008939849994931137,
+          "min_s": 0.0008324430000357097,
+          "operations_per_invocation": 1,
+          "operations_per_s": 1118.5870015346973,
+          "p95_s": 0.0009578977997080074,
+          "phase": "parsing",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 7.291099973372184e-05,
+          "min_s": 6.42079994577216e-05,
+          "operations_per_invocation": 1,
+          "operations_per_s": 13715.351643127904,
+          "p95_s": 9.8201799664821e-05,
+          "phase": "source_mapping",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 9.564100037096068e-05,
+          "min_s": 9.075900015886873e-05,
+          "operations_per_invocation": 1,
+          "operations_per_s": 10455.766837667126,
+          "p95_s": 0.00010993799987772946,
+          "phase": "assembly",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.0019039179996980238,
+          "min_s": 0.0018693210004130378,
+          "operations_per_invocation": 1,
+          "operations_per_s": 525.2327044329681,
+          "p95_s": 0.002021565799623204,
+          "phase": "factorization_solve",
+          "status": "measured"
+        },
+        {
+          "iterations": 0,
+          "median_s": null,
+          "min_s": null,
+          "operations_per_invocation": 1,
+          "operations_per_s": null,
+          "p95_s": null,
+          "phase": "femm",
+          "status": "not_measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.007537935000073048,
+          "min_s": 0.007292803999916941,
+          "operations_per_invocation": 3,
+          "operations_per_s": 397.986981841967,
+          "p95_s": 0.008301509800367058,
+          "phase": "orchestration",
+          "status": "measured"
+        }
+      ],
+      "runtime": {
+        "logical_cpu_count": 24,
+        "numpy": "2.4.1",
+        "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "processor": "x86_64",
+        "python": "3.12.3",
+        "scipy": "1.17.0"
+      },
+      "workload": {
+        "device_count": 4,
+        "grid_points": 1681,
+        "grid_shape": [
+          41,
+          41
+        ],
+        "orchestration_operation_unit": "complete baseplate scenarios",
+        "scenario_count": 3,
+        "workload": "conservative 2.5D baseplate"
+      }
+    },
+    {
+      "created_utc": "2026-10-03T15:16:35.044042+00:00",
+      "decision": "no_user_latency_target_declared; no Rust recommendation",
+      "iterations": 5,
+      "latency_target_s": null,
+      "optimization_evidence": null,
+      "orchestration_p95_s": 0.008808400800626259,
+      "phases": [
+        {
+          "iterations": 5,
+          "median_s": 0.002888004999476834,
+          "min_s": 0.0028363580004224787,
+          "operations_per_invocation": 1,
+          "operations_per_s": 346.2597883941168,
+          "p95_s": 0.0029517000000851114,
+          "phase": "parsing",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.0002074390004054294,
+          "min_s": 0.00018893400010711048,
+          "operations_per_invocation": 1,
+          "operations_per_s": 4820.694266967874,
+          "p95_s": 0.00023029360054351855,
+          "phase": "source_mapping",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.00011379800071154023,
+          "min_s": 9.328400028607575e-05,
+          "operations_per_invocation": 1,
+          "operations_per_s": 8787.500604117295,
+          "p95_s": 0.00013922959988121875,
+          "phase": "assembly",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.0019257459998698323,
+          "min_s": 0.0018700250002439134,
+          "operations_per_invocation": 1,
+          "operations_per_s": 519.2792819341665,
+          "p95_s": 0.002115335999769741,
+          "phase": "factorization_solve",
+          "status": "measured"
+        },
+        {
+          "iterations": 0,
+          "median_s": null,
+          "min_s": null,
+          "operations_per_invocation": 1,
+          "operations_per_s": null,
+          "p95_s": null,
+          "phase": "femm",
+          "status": "not_measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.008339620999322506,
+          "min_s": 0.008158507000189275,
+          "operations_per_invocation": 3,
+          "operations_per_s": 359.7285776228577,
+          "p95_s": 0.008808400800626259,
+          "phase": "orchestration",
+          "status": "measured"
+        }
+      ],
+      "runtime": {
+        "logical_cpu_count": 24,
+        "numpy": "2.4.1",
+        "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "processor": "x86_64",
+        "python": "3.12.3",
+        "scipy": "1.17.0"
+      },
+      "workload": {
+        "device_count": 16,
+        "grid_points": 1681,
+        "grid_shape": [
+          41,
+          41
+        ],
+        "orchestration_operation_unit": "complete baseplate scenarios",
+        "scenario_count": 3,
+        "workload": "conservative 2.5D baseplate"
+      }
+    },
+    {
+      "created_utc": "2026-10-03T15:16:35.315984+00:00",
+      "decision": "no_user_latency_target_declared; no Rust recommendation",
+      "iterations": 5,
+      "latency_target_s": null,
+      "optimization_evidence": null,
+      "orchestration_p95_s": 0.04149584180031525,
+      "phases": [
+        {
+          "iterations": 5,
+          "median_s": 0.0003475160001471522,
+          "min_s": 0.0003287009994892287,
+          "operations_per_invocation": 1,
+          "operations_per_s": 2877.5653482906105,
+          "p95_s": 0.0003969409999626805,
+          "phase": "parsing",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 3.9816999560571276e-05,
+          "min_s": 3.1649000447941944e-05,
+          "operations_per_invocation": 1,
+          "operations_per_s": 25114.90094774114,
+          "p95_s": 6.703760009258985e-05,
+          "phase": "source_mapping",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.00026348899973527296,
+          "min_s": 0.000235032999626128,
+          "operations_per_invocation": 1,
+          "operations_per_s": 3795.2248519091827,
+          "p95_s": 0.0002807690005283803,
+          "phase": "assembly",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.009136640999713563,
+          "min_s": 0.008829719999994268,
+          "operations_per_invocation": 1,
+          "operations_per_s": 109.44941363367022,
+          "p95_s": 0.009192183000595832,
+          "phase": "factorization_solve",
+          "status": "measured"
+        },
+        {
+          "iterations": 0,
+          "median_s": null,
+          "min_s": null,
+          "operations_per_invocation": 1,
+          "operations_per_s": null,
+          "p95_s": null,
+          "phase": "femm",
+          "status": "not_measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.03524012100024265,
+          "min_s": 0.028498089000095206,
+          "operations_per_invocation": 3,
+          "operations_per_s": 85.1302411810488,
+          "p95_s": 0.04149584180031525,
+          "phase": "orchestration",
+          "status": "measured"
+        }
+      ],
+      "runtime": {
+        "logical_cpu_count": 24,
+        "numpy": "2.4.1",
+        "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "processor": "x86_64",
+        "python": "3.12.3",
+        "scipy": "1.17.0"
+      },
+      "workload": {
+        "device_count": 1,
+        "grid_points": 6561,
+        "grid_shape": [
+          81,
+          81
+        ],
+        "orchestration_operation_unit": "complete baseplate scenarios",
+        "scenario_count": 3,
+        "workload": "conservative 2.5D baseplate"
+      }
+    },
+    {
+      "created_utc": "2026-10-03T15:16:35.576454+00:00",
+      "decision": "no_user_latency_target_declared; no Rust recommendation",
+      "iterations": 5,
+      "latency_target_s": null,
+      "optimization_evidence": null,
+      "orchestration_p95_s": 0.03493776059985976,
+      "phases": [
+        {
+          "iterations": 5,
+          "median_s": 0.0008852069995555212,
+          "min_s": 0.0008279840003524441,
+          "operations_per_invocation": 1,
+          "operations_per_s": 1129.6792733249042,
+          "p95_s": 0.0009052584000528441,
+          "phase": "parsing",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 8.878799962985795e-05,
+          "min_s": 8.768800034886226e-05,
+          "operations_per_invocation": 1,
+          "operations_per_s": 11262.783305951589,
+          "p95_s": 9.530300012556836e-05,
+          "phase": "source_mapping",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.00026569500005280133,
+          "min_s": 0.00022978400011197664,
+          "operations_per_invocation": 1,
+          "operations_per_s": 3763.7140322598125,
+          "p95_s": 0.00028831020008510675,
+          "phase": "assembly",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.008662182000080065,
+          "min_s": 0.008144677000018419,
+          "operations_per_invocation": 1,
+          "operations_per_s": 115.444353396264,
+          "p95_s": 0.00889538800020091,
+          "phase": "factorization_solve",
+          "status": "measured"
+        },
+        {
+          "iterations": 0,
+          "median_s": null,
+          "min_s": null,
+          "operations_per_invocation": 1,
+          "operations_per_s": null,
+          "p95_s": null,
+          "phase": "femm",
+          "status": "not_measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.033230506999643694,
+          "min_s": 0.031623660999684944,
+          "operations_per_invocation": 3,
+          "operations_per_s": 90.27849018470187,
+          "p95_s": 0.03493776059985976,
+          "phase": "orchestration",
+          "status": "measured"
+        }
+      ],
+      "runtime": {
+        "logical_cpu_count": 24,
+        "numpy": "2.4.1",
+        "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "processor": "x86_64",
+        "python": "3.12.3",
+        "scipy": "1.17.0"
+      },
+      "workload": {
+        "device_count": 4,
+        "grid_points": 6561,
+        "grid_shape": [
+          81,
+          81
+        ],
+        "orchestration_operation_unit": "complete baseplate scenarios",
+        "scenario_count": 3,
+        "workload": "conservative 2.5D baseplate"
+      }
+    },
+    {
+      "created_utc": "2026-10-03T15:16:35.846631+00:00",
+      "decision": "no_user_latency_target_declared; no Rust recommendation",
+      "iterations": 5,
+      "latency_target_s": null,
+      "optimization_evidence": null,
+      "orchestration_p95_s": 0.031897552799819096,
+      "phases": [
+        {
+          "iterations": 5,
+          "median_s": 0.002953940000224975,
+          "min_s": 0.0028328279995548655,
+          "operations_per_invocation": 1,
+          "operations_per_s": 338.5309112317241,
+          "p95_s": 0.0030433898005867376,
+          "phase": "parsing",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.00033848400016722735,
+          "min_s": 0.00031996100005926564,
+          "operations_per_invocation": 1,
+          "operations_per_s": 2954.349391717044,
+          "p95_s": 0.0003924253996956395,
+          "phase": "source_mapping",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.00023744500049360795,
+          "min_s": 0.0002277370003866963,
+          "operations_per_invocation": 1,
+          "operations_per_s": 4211.501602144367,
+          "p95_s": 0.0002860097998564015,
+          "phase": "assembly",
+          "status": "measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.009411611999894376,
+          "min_s": 0.00923073200010549,
+          "operations_per_invocation": 1,
+          "operations_per_s": 106.25172393541327,
+          "p95_s": 0.010841080400132342,
+          "phase": "factorization_solve",
+          "status": "measured"
+        },
+        {
+          "iterations": 0,
+          "median_s": null,
+          "min_s": null,
+          "operations_per_invocation": 1,
+          "operations_per_s": null,
+          "p95_s": null,
+          "phase": "femm",
+          "status": "not_measured"
+        },
+        {
+          "iterations": 5,
+          "median_s": 0.028093904000343173,
+          "min_s": 0.02775107300021773,
+          "operations_per_invocation": 3,
+          "operations_per_s": 106.7847316614791,
+          "p95_s": 0.031897552799819096,
+          "phase": "orchestration",
+          "status": "measured"
+        }
+      ],
+      "runtime": {
+        "logical_cpu_count": 24,
+        "numpy": "2.4.1",
+        "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "processor": "x86_64",
+        "python": "3.12.3",
+        "scipy": "1.17.0"
+      },
+      "workload": {
+        "device_count": 16,
+        "grid_points": 6561,
+        "grid_shape": [
+          81,
+          81
+        ],
+        "orchestration_operation_unit": "complete baseplate scenarios",
+        "scenario_count": 3,
+        "workload": "conservative 2.5D baseplate"
+      }
+    }
+  ],
+  "workload_matrix": {
+    "device_counts": [
+      1,
+      4,
+      16
+    ],
+    "grid_sizes": [
+      21,
+      41,
+      81
+    ],
+    "iterations": 5,
+    "latency_target_s": null,
+    "repeated_scenarios_per_orchestration": 3,
+    "warmups": 1
+  }
+}
